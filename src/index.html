@@ -21,124 +21,81 @@
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
-body{
-  background:var(--paper);
-  color:var(--ink);
-  font-family:'Inter',system-ui,-apple-system,sans-serif;
-  min-height:100vh;
-}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,-apple-system,sans-serif;min-height:100vh;}
 .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;}
 button{font-family:inherit;cursor:pointer;}
 input,textarea,select{font-family:inherit;}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
-#app{max-width:1080px;margin:0 auto;padding:24px 20px 60px;}
+/* Setup screen */
+#setupScreen{
+  position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;z-index:500;
+}
+.setup-card{
+  background:var(--card-bg);border:1px solid var(--line);border-radius:8px;padding:40px 36px;max-width:480px;width:100%;text-align:center;
+}
+.setup-card h2{font-family:'Special Elite',monospace;font-weight:400;font-size:1.4rem;margin:0 0 12px;}
+.setup-card p{font-size:.9rem;color:var(--muted-ink);line-height:1.6;margin:0 0 24px;}
+.setup-icon{font-size:2.5rem;margin-bottom:16px;}
 
-.topbar{
-  display:flex;flex-direction:column;gap:10px;margin-bottom:18px;
-  align-items:center;text-align:center;
+/* Permission banner */
+#permBanner{
+  background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;
+  padding:10px 16px;margin-bottom:16px;align-items:center;gap:12px;justify-content:space-between;
 }
+#permBanner p{margin:0;font-size:.85rem;color:#7A2A20;}
+
+#app{max-width:1080px;margin:0 auto;padding:24px 20px 60px;}
+.topbar{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;align-items:center;text-align:center;}
 .topbar-right{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
-.eyebrow{
-  font-family:'Special Elite',monospace;
-  font-size:.72rem;letter-spacing:.12em;color:var(--accent);
-  text-transform:uppercase;display:block;margin-bottom:4px;
-}
-.topbar h1{
-  font-family:'Special Elite',monospace;
-  font-size:1.6rem;margin:0;color:var(--ink);font-weight:400;
-}
+.eyebrow{font-family:'Special Elite',monospace;font-size:.72rem;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;display:block;margin-bottom:4px;}
+.topbar h1{font-family:'Special Elite',monospace;font-size:1.6rem;margin:0;color:var(--ink);font-weight:400;}
 
 .tabs{display:flex;gap:6px;background:var(--card-bg);border:1px solid var(--line);border-radius:8px;padding:4px;flex-wrap:wrap;}
-.tab{
-  background:none;border:none;border-radius:6px;padding:8px 16px;font-size:.86rem;
-  font-weight:600;color:var(--muted-ink);
-}
+.tab{background:none;border:none;border-radius:6px;padding:8px 16px;font-size:.86rem;font-weight:600;color:var(--muted-ink);}
 .tab.active{background:var(--accent);color:#fff;}
 .tab:not(.active):hover{color:var(--ink);}
-
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 
 .controls-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
-#searchTemplates{
-  border:1px solid var(--line);background:var(--card-bg);
-  border-radius:20px;padding:9px 16px;font-size:.9rem;width:220px;color:var(--ink);flex:1;min-width:160px;
-}
-.btn-primary{
-  background:var(--accent);color:#fff;border:none;border-radius:6px;
-  padding:10px 16px;font-size:.88rem;font-weight:600;white-space:nowrap;
-}
+#searchTemplates{border:1px solid var(--line);background:var(--card-bg);border-radius:20px;padding:9px 16px;font-size:.9rem;width:220px;color:var(--ink);flex:1;min-width:160px;}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:10px 16px;font-size:.88rem;font-weight:600;white-space:nowrap;}
 .btn-primary:hover{background:#962F25;}
 .hint{font-size:.8rem;color:var(--muted-ink);margin:6px 0 22px;}
 .hint .mono{background:var(--accent-soft);color:#7A2A20;padding:1px 5px;border-radius:3px;}
 
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
-.chip{
-  border:1px solid var(--line);background:var(--card-bg);color:var(--muted-ink);
-  border-radius:14px;padding:6px 13px;font-size:.78rem;font-weight:500;
-}
+.chip{border:1px solid var(--line);background:var(--card-bg);color:var(--muted-ink);border-radius:14px;padding:6px 13px;font-size:.78rem;font-weight:500;}
 .chip.active{background:var(--accent-soft);border-color:var(--accent);color:#7A2A20;}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;}
-
-.model-group-title{
-  font-family:'Special Elite',monospace;font-size:.85rem;color:var(--accent);
-  text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;
-}
+.model-group-title{font-family:'Special Elite',monospace;font-size:.85rem;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;}
 .group-divider{border:none;border-top:1px solid var(--line);margin:28px 0;}
 
-.card{
-  position:relative;background:var(--card-bg);border:1px solid var(--line);
-  border-radius:5px;padding:18px 16px 14px;transition:transform .15s,box-shadow .15s;
-  text-align:left;
-}
+.card{position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:5px;padding:18px 16px 14px;transition:transform .15s,box-shadow .15s;text-align:left;}
 .card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(43,42,40,.1);}
-.card-tag{
-  position:absolute;top:-9px;right:14px;font-family:'Special Elite',monospace;
-  font-size:.66rem;padding:3px 9px;border-radius:2px;letter-spacing:.03em;
-}
+.card-tag{position:absolute;top:-9px;right:14px;font-family:'Special Elite',monospace;font-size:.66rem;padding:3px 9px;border-radius:2px;letter-spacing:.03em;}
 .card-tag.email{background:var(--accent-soft);color:#7A2A20;}
 .card-tag.sms{background:var(--success-soft);color:#244A35;}
-.card h3{
-  font-family:'Special Elite',monospace;font-weight:400;font-size:1rem;
-  margin:6px 0 8px;padding-right:8px;
-}
+.card h3{font-family:'Special Elite',monospace;font-weight:400;font-size:1rem;margin:6px 0 8px;padding-right:8px;}
 .card .cat{font-size:.72rem;color:var(--muted-ink);margin:0 0 6px;}
-.card p{
-  font-size:.82rem;color:var(--muted-ink);margin:0 0 12px;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-  line-height:1.4;
-}
-.card .sms-preview{
-  font-size:.78rem;color:var(--muted-ink);margin:8px 0 12px;padding-top:8px;
-  border-top:1px dashed var(--line);
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;
-}
+.card p{font-size:.82rem;color:var(--muted-ink);margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;}
+.card .sms-preview{font-size:.78rem;color:var(--muted-ink);margin:8px 0 12px;padding-top:8px;border-top:1px dashed var(--line);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;}
 .card .sms-preview strong{color:var(--ink);font-weight:600;}
 .card-foot{display:flex;justify-content:flex-end;gap:8px;}
-.copy-mini{
-  background:none;border:1px solid var(--line);border-radius:5px;font-size:.74rem;
-  padding:4px 10px;color:var(--ink);
-}
+.copy-mini{background:none;border:1px solid var(--line);border-radius:5px;font-size:.74rem;padding:4px 10px;color:var(--ink);}
 .copy-mini:hover{border-color:var(--accent);color:var(--accent);}
 .copy-mini.danger:hover{border-color:var(--accent);background:var(--accent);color:#fff;}
-
 .empty-state{color:var(--muted-ink);font-size:.88rem;padding:30px 0;text-align:center;}
 
-/* Générer tab */
 .gen-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;}
 .field-label{font-size:.78rem;font-weight:600;color:var(--muted-ink);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;}
-.gen-col input,.gen-col select,.gen-col textarea{
-  width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;
-  padding:10px 12px;font-size:.9rem;color:var(--ink);
-}
+.gen-col input,.gen-col select,.gen-col textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:10px 12px;font-size:.9rem;color:var(--ink);}
 .gen-col select:disabled{opacity:.55;cursor:not-allowed;}
-
 .extra-fields{margin-top:18px;}
 .extra-field{margin-bottom:14px;position:relative;}
 .extra-field label{display:block;font-size:.78rem;color:var(--muted-ink);margin-bottom:4px;}
-
 .field-row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
 .field-row-header label{margin-bottom:0;}
 .civility-group{display:flex;gap:12px;flex-wrap:wrap;}
@@ -147,17 +104,9 @@ input,textarea,select{font-family:inherit;}
 
 .date-field-wrap{position:relative;}
 .date-display-input{padding-right:38px;cursor:pointer;background:var(--card-bg);}
-.date-icon-btn{
-  position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;
-  color:var(--muted-ink);padding:5px;display:flex;align-items:center;border-radius:4px;
-}
+.date-icon-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted-ink);padding:5px;display:flex;align-items:center;border-radius:4px;}
 .date-icon-btn:hover{color:var(--accent);background:var(--accent-soft);}
-
-.date-popover{
-  position:absolute;top:calc(100% + 6px);left:0;z-index:60;background:var(--card-bg);
-  border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(43,42,40,.2);
-  padding:14px;width:270px;
-}
+.date-popover{position:absolute;top:calc(100% + 6px);left:0;z-index:60;background:var(--card-bg);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(43,42,40,.2);padding:14px;width:270px;}
 .dp-header{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
 .dp-month{font-family:'Special Elite',monospace;font-size:.88rem;flex:1;text-align:center;text-transform:capitalize;}
 .dp-nav{background:none;border:none;color:var(--ink);font-size:1.05rem;padding:2px 7px;border-radius:4px;line-height:1;}
@@ -165,10 +114,7 @@ input,textarea,select{font-family:inherit;}
 .dp-year{width:66px;border:1px solid var(--line);border-radius:5px;padding:3px 5px;font-size:.82rem;text-align:center;}
 .dp-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:.66rem;color:var(--muted-ink);margin-bottom:4px;}
 .dp-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px;}
-.dp-day{
-  background:none;border:none;border-radius:50%;width:30px;height:30px;font-size:.8rem;color:var(--ink);
-  display:flex;align-items:center;justify-content:center;margin:0 auto;
-}
+.dp-day{background:none;border:none;border-radius:50%;width:30px;height:30px;font-size:.8rem;color:var(--ink);display:flex;align-items:center;justify-content:center;margin:0 auto;}
 .dp-day:hover{background:var(--accent-soft);}
 .dp-day.muted{color:var(--line);}
 .dp-day.today:not(.selected){border:1px solid var(--accent);}
@@ -177,117 +123,81 @@ input,textarea,select{font-family:inherit;}
 .dp-today-link{background:none;border:none;color:var(--accent);font-size:.8rem;font-weight:600;}
 .dp-today-link:hover{text-decoration:underline;}
 
-.preview-col{}
-.preview-subject{
-  background:var(--card-bg);border:1px solid var(--line);border-radius:6px;
-  padding:10px 12px;font-size:.88rem;font-weight:600;margin-bottom:10px;
-}
-.preview-body{
-  background:var(--card-bg);border:1px solid var(--line);border-radius:6px;
-  padding:14px;font-size:.88rem;line-height:1.55;white-space:pre-wrap;min-height:160px;color:var(--muted-ink);
-}
+.preview-subject{background:var(--card-bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:.88rem;font-weight:600;margin-bottom:10px;}
+.preview-body{background:var(--card-bg);border:1px solid var(--line);border-radius:6px;padding:14px;font-size:.88rem;line-height:1.55;white-space:pre-wrap;min-height:160px;color:var(--muted-ink);}
 .preview-body mark.ph-empty{background:var(--accent-soft);color:#7A2A20;border-radius:3px;padding:0 2px;}
 .actions-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
-.btn-outline{
-  background:none;border:1px solid var(--line);border-radius:6px;padding:9px 15px;
-  font-size:.85rem;color:var(--ink);
-}
+.btn-outline{background:none;border:1px solid var(--line);border-radius:6px;padding:9px 15px;font-size:.85rem;color:var(--ink);}
 .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
 .btn-outline.small{padding:6px 12px;font-size:.78rem;}
 .sms-companion{margin-top:18px;}
 .sms-companion .preview-body{min-height:80px;}
 
-/* Anamnèse tab */
 .situation-block{margin-bottom:22px;}
 .anamnese-content{margin-top:6px;}
 .anamnese-block{margin-bottom:22px;}
-.anamnese-block textarea{
-  width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;
-  padding:12px 14px;font-size:.88rem;color:var(--ink);resize:vertical;min-height:190px;line-height:1.6;
-}
+.anamnese-block textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:12px 14px;font-size:.88rem;color:var(--ink);resize:vertical;min-height:190px;line-height:1.6;}
 
-/* Modal */
-.overlay{
-  position:fixed;inset:0;background:rgba(43,42,40,.45);display:flex;align-items:center;
-  justify-content:center;padding:20px;z-index:50;
-}
-.modal{
-  background:var(--card-bg);border-radius:6px;padding:26px 24px;max-width:480px;width:100%;
-  max-height:90vh;overflow-y:auto;
-}
+.overlay{position:fixed;inset:0;background:rgba(43,42,40,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;}
+.modal{background:var(--card-bg);border-radius:6px;padding:26px 24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;}
 .modal h2{font-family:'Special Elite',monospace;font-weight:400;font-size:1.15rem;margin:0 0 16px;}
 .modal label{display:block;font-size:.78rem;font-weight:600;color:var(--muted-ink);margin:14px 0 5px;text-transform:uppercase;letter-spacing:.03em;}
-.modal input,.modal textarea{
-  width:100%;border:1px solid var(--line);background:#fff;border-radius:6px;padding:9px 11px;font-size:.88rem;color:var(--ink);
-}
+.modal input,.modal textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:6px;padding:9px 11px;font-size:.88rem;color:var(--ink);}
 .modal textarea{resize:vertical;min-height:90px;}
 .input-clear-wrap{position:relative;}
 .input-clear-wrap input{padding-right:34px;}
-.input-clear-btn{
-  position:absolute;right:4px;top:50%;transform:translateY(-50%);
-  background:none;border:none;color:var(--muted-ink);font-size:1.05rem;line-height:1;
-  width:26px;height:26px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-}
+.input-clear-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted-ink);font-size:1.05rem;line-height:1;width:26px;height:26px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .input-clear-btn:hover{color:var(--accent);background:var(--accent-soft);}
 .modal .hint{margin:8px 0 0;}
 .radio-row{display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;}
 .radio-row label{display:flex;align-items:center;gap:6px;font-size:.85rem;font-weight:500;text-transform:none;color:var(--ink);margin:0;}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
 .err-msg{color:var(--accent);font-size:.78rem;margin-top:4px;display:none;}
-.btn-danger{
-  background:none;border:1px solid var(--accent);border-radius:6px;padding:9px 15px;
-  font-size:.85rem;color:var(--accent);
-}
+.btn-danger{background:none;border:1px solid var(--accent);border-radius:6px;padding:9px 15px;font-size:.85rem;color:var(--accent);}
 .btn-danger:hover{background:var(--accent);color:#fff;}
 
-/* Chemin de stockage dans Réglages */
-.storage-path-row{display:flex;gap:8px;align-items:center;margin-top:6px;}
-.storage-path-row input{flex:1;font-size:.8rem;color:var(--muted-ink);}
-.storage-path-row button{white-space:nowrap;}
+.folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
+.folder-row span{flex:1;font-size:.85rem;color:var(--muted-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-.toast{
-  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--ink);color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;
-  opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100;
-}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* Tutoriel */
 .tutorial-overlay{position:fixed;inset:0;z-index:200;pointer-events:none;}
 .tutorial-backdrop-full{position:fixed;inset:0;background:rgba(43,42,40,.65);pointer-events:auto;}
-.tutorial-highlight{
-  position:fixed;border-radius:8px;
-  box-shadow:0 0 0 9999px rgba(43,42,40,.65);
-  pointer-events:auto;z-index:201;
-}
-.tutorial-tooltip{
-  position:fixed;z-index:202;background:var(--card-bg);border:1px solid var(--line);
-  border-radius:8px;padding:18px 20px;width:300px;max-width:calc(100vw - 32px);
-  box-shadow:0 10px 30px rgba(0,0,0,.3);pointer-events:auto;
-}
+.tutorial-highlight{position:fixed;border-radius:8px;box-shadow:0 0 0 9999px rgba(43,42,40,.65);pointer-events:auto;z-index:201;}
+.tutorial-tooltip{position:fixed;z-index:202;background:var(--card-bg);border:1px solid var(--line);border-radius:8px;padding:18px 20px;width:300px;max-width:calc(100vw - 32px);box-shadow:0 10px 30px rgba(0,0,0,.3);pointer-events:auto;}
 .tutorial-tooltip h3{font-family:'Special Elite',monospace;font-weight:400;font-size:1rem;margin:0 14px 8px 0;}
 .tutorial-tooltip p{font-size:.85rem;color:var(--muted-ink);line-height:1.5;margin:0 0 16px;}
-.tutorial-close{
-  position:absolute;top:8px;right:10px;background:none;border:none;font-size:1.1rem;
-  color:var(--muted-ink);cursor:pointer;line-height:1;padding:4px;
-}
+.tutorial-close{position:absolute;top:8px;right:10px;background:none;border:none;font-size:1.1rem;color:var(--muted-ink);cursor:pointer;line-height:1;padding:4px;}
 .tutorial-close:hover{color:var(--accent);}
 .tutorial-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .tutorial-step-count{font-size:.74rem;color:var(--muted-ink);white-space:nowrap;}
 .tutorial-nav{display:flex;gap:8px;}
 
-@media(max-width:760px){
-  .gen-layout{grid-template-columns:1fr;}
-}
-@media(max-width:600px){
-  .topbar{flex-direction:column;align-items:stretch;}
-  .tabs{width:100%;justify-content:space-between;}
-  #searchTemplates{width:auto;}
-}
+@media(max-width:760px){.gen-layout{grid-template-columns:1fr;}}
+@media(max-width:600px){.topbar{flex-direction:column;align-items:stretch;}.tabs{width:100%;justify-content:space-between;}#searchTemplates{width:auto;}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 </head>
 <body>
+
+<!-- Écran de premier lancement -->
+<div id="setupScreen" style="display:none;">
+  <div class="setup-card">
+    <div class="setup-icon">📁</div>
+    <h2>Choisir un dossier de sauvegarde</h2>
+    <p>Tes données (modèles, anamnèses) seront sauvegardées dans un fichier <strong>data.json</strong> sur ton ordinateur.<br><br>
+    Choisis le dossier où tu veux stocker ce fichier — par exemple ton bureau ou un dossier réseau partagé.</p>
+    <button class="btn-primary" id="pickFolderBtn" style="font-size:1rem;padding:12px 24px;">Choisir un dossier…</button>
+  </div>
+</div>
+
+<!-- Bannière re-autorisation -->
+<div id="permBanner" style="display:none;">
+  <p>📂 Clique pour réautoriser l'accès à ton dossier de données.</p>
+  <button class="btn-primary" id="reAuthBtn" style="white-space:nowrap;">Autoriser</button>
+</div>
+
 <div id="app">
   <div class="topbar">
     <span class="eyebrow">Boîte à outils mails</span>
@@ -305,11 +215,11 @@ input,textarea,select{font-family:inherit;}
   <div style="display:flex;justify-content:center;margin-bottom:18px;">
     <button class="btn-outline small" id="anamneseTutorialBtn" type="button">🎓 Tutoriel</button>
     <button class="btn-outline small" id="genererTutorialBtn" type="button" style="display:none;">🎓 Tutoriel</button>
-    <button class="btn-outline small" id="modelesTutorialBtn" type="button" style="display:none;" onclick="startModelesTutorial()">🎓 Tutoriel</button>
+    <button class="btn-outline small" id="modelesTutorialBtn" type="button" style="display:none;">🎓 Tutoriel</button>
   </div>
 
   <section id="tab-anamnese" class="tab-panel active">
-    <p class="hint">Choisis le genre du patient puis la situation : le texte (introduction et conclusion réunies) s'affiche en dessous, modifiable directement et enregistré automatiquement. Le genre adapte les accords du type <span class="mono">patient(e)</span> dans le texte copié.</p>
+    <p class="hint">Choisis le genre du patient puis la situation : le texte s'affiche en dessous, modifiable et enregistré automatiquement.</p>
     <div class="situation-block">
       <label class="field-label">Genre du patient</label>
       <div class="civility-group" id="anamneseGenreRow"></div>
@@ -338,15 +248,12 @@ input,textarea,select{font-family:inherit;}
       <div class="gen-col">
         <label class="field-label">Type de suivi</label>
         <div class="civility-group" id="followTypeRow"></div>
-
         <div class="situation-block" id="categoryBlock" style="display:none;margin-top:18px;">
           <label class="field-label">Catégorie</label>
           <div class="civility-group" id="categoryRow"></div>
         </div>
-
         <label class="field-label" style="margin-top:18px;">Modèle</label>
         <select id="templateSelect" disabled><option value="">— Choisis d'abord un type de suivi —</option></select>
-
         <div id="extraFields" class="extra-fields"></div>
       </div>
       <div class="gen-col preview-col">
@@ -374,7 +281,7 @@ input,textarea,select{font-family:inherit;}
       <input id="searchTemplates" type="text" placeholder="Rechercher un modèle…">
       <button class="btn-primary" id="addTemplateBtn">+ Nouveau modèle</button>
     </div>
-    <p class="hint">Utilise <span class="mono">{{champ}}</span> dans l'objet ou le corps pour les parties variables, ex. <span class="mono">{{nom}}</span>, <span class="mono">{{date}}</span>. Ces champs seront à remplir dans l'onglet Générer une fois le modèle choisi.</p>
+    <p class="hint">Utilise <span class="mono">{{champ}}</span> dans l'objet ou le corps pour les parties variables.</p>
     <div class="chips" id="typeChips"></div>
     <div id="templatesGrid"></div>
   </section>
@@ -382,954 +289,573 @@ input,textarea,select{font-family:inherit;}
 <div id="modalRoot"></div>
 <div class="toast" id="toast"></div>
 
-<script type="module">
-import { readTextFile, writeTextFile, exists, mkdir } from '@tauri-apps/plugin-fs';
-import { open } from '@tauri-apps/plugin-dialog';
-import { documentDir, join } from '@tauri-apps/api/path';
+<script>
+/* ========== File System Access API storage ========== */
+let dirHandle = null;
+const DATA_FILE = 'data.json';
+const IDB_NAME = 'generateur-mails-db';
+const IDB_STORE = 'handles';
 
-const STORAGE_KEY = 'data.json';
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function saveHandleToIDB(handle) {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(handle, 'dir');
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function getHandleFromIDB() {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const req = tx.objectStore(IDB_STORE).get('dir');
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function clearHandleFromIDB() {
+  const db = await openIDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete('dir');
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function readDataFile() {
+  if (!dirHandle) return null;
+  try {
+    const fh = await dirHandle.getFileHandle(DATA_FILE, { create: false });
+    const file = await fh.getFile();
+    return await file.text();
+  } catch(e) { return null; }
+}
+async function writeDataFile(content) {
+  if (!dirHandle) return;
+  const fh = await dirHandle.getFileHandle(DATA_FILE, { create: true });
+  const w = await fh.createWritable();
+  await w.write(content);
+  await w.close();
+}
+
+async function pickFolder() {
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    dirHandle = handle;
+    await saveHandleToIDB(handle);
+    return true;
+  } catch(e) { return false; }
+}
+
+async function requestPermission(handle) {
+  try {
+    const perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm === 'granted') return true;
+    if (perm === 'prompt') {
+      const res = await handle.requestPermission({ mode: 'readwrite' });
+      return res === 'granted';
+    }
+    return false;
+  } catch(e) { return false; }
+}
+
+/* ========== Data constants ========== */
 const OLD_SEED_IDS = ['seed-t1', 'seed-t2'];
-
 const NEW_TEMPLATE = {
-  id: 'tpl-confirmation-rdv',
-  title: "Confirmation de votre rendez-vous",
-  category: "Rendez-vous",
-  audience: "patient",
-  patientCategory: "Reconfirmation",
-  type: "email",
-  subject: "Confirmation de votre rendez-vous du {{date}}",
-  body: "Bonjour {{nom}},\n\nJe me permets de vous rappeler votre rendez-vous chez notre partenaire audioprothésiste, prévu le {{date}}.\n\nPourriez-vous me confirmer votre présence par retour d'e-mail ou par téléphone au 09 74 99 99 99 ?\n\nJe vous remercie par avance pour votre réactivité et reste à votre disposition pour toute question.\n\nBien cordialement,\nBenjamin Magnier",
-  smsCompanion: "Bonjour {{nom}}, rappel de votre RDV du {{date}}. Merci de confirmer au 09 74 99 99 99. À bientôt !"
+  id:'tpl-confirmation-rdv', title:"Confirmation de votre rendez-vous", category:"Rendez-vous",
+  audience:"patient", patientCategory:"Reconfirmation", type:"email",
+  subject:"Confirmation de votre rendez-vous du {{date}}",
+  body:"Bonjour {{nom}},\n\nJe me permets de vous rappeler votre rendez-vous chez notre partenaire audioprothésiste, prévu le {{date}}.\n\nPourriez-vous me confirmer votre présence par retour d'e-mail ou par téléphone au 09 74 99 99 99 ?\n\nJe vous remercie par avance pour votre réactivité et reste à votre disposition pour toute question.\n\nBien cordialement,\nBenjamin Magnier",
+  smsCompanion:"Bonjour {{nom}}, rappel de votre RDV du {{date}}. Merci de confirmer au 09 74 99 99 99. À bientôt !"
 };
-
 const SUIVI_TEMPLATES = [
-  { id:'tpl-suivi-depistage', title:"Suivi – Dépistage", category:"Suivi", audience:"partenaire", partnerCategory:"CC1", type:"email", subject:"Suivi – Dépistage de {{nom}}", body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour un dépistage, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée votre consultation ? Un rdv ORL est-il prévu ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier" },
-  { id:'tpl-suivi-premier-rdv', title:"Suivi – 1er RDV", category:"Suivi", audience:"partenaire", partnerCategory:"CC1", type:"email", subject:"Suivi – 1er RDV de {{nom}}", body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour un 1er RDV, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée votre consultation ? Un rdv ORL est-il prévu ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier" },
-  { id:'tpl-suivi-renouvellement', title:"Suivi – Renouvellement", category:"Suivi", audience:"partenaire", partnerCategory:"CC1", type:"email", subject:"Suivi – Renouvellement de {{nom}}", body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour un renouvellement, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée cette consultation ? Avez-vous fixé les dates d'un plan d'appareillage ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier" },
-  { id:'tpl-suivi-adaptation', title:"Suivi – Adaptation", category:"Suivi", audience:"partenaire", partnerCategory:"CC1", type:"email", subject:"Suivi – Adaptation de {{nom}}", body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour une adaptation, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée cette consultation ? Avez-vous fixé les dates d'un plan d'appareillage ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier" }
+  {id:'tpl-suivi-depistage',title:"Suivi – Dépistage",category:"Suivi",audience:"partenaire",partnerCategory:"CC1",type:"email",subject:"Suivi – Dépistage de {{nom}}",body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour un dépistage, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée votre consultation ? Un rdv ORL est-il prévu ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier"},
+  {id:'tpl-suivi-premier-rdv',title:"Suivi – 1er RDV",category:"Suivi",audience:"partenaire",partnerCategory:"CC1",type:"email",subject:"Suivi – 1er RDV de {{nom}}",body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour un 1er RDV, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée votre consultation ? Un rdv ORL est-il prévu ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier"},
+  {id:'tpl-suivi-renouvellement',title:"Suivi – Renouvellement",category:"Suivi",audience:"partenaire",partnerCategory:"CC1",type:"email",subject:"Suivi – Renouvellement de {{nom}}",body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour un renouvellement, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée cette consultation ? Avez-vous fixé les dates d'un plan d'appareillage ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier"},
+  {id:'tpl-suivi-adaptation',title:"Suivi – Adaptation",category:"Suivi",audience:"partenaire",partnerCategory:"CC1",type:"email",subject:"Suivi – Adaptation de {{nom}}",body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour une adaptation, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée cette consultation ? Avez-vous fixé les dates d'un plan d'appareillage ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier"}
 ];
-
 const PATIENT_TEMPLATES = [
-  { id:'tpl-suivi-depistage-orl-patient', title:"Suivi dépistage – Orientation ORL", category:"Suivi", audience:"patient", patientCategory:"CC1", type:"email", subject:"Suivi de votre dépistage auditif : Avez-vous été orienté vers un ORL ?", body:"Bonjour {{nom}},\n\nSuite à votre rendez-vous chez notre audioprothésiste le {{date}}, je me permets de revenir vers vous afin de faire le point.\n\nAvez-vous été orienté(e) vers un ORL ? Avez-vous prévu de réaliser un essai d'appareillage ?\n\nJe reste à votre disposition pour échanger avec vous, par retour d'e-mail ou par téléphone au 09 74 99 99 99.\n\nDans l'attente de votre retour.\n\nBien cordialement,\nBenjamin Magnier", smsCompanion:"Bonjour {{nom}}, suite à votre dépistage du {{date}}, avez-vous été orienté(e) vers un ORL ? N'hésitez pas à nous recontacter au 09 74 99 99 99." },
-  { id:'tpl-suivi-rdv-orl-patient', title:"Suivi – RDV ORL effectué ?", category:"Suivi", audience:"patient", patientCategory:"CC1", type:"email", subject:"Votre RDV ORL a-t-il eu lieu ?", body:"Bonjour {{nom}},\n\nSuite à votre rendez-vous chez notre audioprothésiste le {{date}}, vous deviez consulter un ORL afin de poursuivre votre démarche vers un essai d'appareillage auditif.\n\nAvez-vous pu obtenir une prescription ? Souhaitez-vous que nous convenions d'un rendez-vous pour cet essai ?\n\nJe reste à votre disposition, par retour d'e-mail ou par téléphone au 09 74 99 99 99.\n\nDans cette attente, je vous souhaite une belle journée.\n\nBien cordialement,\nBenjamin Magnier", smsCompanion:"Bonjour {{nom}}, votre RDV ORL a-t-il eu lieu suite à notre dépistage du {{date}} ? N'hésitez pas à nous recontacter au 09 74 99 99 99." }
+  {id:'tpl-suivi-depistage-orl-patient',title:"Suivi dépistage – Orientation ORL",category:"Suivi",audience:"patient",patientCategory:"CC1",type:"email",subject:"Suivi de votre dépistage auditif : Avez-vous été orienté vers un ORL ?",body:"Bonjour {{nom}},\n\nSuite à votre rendez-vous chez notre audioprothésiste le {{date}}, je me permets de revenir vers vous afin de faire le point.\n\nAvez-vous été orienté(e) vers un ORL ? Avez-vous prévu de réaliser un essai d'appareillage ?\n\nJe reste à votre disposition pour échanger avec vous, par retour d'e-mail ou par téléphone au 09 74 99 99 99.\n\nDans l'attente de votre retour.\n\nBien cordialement,\nBenjamin Magnier",smsCompanion:"Bonjour {{nom}}, suite à votre dépistage du {{date}}, avez-vous été orienté(e) vers un ORL ? N'hésitez pas à nous recontacter au 09 74 99 99 99."},
+  {id:'tpl-suivi-rdv-orl-patient',title:"Suivi – RDV ORL effectué ?",category:"Suivi",audience:"patient",patientCategory:"CC1",type:"email",subject:"Votre RDV ORL a-t-il eu lieu ?",body:"Bonjour {{nom}},\n\nSuite à votre rendez-vous chez notre audioprothésiste le {{date}}, vous deviez consulter un ORL afin de poursuivre votre démarche vers un essai d'appareillage auditif.\n\nAvez-vous pu obtenir une prescription ? Souhaitez-vous que nous convenions d'un rendez-vous pour cet essai ?\n\nJe reste à votre disposition, par retour d'e-mail ou par téléphone au 09 74 99 99 99.\n\nDans cette attente, je vous souhaite une belle journée.\n\nBien cordialement,\nBenjamin Magnier",smsCompanion:"Bonjour {{nom}}, votre RDV ORL a-t-il eu lieu suite à notre dépistage du {{date}} ? N'hésitez pas à nous recontacter au 09 74 99 99 99."}
 ];
-
-const FOLLOW_TYPES = [{ id:'patient', label:'Suivi patient' }, { id:'partenaire', label:'Suivi Partenaire' }];
-const PARTNER_CATEGORIES = [{ id:'CC1', label:'CC1' }, { id:'CC2', label:'CC2' }, { id:'CC3', label:'CC3' }, { id:'CC4', label:'CC4' }];
-const PATIENT_CATEGORIES = [{ id:'Reconfirmation', label:'Reconfirmation' }, { id:'CC1', label:'CC1' }, { id:'CC2', label:'CC2' }, { id:'CC3', label:'CC3' }, { id:'CC4', label:'CC4' }];
-const FIELD_LABELS = { nom: "Nom du patient" };
+const FOLLOW_TYPES = [{id:'patient',label:'Suivi patient'},{id:'partenaire',label:'Suivi Partenaire'}];
+const PARTNER_CATEGORIES = [{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
+const PATIENT_CATEGORIES = [{id:'Reconfirmation',label:'Reconfirmation'},{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
+const FIELD_LABELS = {nom:"Nom du patient"};
 const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const WEEKDAYS_FR = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
-
-const ANAMNESE_SITUATIONS = [
-  { id:'depistage_simple', label:'Dépistage' },
-  { id:'depistage_orl', label:'Dépistage avec ORL' },
-  { id:'premier_rdv', label:'1er RDV' },
-  { id:'renouvellement', label:'Renouvellement' }
-];
-const RENOUVELLEMENT_OPTIONS = [{ id:'avec_ordonnance', label:'Avec ordonnance' }, { id:'sans_ordonnance', label:'Sans ordonnance' }];
-
+const ANAMNESE_SITUATIONS = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement',label:'Renouvellement'}];
+const RENOUVELLEMENT_OPTIONS = [{id:'avec_ordonnance',label:'Avec ordonnance'},{id:'sans_ordonnance',label:'Sans ordonnance'}];
 const DEFAULT_ANAMNESE = {
-  depistage_simple: { text: "Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier" },
-  depistage_orl: { text: "Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif, avec orientation vers un ORL de votre réseau. Je vous remercie par avance pour votre prise en charge.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier" },
-  premier_rdv: { text: "Cher partenaire, je vous confie notre patient(e) muni(e) d'une ordonnance ORL pour un premier rendez-vous.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier" },
-  renouvellement_avec_ordonnance: { text: "Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage avec ordonnance de renouvellement.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier" },
-  renouvellement_sans_ordonnance: { text: "Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier" }
+  depistage_simple:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
+  depistage_orl:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif, avec orientation vers un ORL de votre réseau. Je vous remercie par avance pour votre prise en charge.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
+  premier_rdv:{text:"Cher partenaire, je vous confie notre patient(e) muni(e) d'une ordonnance ORL pour un premier rendez-vous.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
+  renouvellement_avec_ordonnance:{text:"Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage avec ordonnance de renouvellement.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
+  renouvellement_sans_ordonnance:{text:"Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"}
 };
-
-const OLD_DEFAULT_EMAIL_FOOTER = "audibene — pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\naudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
-const OLD_DEFAULT_EMAIL_FOOTER_V2 = "Audibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
-const OLD_DEFAULT_EMAIL_FOOTER_V3 = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
-const OLD_DEFAULT_EMAIL_FOOTER_V4 = "_________________________________________________\n\nAudibene - Pour bien entendre\n\nTour la Marseillaise – 2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH · 820 709 046 R.C.S. Marseille · Siège de la société : Berlin · Gérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
+const OLD_FOOTERS = [
+  "audibene — pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\naudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann",
+  "Audibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann",
+  "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann",
+  "_________________________________________________\n\nAudibene - Pour bien entendre\n\nTour la Marseillaise – 2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH · 820 709 046 R.C.S. Marseille · Siège de la société : Berlin · Gérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann"
+];
 const DEFAULT_EMAIL_FOOTER = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
 
-/* ---------- Tauri storage ---------- */
-let dataFilePath = null;
+/* ========== App state ========== */
+let appData = {templates:[],anamnese:{},signatureName:'Benjamin Magnier',emailFooter:DEFAULT_EMAIL_FOOTER};
+let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
+let manualValues={}, civilite=null, followType=null, selectedCategory=null;
+let datePickerOpenVar=null, datePickerView={};
+let selectedSituation=null, anamneseGenre=null, renouvellementType=null;
+let tutorialStepIndex=-1, activeTutorialSteps=null;
 
-async function getDefaultStorageDir() {
-  const docDir = await documentDir();
-  return await join(docDir, 'TemplateMailAuto');
+/* ========== Helpers ========== */
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+function fieldLabel(v){if(FIELD_LABELS[v])return FIELD_LABELS[v];const c=v.replace(/_/g,' ');return c.charAt(0).toUpperCase()+c.slice(1);}
+function isDateVar(v){return /date/i.test(v);}
+function getCurrentCategoryList(){return followType==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES;}
+function extractVars(text){const re=/\{\{\s*([^}]+?)\s*\}\}/g,seen=new Set(),vars=[];let m;while((m=re.exec(text))){const n=m[1].trim();if(n&&!seen.has(n)){seen.add(n);vars.push(n);}}return vars;}
+function buildFilledText(text,values){return text.replace(/\{\{\s*([^}]+?)\s*\}\}/g,(m,n)=>{const v=values[n.trim()];return(v&&String(v).trim().length)?v:m;});}
+function resolveGenre(text,genre){if(!genre)return text;return text.replace(/(\S+?)\(e\)/g,(match,word)=>genre==='Madame'?word+'e':word);}
+function previewHtml(text,values,genre){let f=buildFilledText(text,values);f=resolveGenre(f,genre);return escapeHtml(f).replace(/\{\{\s*([^}]+?)\s*\}\}/g,m=>'<mark class="ph-empty">'+m+'</mark>');}
+function getEffectiveGenre(){return civilite;}
+function getRecipientNomValue(){const r=(manualValues['nom']||'').trim();if(!r)return '';return civilite?civilite+' '+r:r;}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ========== Storage ========== */
+async function persist(){
+  try{await writeDataFile(JSON.stringify(appData,null,2));}
+  catch(e){showToast("Erreur d'enregistrement.");}
 }
 
-async function initStorage() {
-  const defaultDir = await getDefaultStorageDir();
-  const dirExists = await exists(defaultDir);
-  if (!dirExists) await mkdir(defaultDir, { recursive: true });
+async function loadData(){
+  let raw=null;
+  try{raw=await readDataFile();}catch(e){}
+  const parsed=(raw&&raw.trim())?JSON.parse(raw):{};
+  appData.templates=parsed.templates||[];
+  appData.anamnese=parsed.anamnese||{};
+  appData.signatureName=(typeof parsed.signatureName==='string'&&parsed.signatureName)?parsed.signatureName:'Benjamin Magnier';
+  appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
 
-  const dataFile = await join(defaultDir, 'data.json');
-  const fileExists = await exists(dataFile);
-  if (!fileExists) {
-    const initial = {
-      templates: [], anamnese: {},
-      signatureName: 'Benjamin Magnier',
-      emailFooter: DEFAULT_EMAIL_FOOTER,
-      storagePath: defaultDir
-    };
-    await writeTextFile(dataFile, JSON.stringify(initial, null, 2));
-  }
-  return dataFile;
+  let changed=false;
+  OLD_FOOTERS.forEach(old=>{
+    if(appData.emailFooter===old){
+      appData.templates.forEach(t=>{if(t.body)t.body=t.body.split(old).join(DEFAULT_EMAIL_FOOTER);});
+      appData.emailFooter=DEFAULT_EMAIL_FOOTER;changed=true;
+    }
+  });
+  const bl=appData.templates.length;
+  appData.templates=appData.templates.filter(t=>OLD_SEED_IDS.indexOf(t.id)===-1);
+  if(appData.templates.length!==bl)changed=true;
+  if(!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
+  SUIVI_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
+  PATIENT_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
+  appData.templates.forEach(t=>{
+    if(!t.audience){t.audience=(t.id===NEW_TEMPLATE.id)?'patient':(SUIVI_TEMPLATES.some(s=>s.id===t.id)?'partenaire':'patient');changed=true;}
+    if(t.audience==='partenaire'&&!t.partnerCategory){const s=SUIVI_TEMPLATES.find(s=>s.id===t.id);t.partnerCategory=s?s.partnerCategory:'CC1';changed=true;}
+    if(t.audience==='patient'&&!t.patientCategory){t.patientCategory=(t.id===NEW_TEMPLATE.id)?'Reconfirmation':'CC1';changed=true;}
+    if(t.id===NEW_TEMPLATE.id&&!t.smsCompanion){t.smsCompanion=NEW_TEMPLATE.smsCompanion;changed=true;}
+    if(!t.type){t.type='email';changed=true;}
+    if(t.type==='email'&&t.body.indexOf(appData.emailFooter)===-1){t.body=t.body+'\n\n'+appData.emailFooter;changed=true;}
+  });
+  if(appData.anamnese['depistage']){delete appData.anamnese['depistage'];changed=true;}
+  if(appData.anamnese['renouvellement']){delete appData.anamnese['renouvellement'];changed=true;}
+  Object.keys(appData.anamnese).forEach(id=>{
+    const e=appData.anamnese[id];
+    if(e&&typeof e.text!=='string'&&(e.intro||e.conclusion)){appData.anamnese[id]={text:[e.intro||'',e.conclusion||''].filter(Boolean).join('\n\n')};changed=true;}
+  });
+  ['depistage_simple','depistage_orl','premier_rdv','renouvellement_avec_ordonnance','renouvellement_sans_ordonnance'].forEach(id=>{
+    if(!appData.anamnese[id]){appData.anamnese[id]=Object.assign({},DEFAULT_ANAMNESE[id]);changed=true;}
+  });
+  if(changed)await persist();
 }
 
-async function resolveDataFilePath() {
-  const defaultDir = await getDefaultStorageDir();
-  const defaultFile = await join(defaultDir, 'data.json');
-  if (await exists(defaultFile)) {
+/* ========== Init storage flow ========== */
+async function initStorageAndLoad(){
+  const setup=document.getElementById('setupScreen');
+  const banner=document.getElementById('permBanner');
+
+  let handle=null;
+  try{handle=await getHandleFromIDB();}catch(e){}
+
+  if(handle){
+    // requestPermission may require a user gesture (browser policy varies)
+    // Try silently first
     try {
-      const raw = await readTextFile(defaultFile);
-      const parsed = JSON.parse(raw);
-      if (parsed.storagePath && parsed.storagePath !== defaultDir) {
-        const customFile = await join(parsed.storagePath, 'data.json');
-        if (await exists(customFile)) return customFile;
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if(perm === 'granted'){
+        dirHandle=handle;
+        await loadData();
+        return;
       }
-    } catch(e) {}
-  }
-  return await initStorage();
-}
-
-async function persist() {
-  try {
-    await writeTextFile(dataFilePath, JSON.stringify(appData, null, 2));
-  } catch(e) {
-    showToast("Erreur d'enregistrement, réessaie.");
-  }
-}
-
-async function loadData() {
-  dataFilePath = await resolveDataFilePath();
-  try {
-    const raw = await readTextFile(dataFilePath);
-    const parsed = JSON.parse(raw);
-    appData.templates = parsed.templates || [];
-    appData.anamnese = parsed.anamnese || {};
-    appData.signatureName = (typeof parsed.signatureName === 'string' && parsed.signatureName) ? parsed.signatureName : 'Benjamin Magnier';
-    appData.emailFooter = (typeof parsed.emailFooter === 'string' && parsed.emailFooter) ? parsed.emailFooter : DEFAULT_EMAIL_FOOTER;
-    appData.storagePath = parsed.storagePath || null;
-  } catch(e) {
-    appData.templates = [];
-    appData.anamnese = {};
-    appData.signatureName = 'Benjamin Magnier';
-    appData.emailFooter = DEFAULT_EMAIL_FOOTER;
-    appData.storagePath = null;
-  }
-
-  let changed = false;
-
-  // Migration anciens footers
-  [OLD_DEFAULT_EMAIL_FOOTER, OLD_DEFAULT_EMAIL_FOOTER_V2, OLD_DEFAULT_EMAIL_FOOTER_V3, OLD_DEFAULT_EMAIL_FOOTER_V4].forEach(function(old) {
-    if (appData.emailFooter === old) {
-      appData.templates.forEach(function(t) {
-        if (t.body) t.body = t.body.split(old).join(DEFAULT_EMAIL_FOOTER);
-      });
-      appData.emailFooter = DEFAULT_EMAIL_FOOTER;
-      changed = true;
-    }
-  });
-
-  const beforeLen = appData.templates.length;
-  appData.templates = appData.templates.filter(function(t) { return OLD_SEED_IDS.indexOf(t.id) === -1; });
-  if (appData.templates.length !== beforeLen) changed = true;
-
-  if (!appData.templates.some(function(t) { return t.id === NEW_TEMPLATE.id; })) {
-    appData.templates.push(Object.assign({}, NEW_TEMPLATE, { createdAt: Date.now() }));
-    changed = true;
-  }
-  SUIVI_TEMPLATES.forEach(function(tpl) {
-    if (!appData.templates.some(function(t) { return t.id === tpl.id; })) {
-      appData.templates.push(Object.assign({}, tpl, { createdAt: Date.now() }));
-      changed = true;
-    }
-  });
-  PATIENT_TEMPLATES.forEach(function(tpl) {
-    if (!appData.templates.some(function(t) { return t.id === tpl.id; })) {
-      appData.templates.push(Object.assign({}, tpl, { createdAt: Date.now() }));
-      changed = true;
-    }
-  });
-
-  appData.templates.forEach(function(t) {
-    if (!t.audience) {
-      t.audience = (t.id === NEW_TEMPLATE.id) ? 'patient' : (SUIVI_TEMPLATES.some(function(s) { return s.id === t.id; }) ? 'partenaire' : 'patient');
-      changed = true;
-    }
-    if (t.audience === 'partenaire' && !t.partnerCategory) {
-      const seed = SUIVI_TEMPLATES.find(function(s) { return s.id === t.id; });
-      t.partnerCategory = seed ? seed.partnerCategory : 'CC1';
-      changed = true;
-    }
-    if (t.audience === 'patient' && !t.patientCategory) {
-      t.patientCategory = (t.id === NEW_TEMPLATE.id) ? 'Reconfirmation' : 'CC1';
-      changed = true;
-    }
-    if (t.id === NEW_TEMPLATE.id && !t.smsCompanion) {
-      t.smsCompanion = NEW_TEMPLATE.smsCompanion;
-      changed = true;
-    }
-    if (!t.type) { t.type = 'email'; changed = true; }
-    if (t.type === 'email' && t.body.indexOf(appData.emailFooter) === -1) {
-      t.body = t.body + '\n\n' + appData.emailFooter;
-      changed = true;
-    }
-  });
-
-  if (appData.anamnese['depistage']) { delete appData.anamnese['depistage']; changed = true; }
-  if (appData.anamnese['renouvellement']) { delete appData.anamnese['renouvellement']; changed = true; }
-
-  Object.keys(appData.anamnese).forEach(function(id) {
-    const entry = appData.anamnese[id];
-    if (entry && typeof entry.text !== 'string' && (entry.intro || entry.conclusion)) {
-      appData.anamnese[id] = { text: [entry.intro || '', entry.conclusion || ''].filter(Boolean).join('\n\n') };
-      changed = true;
-    }
-  });
-
-  ['depistage_simple','depistage_orl','premier_rdv','renouvellement_avec_ordonnance','renouvellement_sans_ordonnance'].forEach(function(id) {
-    if (!appData.anamnese[id]) {
-      appData.anamnese[id] = Object.assign({}, DEFAULT_ANAMNESE[id]);
-      changed = true;
-    }
-  });
-
-  if (changed) await persist();
-}
-
-/* ---------- App state ---------- */
-let appData = { templates: [], anamnese: {}, signatureName: 'Benjamin Magnier', emailFooter: DEFAULT_EMAIL_FOOTER, storagePath: null };
-let activeTab = 'anamnese';
-let templateTypeFilter = 'all';
-let templateSearch = '';
-let manualValues = {};
-let civilite = null;
-let followType = null;
-let selectedCategory = null;
-let datePickerOpenVar = null;
-let datePickerView = {};
-let selectedSituation = null;
-let anamneseGenre = null;
-let renouvellementType = null;
-let tutorialStepIndex = -1;
-let activeTutorialSteps = null;
-
-function escapeHtml(str) {
-  return str.replace(/[&<>"']/g, function(c) {
-    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
-  });
-}
-function fieldLabel(v) {
-  if (FIELD_LABELS[v]) return FIELD_LABELS[v];
-  const clean = v.replace(/_/g, ' ');
-  return clean.charAt(0).toUpperCase() + clean.slice(1);
-}
-function isDateVar(v) { return /date/i.test(v); }
-function getCurrentCategoryList() { return followType === 'partenaire' ? PARTNER_CATEGORIES : PATIENT_CATEGORIES; }
-function extractVars(text) {
-  const re = /\{\{\s*([^}]+?)\s*\}\}/g;
-  const seen = new Set(); const vars = [];
-  let m;
-  while ((m = re.exec(text))) {
-    const name = m[1].trim();
-    if (name && !seen.has(name)) { seen.add(name); vars.push(name); }
-  }
-  return vars;
-}
-function buildFilledText(text, values) {
-  return text.replace(/\{\{\s*([^}]+?)\s*\}\}/g, function(m, name) {
-    const v = values[name.trim()];
-    return (v && String(v).trim().length) ? v : m;
-  });
-}
-function resolveGenre(text, genre) {
-  if (!genre) return text;
-  return text.replace(/(\S+?)\(e\)/g, function(match, word) {
-    return genre === 'Madame' ? (word + 'e') : word;
-  });
-}
-function previewHtml(text, values, genre) {
-  let filled = buildFilledText(text, values);
-  filled = resolveGenre(filled, genre);
-  const escaped = escapeHtml(filled);
-  return escaped.replace(/\{\{\s*([^}]+?)\s*\}\}/g, function(m) { return '<mark class="ph-empty">' + m + '</mark>'; });
-}
-function getEffectiveGenre() { return civilite; }
-function getRecipientNomValue() {
-  const raw = (manualValues['nom'] || '').trim();
-  if (!raw) return '';
-  return civilite ? civilite + ' ' + raw : raw;
-}
-
-/* ---------- Date picker ---------- */
-function parseFrDate(str) {
-  if (!str) return null;
-  const parts = str.trim().split(' ');
-  if (parts.length !== 3) return null;
-  const day = parseInt(parts[0], 10);
-  const monthIdx = MONTHS_FR.indexOf(parts[1].toLowerCase());
-  const year = parseInt(parts[2], 10);
-  if (isNaN(day) || monthIdx === -1 || isNaN(year)) return null;
-  return new Date(year, monthIdx, day);
-}
-function formatFrDate(date) { return date.getDate() + ' ' + MONTHS_FR[date.getMonth()] + ' ' + date.getFullYear(); }
-function isSameDate(a, b) { return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
-function closeDatePicker() {
-  datePickerOpenVar = null;
-  document.querySelectorAll('.date-popover').forEach(function(el) { el.remove(); });
-}
-function openDatePicker(v, anchorEl) {
-  closeDatePicker();
-  datePickerOpenVar = v;
-  const existing = parseFrDate(manualValues[v]);
-  const now = new Date();
-  datePickerView[v] = datePickerView[v] || { year: existing ? existing.getFullYear() : now.getFullYear(), month: existing ? existing.getMonth() : now.getMonth() };
-  renderDatePopover(v, anchorEl);
-}
-function renderDatePopover(v, anchorEl) {
-  const view = datePickerView[v];
-  const selected = parseFrDate(manualValues[v]);
-  const today = new Date();
-  const firstOfMonth = new Date(view.year, view.month, 1);
-  const startOffset = (firstOfMonth.getDay() + 6) % 7;
-  const daysInMonth = new Date(view.year, view.month + 1, 0).getDate();
-  const prevMonthDays = new Date(view.year, view.month, 0).getDate();
-  let cells = [];
-  for (let i = startOffset - 1; i >= 0; i--) cells.push({ day: prevMonthDays - i, muted: true, date: new Date(view.year, view.month - 1, prevMonthDays - i) });
-  for (let d = 1; d <= daysInMonth; d++) cells.push({ day: d, muted: false, date: new Date(view.year, view.month, d) });
-  let nextDay = 1;
-  while (cells.length < 42) { cells.push({ day: nextDay, muted: true, date: new Date(view.year, view.month + 1, nextDay) }); nextDay++; }
-
-  const popover = document.createElement('div');
-  popover.className = 'date-popover';
-  popover.innerHTML =
-    '<div class="dp-header">' +
-      '<button type="button" class="dp-nav" data-dp-prev>‹</button>' +
-      '<span class="dp-month">' + MONTHS_FR[view.month] + '</span>' +
-      '<button type="button" class="dp-nav" data-dp-next>›</button>' +
-      '<input type="number" class="dp-year" value="' + view.year + '">' +
-    '</div>' +
-    '<div class="dp-weekdays">' + WEEKDAYS_FR.map(function(w) { return '<span>' + w + '</span>'; }).join('') + '</div>' +
-    '<div class="dp-grid">' +
-      cells.map(function(c) {
-        return '<button type="button" class="dp-day ' + (c.muted ? 'muted' : '') + ' ' + (isSameDate(c.date, selected) ? 'selected' : '') + ' ' + (isSameDate(c.date, today) && !c.muted ? 'today' : '') + '" data-dp-day="' + c.date.toISOString() + '">' + c.day + '</button>';
-      }).join('') +
-    '</div>' +
-    '<div class="dp-footer"><button type="button" class="dp-today-link" data-dp-today>Aujourd\'hui</button></div>';
-
-  popover.addEventListener('click', function(e) { e.stopPropagation(); });
-  anchorEl.closest('.date-field-wrap').appendChild(popover);
-  popover.querySelector('[data-dp-prev]').addEventListener('click', function() { view.month--; if (view.month < 0) { view.month = 11; view.year--; } renderDatePopover(v, anchorEl); });
-  popover.querySelector('[data-dp-next]').addEventListener('click', function() { view.month++; if (view.month > 11) { view.month = 0; view.year++; } renderDatePopover(v, anchorEl); });
-  popover.querySelector('.dp-year').addEventListener('change', function(e) { view.year = parseInt(e.target.value, 10) || view.year; renderDatePopover(v, anchorEl); });
-  popover.querySelectorAll('[data-dp-day]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const date = new Date(btn.dataset.dpDay);
-      manualValues[v] = formatFrDate(date);
-      const input = document.getElementById('extra-' + v);
-      if (input) input.value = manualValues[v];
-      closeDatePicker(); renderPreviewOnly();
-    });
-  });
-  popover.querySelector('[data-dp-today]').addEventListener('click', function() {
-    const date = new Date();
-    manualValues[v] = formatFrDate(date);
-    const input = document.getElementById('extra-' + v);
-    if (input) input.value = manualValues[v];
-    closeDatePicker(); renderPreviewOnly();
-  });
-}
-document.addEventListener('click', function() { closeDatePicker(); });
-
-async function copyText(text) {
-  try { await navigator.clipboard.writeText(text); return true; }
-  catch(e) {
-    try {
-      const ta = document.createElement('textarea');
-      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
-      document.body.appendChild(ta); ta.focus(); ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      return true;
-    } catch(e2) { return false; }
-  }
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function() { t.classList.remove('show'); }, 2200);
-}
-
-/* ---------- Tabs ---------- */
-function switchTab(name) {
-  activeTab = name;
-  document.querySelectorAll('.tab').forEach(function(b) { b.classList.toggle('active', b.dataset.tab === name); });
-  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.toggle('active', p.id === 'tab-' + name); });
-  document.getElementById('anamneseTutorialBtn').style.display = (name === 'anamnese') ? 'inline-flex' : 'none';
-  document.getElementById('genererTutorialBtn').style.display = (name === 'generer') ? 'inline-flex' : 'none';
-  document.getElementById('modelesTutorialBtn').style.display = (name === 'modeles') ? 'inline-flex' : 'none';
-  resetTabState(name);
-}
-function resetTabState(name) {
-  closeDatePicker();
-  if (name === 'generer') {
-    manualValues = {}; civilite = null; followType = null; selectedCategory = null; datePickerView = {};
-    renderFollowTypeRow(); renderCategoryRow(); updateCategoryBlockVisibility(); renderTemplateSelect(); updateExtraFieldsAndPreview();
-  } else if (name === 'anamnese') {
-    selectedSituation = null; anamneseGenre = null; renouvellementType = null;
-    renderGenreRow(); renderSituationRow(); renderRenouvellementSubRow(); renderAnamneseContent();
-  } else if (name === 'modeles') {
-    templateSearch = ''; templateTypeFilter = 'all';
-    const searchInput = document.getElementById('searchTemplates');
-    if (searchInput) searchInput.value = '';
-    renderTypeChips(); renderTemplatesGrid();
-  }
-}
-
-/* ---------- Templates grid ---------- */
-function renderTypeChips() {
-  const wrap = document.getElementById('typeChips');
-  const opts = [['all','Tous'],['email','Email'],['sms','SMS']];
-  wrap.innerHTML = opts.map(function(o) {
-    return '<button class="chip ' + (templateTypeFilter === o[0] ? 'active' : '') + '" data-val="' + o[0] + '">' + o[1] + '</button>';
-  }).join('');
-  wrap.querySelectorAll('.chip').forEach(function(c) {
-    c.addEventListener('click', function() { templateTypeFilter = c.dataset.val; renderTypeChips(); renderTemplatesGrid(); });
-  });
-}
-function templateMatchesTypeFilter(t) {
-  if (templateTypeFilter === 'sms') return t.audience !== 'partenaire' && !!t.smsCompanion;
-  return true;
-}
-function renderTemplatesGrid() {
-  const grid = document.getElementById('templatesGrid');
-  const term = templateSearch.toLowerCase();
-  const list = appData.templates.filter(function(t) {
-    return templateMatchesTypeFilter(t) && (t.title.toLowerCase().indexOf(term) !== -1 || (t.category || '').toLowerCase().indexOf(term) !== -1);
-  });
-  if (list.length === 0) { grid.innerHTML = '<div class="empty-state">Aucun modèle pour le moment.</div>'; return; }
-  function renderCard(t) {
-    const catTag = t.audience === 'partenaire' ? t.partnerCategory : t.patientCategory;
-    const audienceLabel = (t.audience === 'partenaire' ? 'Partenaire' : 'Patient') + (catTag ? ' · ' + catTag : '');
-    const hasSmsBadge = t.audience !== 'partenaire' && !!t.smsCompanion;
-    const tagLabel = hasSmsBadge ? 'Email - SMS' : (t.type === 'email' ? 'Email' : 'SMS');
-    const showSmsAsMain = templateTypeFilter === 'sms' && t.smsCompanion;
-    const mainText = showSmsAsMain ? t.smsCompanion : t.body;
-    return '<div class="card">' +
-      '<span class="card-tag ' + t.type + '">' + tagLabel + '</span>' +
-      '<h3>' + escapeHtml(t.title) + '</h3>' +
-      '<p class="cat">' + audienceLabel + (t.category ? ' · ' + escapeHtml(t.category) : '') + '</p>' +
-      '<p>' + escapeHtml(mainText) + '</p>' +
-      (!showSmsAsMain && t.smsCompanion ? '<p class="sms-preview"><strong>SMS :</strong> ' + escapeHtml(t.smsCompanion) + '</p>' : '') +
-      '<div class="card-foot">' +
-        '<button class="copy-mini" data-edit-template="' + t.id + '">Modifier</button>' +
-        '<button class="copy-mini danger" data-del-template="' + t.id + '">Supprimer</button>' +
-      '</div>' +
-    '</div>';
-  }
-  const patientList = list.filter(function(t) { return t.audience !== 'partenaire'; });
-  const partnerList = list.filter(function(t) { return t.audience === 'partenaire'; });
-  const isSmsFilter = templateTypeFilter === 'sms';
-  let html = '<div class="model-group-title">' + (isSmsFilter ? 'SMS patients' : 'Mails patients') + '</div>';
-  html += patientList.length ? '<div class="grid">' + patientList.map(renderCard).join('') + '</div>' : '<div class="empty-state">Aucun modèle patient.</div>';
-  if (!isSmsFilter) {
-    html += '<hr class="group-divider"><div class="model-group-title">Mails partenaires</div>';
-    html += partnerList.length ? '<div class="grid">' + partnerList.map(renderCard).join('') + '</div>' : '<div class="empty-state">Aucun modèle partenaire.</div>';
-  }
-  grid.innerHTML = html;
-}
-function getFilteredTemplateList() {
-  const term = templateSearch.toLowerCase();
-  const list = appData.templates.filter(function(t) {
-    return templateMatchesTypeFilter(t) && (t.title.toLowerCase().indexOf(term) !== -1 || (t.category || '').toLowerCase().indexOf(term) !== -1);
-  });
-  return list.filter(function(t) { return t.audience !== 'partenaire'; }).concat(list.filter(function(t) { return t.audience === 'partenaire'; }));
-}
-
-/* ---------- Générer tab ---------- */
-function updateCategoryBlockVisibility() { document.getElementById('categoryBlock').style.display = followType ? 'block' : 'none'; }
-function renderFollowTypeRow() {
-  const wrap = document.getElementById('followTypeRow');
-  wrap.innerHTML = FOLLOW_TYPES.map(function(o) {
-    return '<label class="civility-option"><input type="radio" name="follow-type" value="' + o.id + '" ' + (followType === o.id ? 'checked' : '') + '> ' + escapeHtml(o.label) + '</label>';
-  }).join('');
-  wrap.querySelectorAll('input[name="follow-type"]').forEach(function(radio) {
-    radio.addEventListener('change', function(e) {
-      followType = e.target.value; selectedCategory = null; manualValues = {}; civilite = null; datePickerView = {};
-      renderCategoryRow(); updateCategoryBlockVisibility(); renderTemplateSelect(); updateExtraFieldsAndPreview();
-    });
-  });
-}
-function renderCategoryRow() {
-  const wrap = document.getElementById('categoryRow');
-  const list = getCurrentCategoryList();
-  wrap.innerHTML = list.map(function(o) {
-    return '<label class="civility-option"><input type="radio" name="selected-category" value="' + o.id + '" ' + (selectedCategory === o.id ? 'checked' : '') + '> ' + escapeHtml(o.label) + '</label>';
-  }).join('');
-  wrap.querySelectorAll('input[name="selected-category"]').forEach(function(radio) {
-    radio.addEventListener('change', function(e) {
-      selectedCategory = e.target.value; manualValues = {}; civilite = null; datePickerView = {};
-      renderTemplateSelect(); updateExtraFieldsAndPreview();
-    });
-  });
-}
-function renderTemplateSelect() {
-  const sel = document.getElementById('templateSelect');
-  if (!followType) { sel.innerHTML = '<option value="">— Choisis d\'abord un type de suivi —</option>'; sel.disabled = true; return; }
-  if (!selectedCategory) { sel.innerHTML = '<option value="">— Choisis d\'abord une catégorie —</option>'; sel.disabled = true; return; }
-  const current = sel.value;
-  const filtered = appData.templates.filter(function(t) {
-    if (t.audience !== followType) return false;
-    if (followType === 'partenaire') return t.partnerCategory === selectedCategory;
-    return t.patientCategory === selectedCategory;
-  });
-  sel.disabled = false;
-  sel.innerHTML = '<option value="">— Choisir un modèle —</option>' +
-    filtered.map(function(t) { return '<option value="' + t.id + '">' + escapeHtml(t.title) + ' (' + (t.type === 'email' ? 'Email' : 'SMS') + ')</option>'; }).join('');
-  if (filtered.some(function(t) { return t.id === current; })) sel.value = current;
-}
-function updateExtraFieldsAndPreview() {
-  closeDatePicker();
-  const sel = document.getElementById('templateSelect');
-  const template = appData.templates.find(function(t) { return t.id === sel.value; });
-  const extraWrap = document.getElementById('extraFields');
-  const subjectWrap = document.getElementById('previewSubjectWrap');
-  const bodyEl = document.getElementById('previewBody');
-  const actions = document.getElementById('copyActions');
-  const smsWrap = document.getElementById('smsCompanionWrap');
-  if (!template) {
-    extraWrap.innerHTML = '';
-    subjectWrap.style.display = 'none';
-    bodyEl.textContent = followType ? 'Choisis un modèle pour commencer.' : 'Choisis un type de suivi puis un modèle pour commencer.';
-    actions.style.display = 'none'; smsWrap.style.display = 'none';
+    } catch(e){}
+    // Need user gesture — show banner
+    banner.style.display='flex';
+    document.getElementById('reAuthBtn').onclick=async()=>{
+      const granted=await requestPermission(handle);
+      if(granted){
+        dirHandle=handle;
+        banner.style.display='none';
+        await loadData();
+        renderAll();
+      } else {
+        await clearHandleFromIDB();
+        banner.style.display='none';
+        setup.style.display='flex';
+      }
+    };
+    // App still loads, but without file persistence until authorized
+    await loadData();
     return;
   }
-  const fullText = (template.subject || '') + ' ' + template.body;
-  let vars = extractVars(fullText);
-  if (vars.indexOf('nom') !== -1) vars = ['nom'].concat(vars.filter(function(v) { return v !== 'nom'; }));
-  extraWrap.innerHTML = vars.map(function(v) {
-    const label = escapeHtml(fieldLabel(v));
-    if (v === 'nom') {
-      return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">' + label + '</label>' +
-        '<div class="civility-group"><label class="civility-option"><input type="radio" name="civilite" value="Monsieur" ' + (civilite === 'Monsieur' ? 'checked' : '') + '> M.</label>' +
-        '<label class="civility-option"><input type="radio" name="civilite" value="Madame" ' + (civilite === 'Madame' ? 'checked' : '') + '> Mme</label></div></div>' +
-        '<input id="extra-nom" data-extra-var="nom" value="' + escapeHtml(manualValues['nom'] || '') + '" placeholder="' + label + '"></div>';
-    }
-    if (isDateVar(v)) {
-      return '<div class="extra-field"><label for="extra-' + v + '">' + label + '</label>' +
-        '<div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-' + v + '" data-extra-var="' + escapeHtml(v) + '" value="' + escapeHtml(manualValues[v] || '') + '" placeholder="' + label + '" readonly>' +
-        '<button type="button" class="date-icon-btn" data-date-toggle="' + escapeHtml(v) + '" aria-label="Choisir une date">' +
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
-        '</button></div></div>';
-    }
-    return '<div class="extra-field"><label for="extra-' + v + '">' + label + '</label>' +
-      '<input id="extra-' + v + '" data-extra-var="' + escapeHtml(v) + '" value="' + escapeHtml(manualValues[v] || '') + '" placeholder="' + label + '"></div>';
+
+  // First launch
+  setup.style.display='flex';
+  document.getElementById('pickFolderBtn').onclick=async()=>{
+    const ok=await pickFolder();
+    if(ok){setup.style.display='none';await loadData();renderAll();}
+  };
+}
+
+function renderAll(){
+  renderTypeChips();renderTemplatesGrid();renderTemplateSelect();
+  renderGenreRow();renderSituationRow();renderRenouvellementSubRow();
+  renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();
+}
+
+/* ========== Date picker ========== */
+function parseFrDate(s){if(!s)return null;const p=s.trim().split(' ');if(p.length!==3)return null;const d=parseInt(p[0]),mi=MONTHS_FR.indexOf(p[1].toLowerCase()),y=parseInt(p[2]);if(isNaN(d)||mi===-1||isNaN(y))return null;return new Date(y,mi,d);}
+function formatFrDate(d){return d.getDate()+' '+MONTHS_FR[d.getMonth()]+' '+d.getFullYear();}
+function isSameDate(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function closeDatePicker(){datePickerOpenVar=null;document.querySelectorAll('.date-popover').forEach(e=>e.remove());}
+function openDatePicker(v,el){closeDatePicker();datePickerOpenVar=v;const ex=parseFrDate(manualValues[v]),now=new Date();datePickerView[v]=datePickerView[v]||{year:ex?ex.getFullYear():now.getFullYear(),month:ex?ex.getMonth():now.getMonth()};renderDatePopover(v,el);}
+function renderDatePopover(v,anchorEl){
+  const view=datePickerView[v],selected=parseFrDate(manualValues[v]),today=new Date();
+  const fom=new Date(view.year,view.month,1),off=(fom.getDay()+6)%7,dim=new Date(view.year,view.month+1,0).getDate(),pmd=new Date(view.year,view.month,0).getDate();
+  let cells=[];
+  for(let i=off-1;i>=0;i--)cells.push({day:pmd-i,muted:true,date:new Date(view.year,view.month-1,pmd-i)});
+  for(let d=1;d<=dim;d++)cells.push({day:d,muted:false,date:new Date(view.year,view.month,d)});
+  let nd=1;while(cells.length<42){cells.push({day:nd,muted:true,date:new Date(view.year,view.month+1,nd)});nd++;}
+  const pop=document.createElement('div');pop.className='date-popover';
+  pop.innerHTML='<div class="dp-header"><button type="button" class="dp-nav" data-dp-prev>‹</button><span class="dp-month">'+MONTHS_FR[view.month]+'</span><button type="button" class="dp-nav" data-dp-next>›</button><input type="number" class="dp-year" value="'+view.year+'"></div><div class="dp-weekdays">'+WEEKDAYS_FR.map(w=>'<span>'+w+'</span>').join('')+'</div><div class="dp-grid">'+cells.map(c=>'<button type="button" class="dp-day '+(c.muted?'muted':'')+' '+(isSameDate(c.date,selected)?'selected':'')+' '+(isSameDate(c.date,today)&&!c.muted?'today':'')+'" data-dp-day="'+c.date.toISOString()+'">'+c.day+'</button>').join('')+'</div><div class="dp-footer"><button type="button" class="dp-today-link" data-dp-today>Aujourd\'hui</button></div>';
+  pop.addEventListener('click',e=>e.stopPropagation());
+  anchorEl.closest('.date-field-wrap').appendChild(pop);
+  pop.querySelector('[data-dp-prev]').addEventListener('click',()=>{view.month--;if(view.month<0){view.month=11;view.year--;}renderDatePopover(v,anchorEl);});
+  pop.querySelector('[data-dp-next]').addEventListener('click',()=>{view.month++;if(view.month>11){view.month=0;view.year++;}renderDatePopover(v,anchorEl);});
+  pop.querySelector('.dp-year').addEventListener('change',e=>{view.year=parseInt(e.target.value)||view.year;renderDatePopover(v,anchorEl);});
+  pop.querySelectorAll('[data-dp-day]').forEach(btn=>btn.addEventListener('click',()=>{const d=new Date(btn.dataset.dpDay);manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();}));
+  pop.querySelector('[data-dp-today]').addEventListener('click',()=>{const d=new Date();manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();});
+}
+document.addEventListener('click',()=>closeDatePicker());
+
+async function copyText(text){
+  try{await navigator.clipboard.writeText(text);return true;}
+  catch(e){try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);return true;}catch(e2){return false;}}
+}
+
+/* ========== Tabs ========== */
+function switchTab(name){
+  activeTab=name;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
+  document.getElementById('anamneseTutorialBtn').style.display=name==='anamnese'?'inline-flex':'none';
+  document.getElementById('genererTutorialBtn').style.display=name==='generer'?'inline-flex':'none';
+  document.getElementById('modelesTutorialBtn').style.display=name==='modeles'?'inline-flex':'none';
+  resetTabState(name);
+}
+function resetTabState(name){
+  closeDatePicker();
+  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;datePickerView={};renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}
+  else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();}
+  else if(name==='modeles'){templateSearch='';templateTypeFilter='all';const s=document.getElementById('searchTemplates');if(s)s.value='';renderTypeChips();renderTemplatesGrid();}
+}
+
+/* ========== Templates grid ========== */
+function renderTypeChips(){
+  const wrap=document.getElementById('typeChips');
+  wrap.innerHTML=[['all','Tous'],['email','Email'],['sms','SMS']].map(o=>'<button class="chip '+(templateTypeFilter===o[0]?'active':'')+'" data-val="'+o[0]+'">'+o[1]+'</button>').join('');
+  wrap.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{templateTypeFilter=c.dataset.val;renderTypeChips();renderTemplatesGrid();}));
+}
+function templateMatchesTypeFilter(t){if(templateTypeFilter==='sms')return t.audience!=='partenaire'&&!!t.smsCompanion;return true;}
+function renderTemplatesGrid(){
+  const grid=document.getElementById('templatesGrid'),term=templateSearch.toLowerCase();
+  const list=appData.templates.filter(t=>templateMatchesTypeFilter(t)&&(t.title.toLowerCase().indexOf(term)!==-1||(t.category||'').toLowerCase().indexOf(term)!==-1));
+  if(!list.length){grid.innerHTML='<div class="empty-state">Aucun modèle pour le moment.</div>';return;}
+  function rc(t){
+    const ct=t.audience==='partenaire'?t.partnerCategory:t.patientCategory;
+    const al=(t.audience==='partenaire'?'Partenaire':'Patient')+(ct?' · '+ct:'');
+    const hsb=t.audience!=='partenaire'&&!!t.smsCompanion;
+    const tl=hsb?'Email - SMS':(t.type==='email'?'Email':'SMS');
+    const sma=templateTypeFilter==='sms'&&t.smsCompanion;
+    return '<div class="card"><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(sma?t.smsCompanion:t.body)+'</p>'+(!sma&&t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
+  }
+  const pl=list.filter(t=>t.audience!=='partenaire'),pal=list.filter(t=>t.audience==='partenaire'),isS=templateTypeFilter==='sms';
+  let html='<div class="model-group-title">'+(isS?'SMS patients':'Mails patients')+'</div>';
+  html+=pl.length?'<div class="grid">'+pl.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle patient.</div>';
+  if(!isS){html+='<hr class="group-divider"><div class="model-group-title">Mails partenaires</div>';html+=pal.length?'<div class="grid">'+pal.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle partenaire.</div>';}
+  grid.innerHTML=html;
+}
+function getFilteredTemplateList(){
+  const term=templateSearch.toLowerCase();
+  const l=appData.templates.filter(t=>templateMatchesTypeFilter(t)&&(t.title.toLowerCase().indexOf(term)!==-1||(t.category||'').toLowerCase().indexOf(term)!==-1));
+  return l.filter(t=>t.audience!=='partenaire').concat(l.filter(t=>t.audience==='partenaire'));
+}
+
+/* ========== Générer tab ========== */
+function updateCategoryBlockVisibility(){document.getElementById('categoryBlock').style.display=followType?'block':'none';}
+function renderFollowTypeRow(){
+  const w=document.getElementById('followTypeRow');
+  w.innerHTML=FOLLOW_TYPES.map(o=>'<label class="civility-option"><input type="radio" name="follow-type" value="'+o.id+'" '+(followType===o.id?'checked':'')+'>  '+escapeHtml(o.label)+'</label>').join('');
+  w.querySelectorAll('input[name="follow-type"]').forEach(r=>r.addEventListener('change',e=>{followType=e.target.value;selectedCategory=null;manualValues={};civilite=null;datePickerView={};renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}));
+}
+function renderCategoryRow(){
+  const w=document.getElementById('categoryRow'),l=getCurrentCategoryList();
+  w.innerHTML=l.map(o=>'<label class="civility-option"><input type="radio" name="selected-category" value="'+o.id+'" '+(selectedCategory===o.id?'checked':'')+'>  '+escapeHtml(o.label)+'</label>').join('');
+  w.querySelectorAll('input[name="selected-category"]').forEach(r=>r.addEventListener('change',e=>{selectedCategory=e.target.value;manualValues={};civilite=null;datePickerView={};renderTemplateSelect();updateExtraFieldsAndPreview();}));
+}
+function renderTemplateSelect(){
+  const sel=document.getElementById('templateSelect');
+  if(!followType){sel.innerHTML="<option value=''>— Choisis d'abord un type de suivi —</option>";sel.disabled=true;return;}
+  if(!selectedCategory){sel.innerHTML="<option value=''>— Choisis d'abord une catégorie —</option>";sel.disabled=true;return;}
+  const cur=sel.value,fil=appData.templates.filter(t=>{if(t.audience!==followType)return false;return followType==='partenaire'?t.partnerCategory===selectedCategory:t.patientCategory===selectedCategory;});
+  sel.disabled=false;
+  sel.innerHTML="<option value=''>— Choisir un modèle —</option>"+fil.map(t=>"<option value='"+t.id+"'>"+escapeHtml(t.title)+' ('+(t.type==='email'?'Email':'SMS')+')</option>').join('');
+  if(fil.some(t=>t.id===cur))sel.value=cur;
+}
+function updateExtraFieldsAndPreview(){
+  closeDatePicker();
+  const sel=document.getElementById('templateSelect'),template=appData.templates.find(t=>t.id===sel.value);
+  const ew=document.getElementById('extraFields'),sw=document.getElementById('previewSubjectWrap'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
+  if(!template){ew.innerHTML='';sw.style.display='none';be.textContent=followType?'Choisis un modèle pour commencer.':'Choisis un type de suivi puis un modèle pour commencer.';ac.style.display='none';smsw.style.display='none';return;}
+  let vars=extractVars((template.subject||'')+' '+template.body);
+  if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
+  ew.innerHTML=vars.map(v=>{
+    const lbl=escapeHtml(fieldLabel(v));
+    if(v==='nom')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label><div class="civility-group"><label class="civility-option"><input type="radio" name="civilite" value="Monsieur" '+(civilite==='Monsieur'?'checked':'')+'>  M.</label><label class="civility-option"><input type="radio" name="civilite" value="Madame" '+(civilite==='Madame'?'checked':'')+'>  Mme</label></div></div><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"></div>';
+    if(isDateVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'" readonly><button type="button" class="date-icon-btn" data-date-toggle="'+escapeHtml(v)+'" aria-label="Choisir une date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div></div>';
+    return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><input id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'"></div>';
   }).join('');
-  extraWrap.querySelectorAll('input[data-extra-var]:not(.date-display-input)').forEach(function(inp) {
-    inp.addEventListener('input', function(e) { manualValues[e.target.dataset.extraVar] = e.target.value; renderPreviewOnly(); });
-  });
-  extraWrap.querySelectorAll('input[name="civilite"]').forEach(function(radio) {
-    radio.addEventListener('change', function(e) { civilite = e.target.value; renderPreviewOnly(); });
-  });
-  extraWrap.querySelectorAll('.date-display-input, [data-date-toggle]').forEach(function(el) {
-    el.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const v = el.dataset.extraVar || el.dataset.dateToggle;
-      if (datePickerOpenVar === v) closeDatePicker(); else openDatePicker(v, el);
-    });
-  });
+  ew.querySelectorAll('input[data-extra-var]:not(.date-display-input)').forEach(i=>i.addEventListener('input',e=>{manualValues[e.target.dataset.extraVar]=e.target.value;renderPreviewOnly();}));
+  ew.querySelectorAll('input[name="civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
+  ew.querySelectorAll('.date-display-input,[data-date-toggle]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const v=el.dataset.extraVar||el.dataset.dateToggle;if(datePickerOpenVar===v)closeDatePicker();else openDatePicker(v,el);}));
   renderPreviewOnly();
 }
-function renderPreviewOnly() {
-  const sel = document.getElementById('templateSelect');
-  const template = appData.templates.find(function(t) { return t.id === sel.value; });
-  if (!template) return;
-  const subjectWrap = document.getElementById('previewSubjectWrap');
-  const subjectEl = document.getElementById('previewSubject');
-  const bodyEl = document.getElementById('previewBody');
-  const actions = document.getElementById('copyActions');
-  const smsWrap = document.getElementById('smsCompanionWrap');
-  const values = Object.assign({}, manualValues, { nom: getRecipientNomValue() });
-  const genre = getEffectiveGenre();
-  if (template.type === 'email' && template.subject) {
-    subjectWrap.style.display = 'block';
-    subjectEl.innerHTML = previewHtml(template.subject, values, genre);
-  } else { subjectWrap.style.display = 'none'; }
-  bodyEl.innerHTML = previewHtml(template.body, values, genre);
-  actions.style.display = 'flex';
-  const showSms = template.audience === 'patient' && template.type === 'email' && template.smsCompanion;
-  if (showSms) { smsWrap.style.display = 'block'; document.getElementById('smsCompanionBody').innerHTML = previewHtml(template.smsCompanion, values, genre); }
-  else smsWrap.style.display = 'none';
+function renderPreviewOnly(){
+  const sel=document.getElementById('templateSelect'),template=appData.templates.find(t=>t.id===sel.value);
+  if(!template)return;
+  const sw=document.getElementById('previewSubjectWrap'),se=document.getElementById('previewSubject'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
+  const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()}),genre=getEffectiveGenre();
+  if(template.type==='email'&&template.subject){sw.style.display='block';se.innerHTML=previewHtml(template.subject,vals,genre);}else sw.style.display='none';
+  be.innerHTML=previewHtml(template.body,vals,genre);ac.style.display='flex';
+  const ss=template.audience==='patient'&&template.type==='email'&&template.smsCompanion;
+  if(ss){smsw.style.display='block';document.getElementById('smsCompanionBody').innerHTML=previewHtml(template.smsCompanion,vals,genre);}else smsw.style.display='none';
 }
-function needsGenreChoice() { return !!document.querySelector('#extraFields input[name="civilite"]'); }
+function needsGenreChoice(){return !!document.querySelector('#extraFields input[name="civilite"]');}
 
-/* ---------- Anamnèse tab ---------- */
-function getCurrentAnamneseKey() {
-  if (selectedSituation === 'renouvellement') return renouvellementType ? ('renouvellement_' + renouvellementType) : null;
-  return selectedSituation;
+/* ========== Anamnèse ========== */
+function getCurrentAnamneseKey(){if(selectedSituation==='renouvellement')return renouvellementType?'renouvellement_'+renouvellementType:null;return selectedSituation;}
+function renderGenreRow(){
+  const w=document.getElementById('anamneseGenreRow');
+  w.innerHTML='<label class="civility-option"><input type="radio" name="anamnese-genre" value="Monsieur" '+(anamneseGenre==='Monsieur'?'checked':'')+'>  M.</label><label class="civility-option"><input type="radio" name="anamnese-genre" value="Madame" '+(anamneseGenre==='Madame'?'checked':'')+'>  Mme</label>';
+  w.querySelectorAll('input[name="anamnese-genre"]').forEach(r=>r.addEventListener('change',e=>{anamneseGenre=e.target.value;}));
 }
-function renderGenreRow() {
-  const wrap = document.getElementById('anamneseGenreRow');
-  wrap.innerHTML =
-    '<label class="civility-option"><input type="radio" name="anamnese-genre" value="Monsieur" ' + (anamneseGenre === 'Monsieur' ? 'checked' : '') + '> M.</label>' +
-    '<label class="civility-option"><input type="radio" name="anamnese-genre" value="Madame" ' + (anamneseGenre === 'Madame' ? 'checked' : '') + '> Mme</label>';
-  wrap.querySelectorAll('input[name="anamnese-genre"]').forEach(function(radio) {
-    radio.addEventListener('change', function(e) { anamneseGenre = e.target.value; });
-  });
+function renderSituationRow(){
+  const w=document.getElementById('situationRow');
+  w.innerHTML=ANAMNESE_SITUATIONS.map(s=>'<label class="civility-option"><input type="radio" name="situation" value="'+s.id+'" '+(selectedSituation===s.id?'checked':'')+'>  '+escapeHtml(s.label)+'</label>').join('');
+  w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();}));
 }
-function renderSituationRow() {
-  const wrap = document.getElementById('situationRow');
-  wrap.innerHTML = ANAMNESE_SITUATIONS.map(function(s) {
-    return '<label class="civility-option"><input type="radio" name="situation" value="' + s.id + '" ' + (selectedSituation === s.id ? 'checked' : '') + '> ' + escapeHtml(s.label) + '</label>';
-  }).join('');
-  wrap.querySelectorAll('input[name="situation"]').forEach(function(radio) {
-    radio.addEventListener('change', function(e) { selectedSituation = e.target.value; renderAnamneseContent(); });
-  });
+function renderRenouvellementSubRow(){
+  const w=document.getElementById('renouvellementSubRow');
+  w.innerHTML=RENOUVELLEMENT_OPTIONS.map(o=>'<label class="civility-option"><input type="radio" name="renouvellement-type" value="'+o.id+'" '+(renouvellementType===o.id?'checked':'')+'>  '+escapeHtml(o.label)+'</label>').join('');
+  w.querySelectorAll('input[name="renouvellement-type"]').forEach(r=>r.addEventListener('change',e=>{renouvellementType=e.target.value;renderAnamneseContent();}));
 }
-function renderRenouvellementSubRow() {
-  const wrap = document.getElementById('renouvellementSubRow');
-  wrap.innerHTML = RENOUVELLEMENT_OPTIONS.map(function(o) {
-    return '<label class="civility-option"><input type="radio" name="renouvellement-type" value="' + o.id + '" ' + (renouvellementType === o.id ? 'checked' : '') + '> ' + escapeHtml(o.label) + '</label>';
-  }).join('');
-  wrap.querySelectorAll('input[name="renouvellement-type"]').forEach(function(radio) {
-    radio.addEventListener('change', function(e) { renouvellementType = e.target.value; renderAnamneseContent(); });
-  });
-}
-function updateRenouvellementVisibility() { document.getElementById('renouvellementSubBlock').style.display = (selectedSituation === 'renouvellement') ? 'block' : 'none'; }
-function renderAnamneseContent() {
-  updateRenouvellementVisibility();
-  const contentWrap = document.getElementById('anamneseContent');
-  const key = getCurrentAnamneseKey();
-  if (!key) { contentWrap.style.display = 'none'; return; }
-  contentWrap.style.display = 'block';
-  const data = appData.anamnese[key] || { text: '' };
-  document.getElementById('anamneseTextarea').value = data.text || '';
+function renderAnamneseContent(){
+  document.getElementById('renouvellementSubBlock').style.display=selectedSituation==='renouvellement'?'block':'none';
+  const cw=document.getElementById('anamneseContent'),key=getCurrentAnamneseKey();
+  if(!key){cw.style.display='none';return;}
+  cw.style.display='block';
+  document.getElementById('anamneseTextarea').value=(appData.anamnese[key]||{text:''}).text||'';
 }
 
-/* ---------- Modals ---------- */
-function closeModal() { document.getElementById('modalRoot').innerHTML = ''; }
-function showCenterAlert(message) {
-  const root = document.getElementById('modalRoot');
-  root.innerHTML = '<div class="overlay" id="overlay"><div class="modal"><p style="font-size:.9rem;color:var(--ink);margin:6px 0 18px;text-align:center;">' + escapeHtml(message) + '</p><div class="modal-foot" style="justify-content:center;"><button class="btn-primary" id="alertOkBtn">Compris</button></div></div></div>';
-  document.getElementById('overlay').addEventListener('click', function(e) { if (e.target.id === 'overlay') closeModal(); });
-  document.getElementById('alertOkBtn').addEventListener('click', closeModal);
+/* ========== Modals ========== */
+function closeModal(){document.getElementById('modalRoot').innerHTML='';}
+function showCenterAlert(msg){
+  const r=document.getElementById('modalRoot');
+  r.innerHTML='<div class="overlay" id="overlay"><div class="modal"><p style="font-size:.9rem;color:var(--ink);margin:6px 0 18px;text-align:center;">'+escapeHtml(msg)+'</p><div class="modal-foot" style="justify-content:center;"><button class="btn-primary" id="alertOkBtn">Compris</button></div></div></div>';
+  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('alertOkBtn').addEventListener('click',closeModal);
 }
 
-/* ---------- Tutoriels ---------- */
-const ANAMNESE_TUTORIAL_STEPS = [
-  { target: null, title: 'Bienvenue sur le générateur de contenu', text: "Ce petit tutoriel te montre comment utiliser l'onglet Anamnèse, étape par étape. Clique sur « Suivant » pour commencer." },
-  { target: '#anamneseGenreRow', title: 'Genre du patient', text: 'Commence par choisir M. ou Mme. Ce choix adapte automatiquement les accords (patient/patiente) dans le texte généré.' },
-  { target: '#situationRow', title: 'Situation', text: 'Choisis ensuite la situation correspondante : Dépistage, Dépistage avec ORL, 1er RDV ou Renouvellement.' },
-  { target: '#anamneseContent', title: 'Le texte', text: "L'introduction et la conclusion s'affichent ici, modifiables directement. Tes modifications sont enregistrées automatiquement.", tooltipPosition: 'above', ensure: function(){ if(!selectedSituation){ selectedSituation='depistage_simple'; renderSituationRow(); renderAnamneseContent(); } } },
-  { target: '#copyAnamneseBtn', title: 'Copier', text: 'Une fois prêt, clique ici pour copier le texte complet et le coller où tu en as besoin.', ensure: function(){ if(!selectedSituation){ selectedSituation='depistage_simple'; renderSituationRow(); renderAnamneseContent(); } } }
+/* ========== Tutoriels ========== */
+const ANAMNESE_TUTORIAL_STEPS=[
+  {target:null,title:'Bienvenue sur le générateur',text:"Ce tutoriel te montre comment utiliser l'onglet Anamnèse. Clique sur « Suivant » pour commencer."},
+  {target:'#anamneseGenreRow',title:'Genre du patient',text:'Commence par choisir M. ou Mme. Ce choix adapte automatiquement les accords dans le texte généré.'},
+  {target:'#situationRow',title:'Situation',text:'Choisis la situation : Dépistage, Dépistage avec ORL, 1er RDV ou Renouvellement.'},
+  {target:'#anamneseContent',title:'Le texte',text:"L'introduction et la conclusion s'affichent ici, modifiables. Tes modifications sont enregistrées automatiquement.",tooltipPosition:'above',ensure:function(){if(!selectedSituation){selectedSituation='depistage_simple';renderSituationRow();renderAnamneseContent();}}},
+  {target:'#copyAnamneseBtn',title:'Copier',text:'Clique ici pour copier le texte complet.',ensure:function(){if(!selectedSituation){selectedSituation='depistage_simple';renderSituationRow();renderAnamneseContent();}}}
 ];
-const GENERER_TUTORIAL_STEPS = [
-  { target: null, title: 'Tutoriel — Onglet Générer', text: "Cet onglet sert à générer rapidement un email (et son SMS associé) prêt à copier-coller. Clique sur « Suivant » pour voir comment ça marche." },
-  { target: '#followTypeRow', title: 'Type de suivi', text: "Choisis d'abord si le mail s'adresse à un patient ou à un partenaire : ça filtre les modèles disponibles." },
-  { target: '#templateSelect', title: 'Modèle', text: 'Sélectionne ensuite le modèle correspondant à ta situation.', ensure: function(){ if(!followType){ followType='patient'; renderFollowTypeRow(); renderCategoryRow(); updateCategoryBlockVisibility(); renderTemplateSelect(); } if(!selectedCategory){ selectedCategory='Reconfirmation'; renderCategoryRow(); renderTemplateSelect(); } } },
-  { target: '#extraFields', title: 'Informations à compléter', text: 'Renseigne ici le nom du patient et les autres champs comme la date.', ensure: function(){ const sel=document.getElementById('templateSelect'); if(sel&&!sel.value&&appData.templates.some(function(t){return t.id==='tpl-confirmation-rdv';})){sel.value='tpl-confirmation-rdv';updateExtraFieldsAndPreview();} } },
-  { target: '.preview-col', title: 'Aperçu et copie', text: 'Le message généré apparaît ici, déjà rempli. Clique sur « Copier le message ».', tooltipPosition: 'left' }
+const GENERER_TUTORIAL_STEPS=[
+  {target:null,title:'Tutoriel — Onglet Générer',text:"Génère rapidement un email prêt à copier-coller. Clique sur « Suivant »."},
+  {target:'#followTypeRow',title:'Type de suivi',text:"Choisis si le mail s'adresse à un patient ou un partenaire."},
+  {target:'#templateSelect',title:'Modèle',text:'Sélectionne le modèle correspondant.',ensure:function(){if(!followType){followType='patient';renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();}if(!selectedCategory){selectedCategory='Reconfirmation';renderCategoryRow();renderTemplateSelect();}}},
+  {target:'#extraFields',title:'Informations',text:'Renseigne le nom du patient et la date.',ensure:function(){const s=document.getElementById('templateSelect');if(s&&!s.value&&appData.templates.some(t=>t.id==='tpl-confirmation-rdv')){s.value='tpl-confirmation-rdv';updateExtraFieldsAndPreview();}}},
+  {target:'.preview-col',title:'Aperçu et copie',text:'Le message apparaît ici. Clique sur « Copier le message ».',tooltipPosition:'left'}
 ];
-const MODELES_TUTORIAL_STEPS = [
-  { target: null, title: 'Tutoriel — Onglet Modèles', text: "Cet onglet te permet de gérer tous tes modèles d'email et de SMS." },
-  { target: '.controls-row', title: 'Rechercher ou créer', text: 'Utilise la barre de recherche ou clique sur « + Nouveau modèle » pour en créer un.' },
-  { target: '#typeChips', title: 'Filtrer par type', text: "Ces filtres permettent d'afficher uniquement les modèles Email ou SMS." },
-  { target: '#templatesGrid', title: 'Mails patients et partenaires', text: "Les modèles sont classés en deux groupes. « Modifier » permet de changer le contenu, « Supprimer » l'efface.", tooltipPosition: 'above' }
+const MODELES_TUTORIAL_STEPS=[
+  {target:null,title:'Tutoriel — Onglet Modèles',text:"Gère tous tes modèles d'email et SMS."},
+  {target:'.controls-row',title:'Rechercher ou créer',text:'Barre de recherche ou « + Nouveau modèle ».'},
+  {target:'#typeChips',title:'Filtrer',text:"Affiche uniquement Email ou SMS."},
+  {target:'#templatesGrid',title:'Mails patients et partenaires',text:"Deux groupes. « Modifier » pour changer, « Supprimer » pour effacer.",tooltipPosition:'above'}
 ];
-
-function startTutorial(steps) { activeTutorialSteps = steps; tutorialStepIndex = 0; renderTutorialStep(); }
-function startAnamneseTutorial() { startTutorial(ANAMNESE_TUTORIAL_STEPS); }
-function startGenererTutorial() { startTutorial(GENERER_TUTORIAL_STEPS); }
-function startModelesTutorial() { startTutorial(MODELES_TUTORIAL_STEPS); }
-function closeTutorial() {
-  tutorialStepIndex = -1; activeTutorialSteps = null;
-  const overlay = document.getElementById('tutorialOverlay');
-  if (overlay) overlay.remove();
-}
-function renderTutorialStep() {
-  if (tutorialStepIndex < 0 || !activeTutorialSteps) return;
-  const steps = activeTutorialSteps;
-  const step = steps[tutorialStepIndex];
-  if (step.ensure) step.ensure();
-  let overlay = document.getElementById('tutorialOverlay');
-  if (!overlay) { overlay = document.createElement('div'); overlay.id = 'tutorialOverlay'; overlay.className = 'tutorial-overlay'; document.body.appendChild(overlay); }
-  let targetRect = null;
-  if (step.target) { const el = document.querySelector(step.target); if (el) targetRect = el.getBoundingClientRect(); }
-  let boxHtml = '';
-  let tooltipStyle;
-  if (targetRect && targetRect.width > 0) {
-    boxHtml = '<div class="tutorial-highlight" style="top:' + (targetRect.top - 8) + 'px;left:' + (targetRect.left - 8) + 'px;width:' + (targetRect.width + 16) + 'px;height:' + (targetRect.height + 16) + 'px;"></div>';
-    if (step.tooltipPosition === 'above') { const tl = Math.max(16, Math.min(targetRect.left, window.innerWidth - 316)); tooltipStyle = 'bottom:' + (window.innerHeight - targetRect.top + 14) + 'px;left:' + tl + 'px;'; }
-    else if (step.tooltipPosition === 'left') { const tr = Math.min(window.innerWidth - targetRect.left + 14, window.innerWidth - 316); const tt = Math.max(16, Math.min(targetRect.top, window.innerHeight - 260)); tooltipStyle = 'right:' + tr + 'px;top:' + tt + 'px;'; }
-    else { tooltipStyle = 'top:' + (targetRect.bottom + 14) + 'px;left:' + Math.max(16, Math.min(targetRect.left, window.innerWidth - 316)) + 'px;'; }
-  } else { tooltipStyle = 'top:50%;left:50%;transform:translate(-50%,-50%);'; }
-  overlay.innerHTML =
-    (targetRect && targetRect.width > 0 ? '' : '<div class="tutorial-backdrop-full"></div>') + boxHtml +
-    '<div class="tutorial-tooltip" style="' + tooltipStyle + '">' +
-      '<button type="button" class="tutorial-close" id="tutorialCloseBtn">×</button>' +
-      '<h3>' + escapeHtml(step.title) + '</h3><p>' + step.text + '</p>' +
-      '<div class="tutorial-foot"><span class="tutorial-step-count">' + (tutorialStepIndex + 1) + ' / ' + steps.length + '</span>' +
-      '<div class="tutorial-nav"><button type="button" class="btn-outline small" id="tutorialPrevBtn" ' + (tutorialStepIndex === 0 ? 'disabled' : '') + '>Précédent</button>' +
-      '<button type="button" class="btn-primary" id="tutorialNextBtn">' + (tutorialStepIndex === steps.length - 1 ? 'Terminer' : 'Suivant') + '</button></div></div></div>';
-  document.getElementById('tutorialCloseBtn').addEventListener('click', closeTutorial);
-  document.getElementById('tutorialPrevBtn').addEventListener('click', function() { if (tutorialStepIndex > 0) { tutorialStepIndex--; renderTutorialStep(); } });
-  document.getElementById('tutorialNextBtn').addEventListener('click', function() { if (tutorialStepIndex < steps.length - 1) { tutorialStepIndex++; renderTutorialStep(); } else closeTutorial(); });
+function startTutorial(steps){activeTutorialSteps=steps;tutorialStepIndex=0;renderTutorialStep();}
+function startAnamneseTutorial(){startTutorial(ANAMNESE_TUTORIAL_STEPS);}
+function startGenererTutorial(){startTutorial(GENERER_TUTORIAL_STEPS);}
+function startModelesTutorial(){startTutorial(MODELES_TUTORIAL_STEPS);}
+function closeTutorial(){tutorialStepIndex=-1;activeTutorialSteps=null;const o=document.getElementById('tutorialOverlay');if(o)o.remove();}
+function renderTutorialStep(){
+  if(tutorialStepIndex<0||!activeTutorialSteps)return;
+  const steps=activeTutorialSteps,step=steps[tutorialStepIndex];
+  if(step.ensure)step.ensure();
+  let ov=document.getElementById('tutorialOverlay');
+  if(!ov){ov=document.createElement('div');ov.id='tutorialOverlay';ov.className='tutorial-overlay';document.body.appendChild(ov);}
+  let tr=null;if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
+  let box='',ts;
+  if(tr&&tr.width>0){
+    box='<div class="tutorial-highlight" style="top:'+(tr.top-8)+'px;left:'+(tr.left-8)+'px;width:'+(tr.width+16)+'px;height:'+(tr.height+16)+'px;"></div>';
+    if(step.tooltipPosition==='above'){const tl=Math.max(16,Math.min(tr.left,window.innerWidth-316));ts='bottom:'+(window.innerHeight-tr.top+14)+'px;left:'+tl+'px;';}
+    else if(step.tooltipPosition==='left'){ts='right:'+Math.min(window.innerWidth-tr.left+14,window.innerWidth-316)+'px;top:'+Math.max(16,Math.min(tr.top,window.innerHeight-260))+'px;';}
+    else ts='top:'+(tr.bottom+14)+'px;left:'+Math.max(16,Math.min(tr.left,window.innerWidth-316))+'px;';
+  }else ts='top:50%;left:50%;transform:translate(-50%,-50%);';
+  ov.innerHTML=(tr&&tr.width>0?'':'<div class="tutorial-backdrop-full"></div>')+box+'<div class="tutorial-tooltip" style="'+ts+'"><button type="button" class="tutorial-close" id="tutorialCloseBtn">×</button><h3>'+escapeHtml(step.title)+'</h3><p>'+step.text+'</p><div class="tutorial-foot"><span class="tutorial-step-count">'+(tutorialStepIndex+1)+' / '+steps.length+'</span><div class="tutorial-nav"><button type="button" class="btn-outline small" id="tutorialPrevBtn" '+(tutorialStepIndex===0?'disabled':'')+'>Précédent</button><button type="button" class="btn-primary" id="tutorialNextBtn">'+(tutorialStepIndex===steps.length-1?'Terminer':'Suivant')+'</button></div></div></div>';
+  document.getElementById('tutorialCloseBtn').addEventListener('click',closeTutorial);
+  document.getElementById('tutorialPrevBtn').addEventListener('click',()=>{if(tutorialStepIndex>0){tutorialStepIndex--;renderTutorialStep();}});
+  document.getElementById('tutorialNextBtn').addEventListener('click',()=>{if(tutorialStepIndex<steps.length-1){tutorialStepIndex++;renderTutorialStep();}else closeTutorial();});
 }
 
-/* ---------- Réglages ---------- */
-async function renameSignature(oldName, newName) {
-  if (!newName) return;
-  const oldTrim = (oldName || '').trim();
-  if (oldTrim && oldTrim !== newName) {
-    appData.templates.forEach(function(t) {
-      t.body = t.body.split(oldTrim).join(newName);
-      if (t.subject) t.subject = t.subject.split(oldTrim).join(newName);
-      if (t.smsCompanion) t.smsCompanion = t.smsCompanion.split(oldTrim).join(newName);
-    });
-    Object.keys(appData.anamnese).forEach(function(id) {
-      if (appData.anamnese[id] && typeof appData.anamnese[id].text === 'string')
-        appData.anamnese[id].text = appData.anamnese[id].text.split(oldTrim).join(newName);
-    });
+/* ========== Réglages ========== */
+async function renameSignature(oldName,newName){
+  if(!newName)return;
+  const ot=(oldName||'').trim();
+  if(ot&&ot!==newName){
+    appData.templates.forEach(t=>{t.body=t.body.split(ot).join(newName);if(t.subject)t.subject=t.subject.split(ot).join(newName);if(t.smsCompanion)t.smsCompanion=t.smsCompanion.split(ot).join(newName);});
+    Object.keys(appData.anamnese).forEach(id=>{if(appData.anamnese[id]&&typeof appData.anamnese[id].text==='string')appData.anamnese[id].text=appData.anamnese[id].text.split(ot).join(newName);});
   }
-  appData.signatureName = newName;
+  appData.signatureName=newName;
   await persist();
 }
 
-async function openSettingsForm() {
-  const defaultDir = await getDefaultStorageDir();
-  const currentPath = appData.storagePath || defaultDir;
-  const root = document.getElementById('modalRoot');
-  root.innerHTML =
-    '<div class="overlay" id="overlay"><div class="modal"><h2>Réglages</h2>' +
-    '<label>Nom de signature</label>' +
-    '<div class="input-clear-wrap"><input id="f-signature" value="' + escapeHtml(appData.signatureName || '') + '" placeholder="Ex. Benjamin Magnier"><button type="button" class="input-clear-btn" id="clearSignatureBtn">×</button></div>' +
-    '<p class="hint">Remplace automatiquement ce nom partout où il apparaît déjà dans les modèles et textes d\'anamnèse.</p>' +
-    '<label>Dossier de stockage des données</label>' +
-    '<div class="storage-path-row"><input id="f-storagePath" value="' + escapeHtml(currentPath) + '" readonly><button type="button" class="btn-outline small" id="browseStorageBtn">Parcourir…</button><button type="button" class="btn-outline small" id="resetStorageBtn">Réinitialiser</button></div>' +
-    '<p class="hint">Les données sont enregistrées dans ce dossier. Changer le dossier déplace uniquement les futurs enregistrements.</p>' +
-    '<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div>' +
-    '</div></div>';
-
-  document.getElementById('clearSignatureBtn').addEventListener('click', function() {
-    const inp = document.getElementById('f-signature'); inp.value = ''; inp.focus();
+function openSettingsForm(){
+  const root=document.getElementById('modalRoot');
+  const folderName=dirHandle?dirHandle.name:'(non défini)';
+  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Réglages</h2><label>Nom de signature</label><div class="input-clear-wrap"><input id="f-signature" value="'+escapeHtml(appData.signatureName||'')+'" placeholder="Ex. Benjamin Magnier"><button type="button" class="input-clear-btn" id="clearSignatureBtn">×</button></div><p class="hint">Remplace automatiquement ce nom partout dans les modèles et textes d\'anamnèse.</p><label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div><p class="hint">Les données sont sauvegardées dans ce dossier. Changer le dossier ne déplace pas les données existantes.</p><div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div></div></div>';
+  document.getElementById('clearSignatureBtn').addEventListener('click',()=>{const i=document.getElementById('f-signature');i.value='';i.focus();});
+  document.getElementById('changeFolderBtn').addEventListener('click',async()=>{
+    const ok=await pickFolder();
+    if(ok){closeModal();showToast('Dossier mis à jour ✓');}
   });
-
-  document.getElementById('browseStorageBtn').addEventListener('click', async function() {
-    const selected = await open({ directory: true, multiple: false, title: 'Choisir le dossier de stockage' });
-    if (selected) document.getElementById('f-storagePath').value = selected;
-  });
-
-  document.getElementById('resetStorageBtn').addEventListener('click', async function() {
-    document.getElementById('f-storagePath').value = defaultDir;
-  });
-
-  document.getElementById('cancelBtn').addEventListener('click', closeModal);
-  document.getElementById('overlay').addEventListener('click', function(e) { if (e.target.id === 'overlay') closeModal(); });
-  document.getElementById('f-signature').addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); saveSettings(); } });
-
-  async function saveSettings() {
-    const newName = document.getElementById('f-signature').value.trim();
-    if (!newName) return;
-    const newPath = document.getElementById('f-storagePath').value.trim();
-    const oldName = appData.signatureName;
-
-    if (newPath && newPath !== (appData.storagePath || defaultDir)) {
-      try {
-        const dirEx = await exists(newPath);
-        if (!dirEx) await mkdir(newPath, { recursive: true });
-        appData.storagePath = newPath;
-        dataFilePath = await join(newPath, 'data.json');
-      } catch(e) {
-        showToast('Impossible d\'accéder à ce dossier.');
-        return;
-      }
-    }
-
-    await renameSignature(oldName, newName);
-    closeModal();
-    renderTemplatesGrid();
-    renderTemplateSelect();
-    if (document.getElementById('templateSelect').value) updateExtraFieldsAndPreview();
-    if (selectedSituation) renderAnamneseContent();
+  document.getElementById('cancelBtn').addEventListener('click',closeModal);
+  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('f-signature').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save();}});
+  async function save(){
+    const nn=document.getElementById('f-signature').value.trim();
+    if(!nn)return;
+    await renameSignature(appData.signatureName,nn);
+    closeModal();renderTemplatesGrid();renderTemplateSelect();
+    if(document.getElementById('templateSelect').value)updateExtraFieldsAndPreview();
+    if(selectedSituation)renderAnamneseContent();
     showToast('Réglages enregistrés ✓');
   }
-
-  document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+  document.getElementById('saveSettingsBtn').addEventListener('click',save);
 }
 
-/* ---------- Template modal ---------- */
-function renderFormCategoryField(audienceVal, currentCat) {
-  const list = audienceVal === 'partenaire' ? PARTNER_CATEGORIES : PATIENT_CATEGORIES;
-  const wrap = document.getElementById('formCategoryField');
-  if (!wrap) return;
-  wrap.innerHTML = '<label>Catégorie</label><div class="radio-row">' +
-    list.map(function(o) { return '<label><input type="radio" name="f-category" value="' + o.id + '" ' + (currentCat === o.id ? 'checked' : '') + '> ' + o.label + '</label>'; }).join('') + '</div>';
+/* ========== Template modal ========== */
+function renderFormCategoryField(av,cc){
+  const l=av==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES,w=document.getElementById('formCategoryField');
+  if(!w)return;
+  w.innerHTML='<label>Catégorie</label><div class="radio-row">'+l.map(o=>'<label><input type="radio" name="f-category" value="'+o.id+'" '+(cc===o.id?'checked':'')+'>  '+o.label+'</label>').join('')+'</div>';
 }
-function openTemplateForm(editing) {
-  const root = document.getElementById('modalRoot');
-  const audience = editing ? (editing.audience || 'patient') : 'patient';
-  const initialCat = editing ? (editing.audience === 'partenaire' ? (editing.partnerCategory || 'CC1') : (editing.patientCategory || 'Reconfirmation')) : 'Reconfirmation';
-  const navList = editing ? getFilteredTemplateList() : [];
-  const navIdx = editing ? navList.findIndex(function(t) { return t.id === editing.id; }) : -1;
-  root.innerHTML =
-    '<div class="overlay" id="overlay"><div class="modal">' +
-    '<h2>' + (editing ? 'Modifier le modèle' : 'Nouveau modèle') + '</h2>' +
-    '<label>Destinataire</label><div class="radio-row"><label><input type="radio" name="f-audience" value="patient" ' + (audience === 'patient' ? 'checked' : '') + '> Patient</label><label><input type="radio" name="f-audience" value="partenaire" ' + (audience === 'partenaire' ? 'checked' : '') + '> Partenaire</label></div>' +
-    '<div id="formCategoryField"></div>' +
-    '<label>Titre</label><input id="f-title" value="' + (editing ? escapeHtml(editing.title) : '') + '">' +
-    '<label>Étiquette (optionnel)</label><input id="f-category" value="' + (editing ? escapeHtml(editing.category || '') : '') + '">' +
-    '<label>Objet</label><input id="f-subject" value="' + (editing ? escapeHtml(editing.subject || '') : '') + '">' +
-    '<label>Mail</label><textarea id="f-body">' + (editing ? escapeHtml(editing.body) : escapeHtml('\n\n' + appData.emailFooter)) + '</textarea>' +
-    '<div id="smsCompanionField" style="display:' + (audience === 'patient' ? 'block' : 'none') + ';"><label>SMS</label><textarea id="f-sms" placeholder="Version courte pour SMS…">' + (editing ? escapeHtml(editing.smsCompanion || '') : '') + '</textarea></div>' +
-    '<div class="err-msg" id="f-err">Le titre et le corps du message sont obligatoires.</div>' +
-    (editing ? '<div class="modal-foot" style="justify-content:space-between;"><button type="button" class="btn-outline small" id="prevTemplateBtn" ' + (navIdx <= 0 ? 'disabled' : '') + '>‹ Précédent</button><button type="button" class="btn-outline small" id="nextTemplateBtn" ' + (navIdx >= navList.length - 1 ? 'disabled' : '') + '>Suivant ›</button></div>' : '') +
-    '<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">' + (editing ? 'Enregistrer' : 'Ajouter') + '</button></div>' +
-    '</div></div>';
-
-  renderFormCategoryField(audience, initialCat);
-  function toggleAudienceFields() {
-    const a = root.querySelector('input[name="f-audience"]:checked').value;
-    renderFormCategoryField(a, a === 'partenaire' ? 'CC1' : 'Reconfirmation');
-    document.getElementById('smsCompanionField').style.display = a === 'patient' ? 'block' : 'none';
+function openTemplateForm(editing){
+  const root=document.getElementById('modalRoot');
+  const aud=editing?(editing.audience||'patient'):'patient';
+  const ic=editing?(editing.audience==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
+  const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
+  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>'+(editing?'Modifier le modèle':'Nouveau modèle')+'</h2><label>Destinataire</label><div class="radio-row"><label><input type="radio" name="f-audience" value="patient" '+(aud==='patient'?'checked':'')+'>  Patient</label><label><input type="radio" name="f-audience" value="partenaire" '+(aud==='partenaire'?'checked':'')+'>  Partenaire</label></div><div id="formCategoryField"></div><label>Titre</label><input id="f-title" value="'+(editing?escapeHtml(editing.title):'')+'"><label>Étiquette (optionnel)</label><input id="f-category" value="'+(editing?escapeHtml(editing.category||''):'')+'"><label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'"><label>Mail</label><textarea id="f-body">'+(editing?escapeHtml(editing.body):escapeHtml('\n\n'+appData.emailFooter))+'</textarea><div id="smsCompanionField" style="display:'+(aud==='patient'?'block':'none')+';"><label>SMS</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):'')+'</textarea></div><div class="err-msg" id="f-err">Le titre et le corps sont obligatoires.</div>'+(editing?'<div class="modal-foot" style="justify-content:space-between;"><button type="button" class="btn-outline small" id="prevTplBtn" '+(ni<=0?'disabled':'')+'>‹ Précédent</button><button type="button" class="btn-outline small" id="nextTplBtn" '+(ni>=nl.length-1?'disabled':'')+'>Suivant ›</button></div>':'')+'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">'+(editing?'Enregistrer':'Ajouter')+'</button></div></div></div>';
+  renderFormCategoryField(aud,ic);
+  function tog(){const a=root.querySelector('input[name="f-audience"]:checked').value;renderFormCategoryField(a,a==='partenaire'?'CC1':'Reconfirmation');document.getElementById('smsCompanionField').style.display=a==='patient'?'block':'none';}
+  root.querySelectorAll('input[name="f-audience"]').forEach(r=>r.addEventListener('change',tog));
+  document.getElementById('cancelBtn').addEventListener('click',closeModal);
+  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  async function saveForm(){
+    const ti=document.getElementById('f-title').value.trim(),ca=document.getElementById('f-category').value.trim();
+    const a2=root.querySelector('input[name="f-audience"]:checked').value,cc=root.querySelector('input[name="f-category"]:checked');
+    const cv=cc?cc.value:(a2==='partenaire'?'CC1':'Reconfirmation');
+    const su=document.getElementById('f-subject').value.trim(),bo=document.getElementById('f-body').value.trim(),sm=document.getElementById('f-sms').value.trim();
+    const er=document.getElementById('f-err');
+    if(!ti||!bo){er.style.display='block';return false;}er.style.display='none';
+    if(editing){editing.title=ti;editing.category=ca;editing.type='email';editing.audience=a2;editing.subject=su;editing.body=bo;editing.partnerCategory=a2==='partenaire'?cv:undefined;editing.patientCategory=a2==='patient'?cv:undefined;editing.smsCompanion=a2==='patient'?(sm||undefined):undefined;}
+    else{appData.templates.push({id:'user-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),title:ti,category:ca,type:'email',audience:a2,partnerCategory:a2==='partenaire'?cv:undefined,patientCategory:a2==='patient'?cv:undefined,smsCompanion:a2==='patient'?(sm||undefined):undefined,subject:su,body:bo,createdAt:Date.now()});}
+    await persist();renderTemplatesGrid();renderTemplateSelect();return true;
   }
-  root.querySelectorAll('input[name="f-audience"]').forEach(function(r) { r.addEventListener('change', toggleAudienceFields); });
-  document.getElementById('cancelBtn').addEventListener('click', closeModal);
-  document.getElementById('overlay').addEventListener('click', function(e) { if (e.target.id === 'overlay') closeModal(); });
-
-  async function saveCurrentForm() {
-    const title = document.getElementById('f-title').value.trim();
-    const category = document.getElementById('f-category').value.trim();
-    const audience2 = root.querySelector('input[name="f-audience"]:checked').value;
-    const catChecked = root.querySelector('input[name="f-category"]:checked');
-    const catValue = catChecked ? catChecked.value : (audience2 === 'partenaire' ? 'CC1' : 'Reconfirmation');
-    const subject = document.getElementById('f-subject').value.trim();
-    const body = document.getElementById('f-body').value.trim();
-    const smsText = document.getElementById('f-sms').value.trim();
-    const err = document.getElementById('f-err');
-    if (!title || !body) { err.style.display = 'block'; return false; }
-    err.style.display = 'none';
-    if (editing) {
-      editing.title = title; editing.category = category; editing.type = 'email';
-      editing.audience = audience2; editing.subject = subject; editing.body = body;
-      editing.partnerCategory = audience2 === 'partenaire' ? catValue : undefined;
-      editing.patientCategory = audience2 === 'patient' ? catValue : undefined;
-      editing.smsCompanion = audience2 === 'patient' ? (smsText || undefined) : undefined;
-    } else {
-      appData.templates.push({
-        id: 'user-' + Date.now() + '-' + Math.random().toString(36).slice(2,7),
-        title, category, type: 'email', audience: audience2,
-        partnerCategory: audience2 === 'partenaire' ? catValue : undefined,
-        patientCategory: audience2 === 'patient' ? catValue : undefined,
-        smsCompanion: audience2 === 'patient' ? (smsText || undefined) : undefined,
-        subject, body, createdAt: Date.now()
-      });
-    }
-    await persist();
-    renderTemplatesGrid();
-    renderTemplateSelect();
-    return true;
-  }
-
-  document.getElementById('saveBtn').addEventListener('click', async function() {
-    const ok = await saveCurrentForm();
-    if (ok) { closeModal(); showToast(editing ? 'Modèle mis à jour ✓' : 'Modèle ajouté ✓'); }
-  });
-  if (editing) {
-    document.getElementById('prevTemplateBtn').addEventListener('click', async function() {
-      const ok = await saveCurrentForm(); if (!ok) return;
-      const list = getFilteredTemplateList(); const i = list.findIndex(function(t) { return t.id === editing.id; });
-      if (i > 0) openTemplateForm(list[i - 1]);
-    });
-    document.getElementById('nextTemplateBtn').addEventListener('click', async function() {
-      const ok = await saveCurrentForm(); if (!ok) return;
-      const list = getFilteredTemplateList(); const i = list.findIndex(function(t) { return t.id === editing.id; });
-      if (i < list.length - 1) openTemplateForm(list[i + 1]);
-    });
+  document.getElementById('saveBtn').addEventListener('click',async()=>{const ok=await saveForm();if(ok){closeModal();showToast(editing?'Modèle mis à jour ✓':'Modèle ajouté ✓');}});
+  if(editing){
+    document.getElementById('prevTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i>0)openTemplateForm(l[i-1]);});
+    document.getElementById('nextTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i<l.length-1)openTemplateForm(l[i+1]);});
   }
 }
 
-/* ---------- Delete confirm ---------- */
-function confirmDeleteTemplate(id) {
-  const root = document.getElementById('modalRoot');
-  const item = appData.templates.find(function(t) { return t.id === id; });
-  if (!item) return;
-  root.innerHTML =
-    '<div class="overlay" id="overlay"><div class="modal"><h2>Supprimer ?</h2>' +
-    '<p style="font-size:.88rem;color:var(--muted-ink);">Veux-tu vraiment supprimer "' + escapeHtml(item.title) + '" ? Cette action est définitive.</p>' +
-    '<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-danger" id="confirmDelBtn">Supprimer</button></div>' +
-    '</div></div>';
-  document.getElementById('cancelBtn').addEventListener('click', closeModal);
-  document.getElementById('overlay').addEventListener('click', function(e) { if (e.target.id === 'overlay') closeModal(); });
-  document.getElementById('confirmDelBtn').addEventListener('click', async function() {
-    appData.templates = appData.templates.filter(function(t) { return t.id !== id; });
-    await persist(); closeModal(); renderTemplatesGrid(); renderTemplateSelect(); showToast('Supprimé ✓');
-  });
+/* ========== Delete ========== */
+function confirmDeleteTemplate(id){
+  const root=document.getElementById('modalRoot'),item=appData.templates.find(t=>t.id===id);
+  if(!item)return;
+  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Supprimer ?</h2><p style="font-size:.88rem;color:var(--muted-ink);">Veux-tu vraiment supprimer "'+escapeHtml(item.title)+'" ? Cette action est définitive.</p><div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-danger" id="confirmDelBtn">Supprimer</button></div></div></div>';
+  document.getElementById('cancelBtn').addEventListener('click',closeModal);
+  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('confirmDelBtn').addEventListener('click',async()=>{appData.templates=appData.templates.filter(t=>t.id!==id);await persist();closeModal();renderTemplatesGrid();renderTemplateSelect();showToast('Supprimé ✓');});
 }
 
-/* ---------- Init ---------- */
-(async function init() {
-  await loadData();
+/* ========== Wiring ========== */
+(async function init(){
+  await initStorageAndLoad();
+  renderAll();
 
-  renderTypeChips();
-  renderTemplatesGrid();
-  renderTemplateSelect();
-  renderGenreRow();
-  renderSituationRow();
-  renderRenouvellementSubRow();
-  renderFollowTypeRow();
-  renderCategoryRow();
-  updateCategoryBlockVisibility();
-
-  document.getElementById('tabs').addEventListener('click', function(e) {
-    const btn = e.target.closest('.tab');
-    if (btn) switchTab(btn.dataset.tab);
+  document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)switchTab(b.dataset.tab);});
+  document.getElementById('templateSelect').addEventListener('change',()=>{manualValues={};civilite=null;datePickerView={};updateExtraFieldsAndPreview();});
+  document.getElementById('copyBodyBtn').addEventListener('click',async()=>{
+    const t=appData.templates.find(t=>t.id===document.getElementById('templateSelect').value);if(!t)return;
+    if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
+    const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()});
+    showToast(await copyText(resolveGenre(buildFilledText(t.body,vals),getEffectiveGenre()))?'Message copié ✓':"Impossible de copier.");
   });
-  document.getElementById('templateSelect').addEventListener('change', function() {
-    manualValues = {}; civilite = null; datePickerView = {};
-    updateExtraFieldsAndPreview();
+  document.getElementById('copySmsBtn').addEventListener('click',async()=>{
+    const t=appData.templates.find(t=>t.id===document.getElementById('templateSelect').value);if(!t||!t.smsCompanion)return;
+    if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
+    const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()});
+    showToast(await copyText(resolveGenre(buildFilledText(t.smsCompanion,vals),getEffectiveGenre()))?'SMS copié ✓':"Impossible de copier.");
   });
-  document.getElementById('copyBodyBtn').addEventListener('click', async function() {
-    const sel = document.getElementById('templateSelect');
-    const template = appData.templates.find(function(t) { return t.id === sel.value; });
-    if (!template) return;
-    if (needsGenreChoice() && !civilite) { showCenterAlert('Sélectionne le genre du patient avant de copier le message.'); return; }
-    const values = Object.assign({}, manualValues, { nom: getRecipientNomValue() });
-    const filled = buildFilledText(template.body, values);
-    const ok = await copyText(resolveGenre(filled, getEffectiveGenre()));
-    showToast(ok ? 'Message copié ✓' : "Impossible de copier, réessaie.");
+  document.getElementById('anamneseTextarea').addEventListener('change',async e=>{const k=getCurrentAnamneseKey();if(!k)return;appData.anamnese[k]={text:e.target.value};await persist();showToast('Texte enregistré ✓');});
+  document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}showToast(await copyText(resolveGenre(document.getElementById('anamneseTextarea').value,anamneseGenre))?'Texte copié ✓':"Impossible de copier.");});
+  document.getElementById('anamneseTutorialBtn').addEventListener('click',startAnamneseTutorial);
+  document.getElementById('genererTutorialBtn').addEventListener('click',startGenererTutorial);
+  document.getElementById('modelesTutorialBtn').addEventListener('click',startModelesTutorial);
+  document.getElementById('templatesGrid').addEventListener('click',e=>{
+    const ed=e.target.closest('[data-edit-template]'),dl=e.target.closest('[data-del-template]');
+    if(ed)openTemplateForm(appData.templates.find(t=>t.id===ed.dataset.editTemplate));
+    if(dl)confirmDeleteTemplate(dl.dataset.delTemplate);
   });
-  document.getElementById('copySmsBtn').addEventListener('click', async function() {
-    const sel = document.getElementById('templateSelect');
-    const template = appData.templates.find(function(t) { return t.id === sel.value; });
-    if (!template || !template.smsCompanion) return;
-    if (needsGenreChoice() && !civilite) { showCenterAlert('Sélectionne le genre du patient avant de copier le SMS.'); return; }
-    const values = Object.assign({}, manualValues, { nom: getRecipientNomValue() });
-    const filled = buildFilledText(template.smsCompanion, values);
-    const ok = await copyText(resolveGenre(filled, getEffectiveGenre()));
-    showToast(ok ? 'SMS copié ✓' : "Impossible de copier, réessaie.");
-  });
-  document.getElementById('anamneseTextarea').addEventListener('change', async function(e) {
-    const key = getCurrentAnamneseKey();
-    if (!key) return;
-    appData.anamnese[key] = { text: e.target.value };
-    await persist();
-    showToast('Texte enregistré ✓');
-  });
-  document.getElementById('copyAnamneseBtn').addEventListener('click', async function() {
-    if (!anamneseGenre) { showCenterAlert('Sélectionne le genre du patient avant de copier le message.'); return; }
-    const raw = document.getElementById('anamneseTextarea').value;
-    const ok = await copyText(resolveGenre(raw, anamneseGenre));
-    showToast(ok ? 'Texte copié ✓' : "Impossible de copier, réessaie.");
-  });
-  document.getElementById('anamneseTutorialBtn').addEventListener('click', startAnamneseTutorial);
-  document.getElementById('genererTutorialBtn').addEventListener('click', startGenererTutorial);
-  document.getElementById('templatesGrid').addEventListener('click', function(e) {
-    const editId = e.target.closest('[data-edit-template]');
-    const delId = e.target.closest('[data-del-template]');
-    if (editId) openTemplateForm(appData.templates.find(function(t) { return t.id === editId.dataset.editTemplate; }));
-    if (delId) confirmDeleteTemplate(delId.dataset.delTemplate);
-  });
-  document.getElementById('addTemplateBtn').addEventListener('click', function() { openTemplateForm(null); });
-  document.getElementById('searchTemplates').addEventListener('input', function(e) { templateSearch = e.target.value; renderTemplatesGrid(); });
-  document.getElementById('settingsBtn').addEventListener('click', function() { openSettingsForm(); });
-  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeModal(); closeTutorial(); } });
+  document.getElementById('addTemplateBtn').addEventListener('click',()=>openTemplateForm(null));
+  document.getElementById('searchTemplates').addEventListener('input',e=>{templateSearch=e.target.value;renderTemplatesGrid();});
+  document.getElementById('settingsBtn').addEventListener('click',openSettingsForm);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTutorial();}});
 })();
 </script>
 </body>
