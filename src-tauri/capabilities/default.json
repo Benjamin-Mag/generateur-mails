@@ -10,7 +10,6 @@
     "fs:allow-mkdir",
     "fs:scope-document-recursive",
     "fs:scope-home-recursive",
-    "dialog:allow-open",
-    "path:default"
+    "dialog:allow-open"
   ]
 }
