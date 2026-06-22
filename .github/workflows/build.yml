@@ -42,4 +42,4 @@ jobs:
           releaseBody: 'Nouvelle version du générateur de mails & SMS.'
           releaseDraft: false
           prerelease: false
-          args: --target x86_64-pc-windows-msvc --bundles nsis,zip
+          args: --bundles nsis,msi
