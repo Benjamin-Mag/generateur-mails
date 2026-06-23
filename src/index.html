@@ -157,6 +157,12 @@ input,textarea,select{font-family:inherit;}
 .btn-danger:hover{background:var(--accent);color:#fff;}
 
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
+
+/* Onglets marque-page du modal template */
+.tpl-modal-tabs{display:flex;gap:0;margin-bottom:0;padding:0 24px;position:relative;top:0;}
+.tpl-modal-tab{background:var(--paper);border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;padding:9px 22px;font-size:.85rem;font-weight:600;color:var(--muted-ink);cursor:pointer;margin-right:4px;position:relative;top:1px;transition:background .15s,color .15s;}
+.tpl-modal-tab:hover{color:var(--ink);}
+.tpl-modal-tab.active{background:var(--card-bg);color:var(--accent);border-color:var(--line);z-index:1;}
 .folder-row span{flex:1;font-size:.85rem;color:var(--muted-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100;}
@@ -793,33 +799,74 @@ function renderFormCategoryField(av,cc){
   if(!w)return;
   w.innerHTML='<label>Catégorie</label><div class="radio-row">'+l.map(o=>'<label><input type="radio" name="f-category" value="'+o.id+'" '+(cc===o.id?'checked':'')+'>  '+o.label+'</label>').join('')+'</div>';
 }
+function buildModalHTML(aud,editing,nl,ni){
+  const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
+  const req='<span style="color:var(--accent);margin-left:2px;">*</span>';
+  const navRow=editing?'<div class="modal-foot" style="justify-content:space-between;margin-top:10px;"><button type="button" class="btn-outline small" id="prevTplBtn" '+(ni<=0?'disabled':'')+'>‹ Précédent</button><button type="button" class="btn-outline small" id="nextTplBtn" '+(ni>=nl.length-1?'disabled':'')+'>Suivant ›</button></div>':'';
+  return '<div class="overlay" id="overlay">'
+    +'<div class="modal" style="padding-top:0;overflow:visible;">'
+    +'<div class="tpl-modal-tabs">'
+    +'<button type="button" class="tpl-modal-tab'+(aud==='patient'?' active':'')+'" data-aud="patient">Patient</button>'
+    +'<button type="button" class="tpl-modal-tab'+(aud==='partenaire'?' active':'')+'" data-aud="partenaire">Partenaire</button>'
+    +'</div>'
+    +'<div style="padding:20px 24px 24px;">'
+    +'<h2 style="margin-top:4px;">'+(editing?'Modifier le modèle':'Nouveau modèle')+'</h2>'
+    +'<div id="formCategoryField"></div>'
+    +'<label>Titre'+req+'</label><input id="f-title" value="'+(editing?escapeHtml(editing.title):'')+'">'
+    +'<label>Étiquette <span style="font-weight:400;text-transform:none;font-size:.75rem;color:var(--muted-ink);">(optionnel)</span></label><input id="f-category" value="'+(editing?escapeHtml(editing.category||''):'')+'">'
+    +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
+    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing?escapeHtml(editing.body):escapeHtml('\n\n'+appData.emailFooter))+'</textarea>'
+    +(aud==='patient'?'<div id="smsCompanionField"><label>SMS'+req+'</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):'')+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS'+req+'</label><textarea id="f-sms"></textarea></div>')
+    +'<div class="err-msg" id="f-err">Le titre et le corps du mail sont obligatoires.</div>'
+    +navRow
+    +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">'+(editing?'Enregistrer':'Ajouter')+'</button></div>'
+    +'</div>'
+    +'</div></div>';
+}
 function openTemplateForm(editing){
   const root=document.getElementById('modalRoot');
-  const aud=editing?(editing.audience||'patient'):'patient';
-  const ic=editing?(editing.audience==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
+  let aud=editing?(editing.audience||'patient'):'patient';
   const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
-  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>'+(editing?'Modifier le modèle':'Nouveau modèle')+'</h2><label>Destinataire</label><div class="radio-row"><label><input type="radio" name="f-audience" value="patient" '+(aud==='patient'?'checked':'')+'>  Patient</label><label><input type="radio" name="f-audience" value="partenaire" '+(aud==='partenaire'?'checked':'')+'>  Partenaire</label></div><div id="formCategoryField"></div><label>Titre</label><input id="f-title" value="'+(editing?escapeHtml(editing.title):'')+'"><label>Étiquette (optionnel)</label><input id="f-category" value="'+(editing?escapeHtml(editing.category||''):'')+'"><label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'"><label>Mail</label><textarea id="f-body">'+(editing?escapeHtml(editing.body):escapeHtml('\n\n'+appData.emailFooter))+'</textarea><div id="smsCompanionField" style="display:'+(aud==='patient'?'block':'none')+';"><label>SMS</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):'')+'</textarea></div><div class="err-msg" id="f-err">Le titre et le corps sont obligatoires.</div>'+(editing?'<div class="modal-foot" style="justify-content:space-between;"><button type="button" class="btn-outline small" id="prevTplBtn" '+(ni<=0?'disabled':'')+'>‹ Précédent</button><button type="button" class="btn-outline small" id="nextTplBtn" '+(ni>=nl.length-1?'disabled':'')+'>Suivant ›</button></div>':'')+'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">'+(editing?'Enregistrer':'Ajouter')+'</button></div></div></div>';
-  renderFormCategoryField(aud,ic);
-  function tog(){const a=root.querySelector('input[name="f-audience"]:checked').value;renderFormCategoryField(a,a==='partenaire'?'CC1':'Reconfirmation');document.getElementById('smsCompanionField').style.display=a==='patient'?'block':'none';}
-  root.querySelectorAll('input[name="f-audience"]').forEach(r=>r.addEventListener('change',tog));
-  document.getElementById('cancelBtn').addEventListener('click',closeModal);
-  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
-  async function saveForm(){
-    const ti=document.getElementById('f-title').value.trim(),ca=document.getElementById('f-category').value.trim();
-    const a2=root.querySelector('input[name="f-audience"]:checked').value,cc=root.querySelector('input[name="f-category"]:checked');
-    const cv=cc?cc.value:(a2==='partenaire'?'CC1':'Reconfirmation');
-    const su=document.getElementById('f-subject').value.trim(),bo=document.getElementById('f-body').value.trim(),sm=document.getElementById('f-sms').value.trim();
-    const er=document.getElementById('f-err');
-    if(!ti||!bo){er.style.display='block';return false;}er.style.display='none';
-    if(editing){editing.title=ti;editing.category=ca;editing.type='email';editing.audience=a2;editing.subject=su;editing.body=bo;editing.partnerCategory=a2==='partenaire'?cv:undefined;editing.patientCategory=a2==='patient'?cv:undefined;editing.smsCompanion=a2==='patient'?(sm||undefined):undefined;}
-    else{appData.templates.push({id:'user-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),title:ti,category:ca,type:'email',audience:a2,partnerCategory:a2==='partenaire'?cv:undefined,patientCategory:a2==='patient'?cv:undefined,smsCompanion:a2==='patient'?(sm||undefined):undefined,subject:su,body:bo,createdAt:Date.now()});}
-    await persist();renderTemplatesGrid();renderTemplateSelect();return true;
+  function render(){
+    const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
+    root.innerHTML=buildModalHTML(aud,editing,nl,ni);
+    renderFormCategoryField(aud,ic);
+    root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
+      // Sauvegarde les valeurs en cours avant de changer d'onglet
+      const ti=document.getElementById('f-title').value;
+      const ca=document.getElementById('f-category').value;
+      const su=document.getElementById('f-subject').value;
+      const bo=document.getElementById('f-body').value;
+      const sm=document.getElementById('f-sms').value;
+      aud=btn.dataset.aud;
+      render();
+      // Restaure les valeurs communes
+      document.getElementById('f-title').value=ti;
+      document.getElementById('f-category').value=ca;
+      document.getElementById('f-subject').value=su;
+      document.getElementById('f-body').value=bo;
+      document.getElementById('f-sms').value=sm;
+    }));
+    document.getElementById('cancelBtn').addEventListener('click',closeModal);
+    document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+    async function saveForm(){
+      const ti=document.getElementById('f-title').value.trim(),ca=document.getElementById('f-category').value.trim();
+      const cc=root.querySelector('input[name="f-category"]:checked');
+      const cv=cc?cc.value:(aud==='partenaire'?'CC1':'Reconfirmation');
+      const su=document.getElementById('f-subject').value.trim(),bo=document.getElementById('f-body').value.trim(),sm=(document.getElementById('f-sms').value||'').trim();
+      const er=document.getElementById('f-err');
+      if(!ti||!bo){er.style.display='block';return false;}er.style.display='none';
+      if(editing){editing.title=ti;editing.category=ca;editing.type='email';editing.audience=aud;editing.subject=su;editing.body=bo;editing.partnerCategory=aud==='partenaire'?cv:undefined;editing.patientCategory=aud==='patient'?cv:undefined;editing.smsCompanion=aud==='patient'?(sm||undefined):undefined;}
+      else{appData.templates.push({id:'user-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),title:ti,category:ca,type:'email',audience:aud,partnerCategory:aud==='partenaire'?cv:undefined,patientCategory:aud==='patient'?cv:undefined,smsCompanion:aud==='patient'?(sm||undefined):undefined,subject:su,body:bo,createdAt:Date.now()});}
+      await persist();renderTemplatesGrid();renderTemplateSelect();return true;
+    }
+    document.getElementById('saveBtn').addEventListener('click',async()=>{const ok=await saveForm();if(ok){closeModal();showToast(editing?'Modèle mis à jour ✓':'Modèle ajouté ✓');}});
+    if(editing){
+      document.getElementById('prevTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i>0)openTemplateForm(l[i-1]);});
+      document.getElementById('nextTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i<l.length-1)openTemplateForm(l[i+1]);});
+    }
   }
-  document.getElementById('saveBtn').addEventListener('click',async()=>{const ok=await saveForm();if(ok){closeModal();showToast(editing?'Modèle mis à jour ✓':'Modèle ajouté ✓');}});
-  if(editing){
-    document.getElementById('prevTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i>0)openTemplateForm(l[i-1]);});
-    document.getElementById('nextTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i<l.length-1)openTemplateForm(l[i+1]);});
-  }
+  render();
 }
 
 /* ========== Delete ========== */
