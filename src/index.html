@@ -734,9 +734,10 @@ function renderTutorialStep(){
     if(el)el.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
   }
   // Attend la fin du scroll avant de calculer la bounding box
-  setTimeout(()=>_renderTutorialStepPositioned(step,ov),350);
+  const steps=activeTutorialSteps;
+  setTimeout(()=>_renderTutorialStepPositioned(step,steps,ov),350);
 }
-function _renderTutorialStepPositioned(step,ov){
+function _renderTutorialStepPositioned(step,steps,ov){
   let tr=null;if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
   let box='',ts;
   if(tr&&tr.width>0){
