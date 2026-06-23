@@ -728,6 +728,15 @@ function renderTutorialStep(){
   if(step.ensure)step.ensure();
   let ov=document.getElementById('tutorialOverlay');
   if(!ov){ov=document.createElement('div');ov.id='tutorialOverlay';ov.className='tutorial-overlay';document.body.appendChild(ov);}
+  // Scroll l'élément cible dans la zone visible avant de calculer sa position
+  if(step.target){
+    const el=document.querySelector(step.target);
+    if(el)el.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
+  }
+  // Attend la fin du scroll avant de calculer la bounding box
+  setTimeout(()=>_renderTutorialStepPositioned(step,ov),350);
+}
+function _renderTutorialStepPositioned(step,ov){
   let tr=null;if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
   let box='',ts;
   if(tr&&tr.width>0){
