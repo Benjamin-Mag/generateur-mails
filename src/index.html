@@ -629,7 +629,7 @@ function renderTemplateSelect(){
   if(!selectedCategory){sel.innerHTML="<option value=''>— Choisis d'abord une catégorie —</option>";sel.disabled=true;return;}
   const cur=sel.value,fil=appData.templates.filter(t=>{if(t.audience!==followType)return false;return followType==='partenaire'?t.partnerCategory===selectedCategory:t.patientCategory===selectedCategory;});
   sel.disabled=false;
-  sel.innerHTML="<option value=''>— Choisir un modèle —</option>"+fil.map(t=>"<option value='"+t.id+"'>"+escapeHtml(t.title)+' ('+(t.type==='email'?'Email':'SMS')+')</option>').join('');
+  sel.innerHTML="<option value=''>— Choisir un modèle —</option>"+fil.map(t=>"<option value='"+t.id+"'>"+escapeHtml(t.title)+'</option>').join('');
   if(fil.some(t=>t.id===cur))sel.value=cur;
 }
 function updateExtraFieldsAndPreview(){
