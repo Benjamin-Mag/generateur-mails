@@ -464,8 +464,6 @@ async function loadData(){
   appData.templates=appData.templates.filter(t=>OLD_SEED_IDS.indexOf(t.id)===-1);
   if(appData.templates.length!==bl)changed=true;
   if(!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
-  const _ntr=appData.templates.find(t=>t.id===NEW_TEMPLATE.id);
-  if(_ntr&&_ntr.smsCompanion!==NEW_TEMPLATE.smsCompanion){_ntr.smsCompanion=NEW_TEMPLATE.smsCompanion;changed=true;}
   SUIVI_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
   PATIENT_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
   appData.templates.forEach(t=>{
