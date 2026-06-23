@@ -382,7 +382,7 @@ const NEW_TEMPLATE = {
   audience:"patient", patientCategory:"Reconfirmation", type:"email",
   subject:"Confirmation de votre rendez-vous du {{date}}",
   body:"Bonjour {{nom}},\n\nJe me permets de vous rappeler votre rendez-vous chez notre partenaire audioprothésiste, prévu le {{date}}.\n\nPourriez-vous me confirmer votre présence par retour d'e-mail ou par téléphone au 09 74 99 99 99 ?\n\nJe vous remercie par avance pour votre réactivité et reste à votre disposition pour toute question.\n\nBien cordialement,\nBenjamin Magnier",
-  smsCompanion:"Bonjour {{nom}}, rappel de votre RDV du {{date}}. Merci de confirmer au 09 74 99 99 99. À bientôt !"
+  smsCompanion:"Petit rappel de votre rendez-vous avec notre partenaire audioprothésiste prévu le {{date}} à {{heure}}.\n\nJe vous remercie par avance de me confirmer que ce RDV vous convient toujours en me répondant OK.\nNotre partenaire audioprothésiste se réjouit déjà de vous accueillir !\nBien cordialement,\nBenjamin Magnier\nVotre conseiller Audibene\n09 74 99 99 99"
 };
 const SUIVI_TEMPLATES = [
   {id:'tpl-suivi-depistage',title:"Suivi – Dépistage",category:"Suivi",audience:"partenaire",partnerCategory:"CC1",type:"email",subject:"Suivi – Dépistage de {{nom}}",body:"Cher partenaire,\n\nDans le cadre du suivi de {{nom}}, que vous avez reçu(e) le {{date}} pour un dépistage, je viens prendre de vos nouvelles.\n\nDe votre côté, comment s'est passée votre consultation ? Un rdv ORL est-il prévu ?\n\nJe vous remercie pour votre retour, afin que j'adapte le suivi.\n\nN'hésitez pas à remplir les informations sur le portail My audibene.\n\nDans l'attente de votre réponse.\n\nBien à vous,\nBenjamin Magnier"},
@@ -464,6 +464,8 @@ async function loadData(){
   appData.templates=appData.templates.filter(t=>OLD_SEED_IDS.indexOf(t.id)===-1);
   if(appData.templates.length!==bl)changed=true;
   if(!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
+  const _ntr=appData.templates.find(t=>t.id===NEW_TEMPLATE.id);
+  if(_ntr&&_ntr.smsCompanion!==NEW_TEMPLATE.smsCompanion){_ntr.smsCompanion=NEW_TEMPLATE.smsCompanion;changed=true;}
   SUIVI_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
   PATIENT_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
   appData.templates.forEach(t=>{
