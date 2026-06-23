@@ -159,10 +159,12 @@ input,textarea,select{font-family:inherit;}
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
 
 /* Onglets marque-page du modal template */
-.tpl-modal-tabs{display:flex;gap:0;margin-bottom:0;padding:0 24px;position:relative;top:0;}
-.tpl-modal-tab{background:var(--paper);border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;padding:9px 22px;font-size:.85rem;font-weight:600;color:var(--muted-ink);cursor:pointer;margin-right:4px;position:relative;top:1px;transition:background .15s,color .15s;}
-.tpl-modal-tab:hover{color:var(--ink);}
-.tpl-modal-tab.active{background:var(--card-bg);color:var(--accent);border-color:var(--line);z-index:1;}
+.tpl-modal-wrapper{display:flex;flex-direction:column;max-width:480px;width:100%;}
+.tpl-modal-tabs{display:flex;gap:4px;padding:0;align-self:flex-start;}
+.tpl-modal-tab{background:var(--paper);border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;padding:9px 22px;font-size:.85rem;font-weight:600;color:var(--muted-ink);cursor:pointer;transition:background .15s,color .15s;position:relative;bottom:-1px;}
+.tpl-modal-tab:hover{color:var(--ink);background:var(--card-bg);}
+.tpl-modal-tab.active{background:var(--card-bg);color:var(--accent);border-bottom-color:var(--card-bg);}
+.tpl-modal-wrapper .modal{border-radius:0 6px 6px 6px;margin-top:0;}
 .folder-row span{flex:1;font-size:.85rem;color:var(--muted-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100;}
@@ -804,12 +806,13 @@ function buildModalHTML(aud,editing,nl,ni){
   const req='<span style="color:var(--accent);margin-left:2px;">*</span>';
   const navRow=editing?'<div class="modal-foot" style="justify-content:space-between;margin-top:10px;"><button type="button" class="btn-outline small" id="prevTplBtn" '+(ni<=0?'disabled':'')+'>‹ Précédent</button><button type="button" class="btn-outline small" id="nextTplBtn" '+(ni>=nl.length-1?'disabled':'')+'>Suivant ›</button></div>':'';
   return '<div class="overlay" id="overlay">'
-    +'<div class="modal" style="padding-top:0;overflow:visible;">'
+    +'<div class="tpl-modal-wrapper">'
     +'<div class="tpl-modal-tabs">'
     +'<button type="button" class="tpl-modal-tab'+(aud==='patient'?' active':'')+'" data-aud="patient">Patient</button>'
     +'<button type="button" class="tpl-modal-tab'+(aud==='partenaire'?' active':'')+'" data-aud="partenaire">Partenaire</button>'
     +'</div>'
-    +'<div style="padding:20px 24px 24px;">'
+    +'<div class="modal">'
+    +'<div style="padding:0 0 4px;">'
     +'<h2 style="margin-top:4px;">'+(editing?'Modifier le modèle':'Nouveau modèle')+'</h2>'
     +'<div id="formCategoryField"></div>'
     +'<label>Titre'+req+'</label><input id="f-title" value="'+(editing?escapeHtml(editing.title):'')+'">'
@@ -821,7 +824,7 @@ function buildModalHTML(aud,editing,nl,ni){
     +navRow
     +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">'+(editing?'Enregistrer':'Ajouter')+'</button></div>'
     +'</div>'
-    +'</div></div>';
+    +'</div></div></div>';
 }
 function openTemplateForm(editing){
   const root=document.getElementById('modalRoot');
