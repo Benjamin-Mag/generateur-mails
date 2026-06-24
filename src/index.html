@@ -1148,8 +1148,10 @@ function openTemplateForm(editing){
   function render(skipAnim,slideDir){
     const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
     root.innerHTML=buildModalHTML(aud,editing,nl,ni);
-    if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';}
-    if(slideDir){const m=root.querySelector('.modal');if(m)m.classList.add(slideDir==='right'?'tab-slide-from-right':'tab-slide-from-left');}
+    if(skipAnim){
+      const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';
+      const m=root.querySelector('.modal');if(m)m.style.animation=slideDir==='right'?'tabSlideFromRight .22s cubic-bezier(.22,1,.36,1) both':'tabSlideFromLeft .22s cubic-bezier(.22,1,.36,1) both';
+    }
     renderFormCategoryField(aud,ic);
     root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
       // Sauvegarde les valeurs en cours avant de changer d'onglet
