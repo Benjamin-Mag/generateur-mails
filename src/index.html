@@ -976,12 +976,13 @@ function renderGenreRow(){
     anamneseGenre=e.target.value;
     const ta=document.getElementById('anamneseTextarea');
     if(ta&&ta.value)ta.value=resolveGenre(ta.value,anamneseGenre);
+    if(selectedSituation&&getCurrentAnamneseKey())settleAnamPanel();
   }));
 }
 function renderSituationRow(){
   const w=document.getElementById('situationRow');
   w.innerHTML=makeSeg('situation',ANAMNESE_SITUATIONS,selectedSituation);
-  w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();if(!anamneseGenre){const gr=document.getElementById('anamneseGenreRow');gr.classList.remove('genre-alert');void gr.offsetWidth;gr.classList.add('genre-alert');gr.addEventListener('animationend',()=>gr.classList.remove('genre-alert'),{once:true});}}));
+  w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();}));
 }
 function renderRenouvellementSubRow(){
   const w=document.getElementById('renouvellementSubRow');
@@ -994,7 +995,7 @@ function renderAnamneseContent(){
   if(!key){cw.style.display='none';return;}
   cw.style.display='block';
   document.getElementById('anamneseTextarea').value=(appData.anamnese[key]||{text:''}).text||'';
-  settleAnamPanel();
+  if(anamneseGenre){settleAnamPanel();}else{const gr=document.getElementById('anamneseGenreRow');gr.classList.remove('genre-alert');void gr.offsetWidth;gr.classList.add('genre-alert');gr.addEventListener('animationend',()=>gr.classList.remove('genre-alert'),{once:true});}
 }
 
 /* ========== Modals ========== */
