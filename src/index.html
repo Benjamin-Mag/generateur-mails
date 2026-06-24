@@ -1222,7 +1222,7 @@ function openTemplateForm(editing,initialAud,noAnim){
     if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
     renderFormCategoryField(aud,ic);
     root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
-      if(btn.dataset.aud==='anamnese'){openTemplateForm(editing,'anamnese');return;}
+      if(btn.dataset.aud==='anamnese'){openTemplateForm(editing,'anamnese',true);return;}
       // Sauvegarde les valeurs en cours avant de changer d'onglet
       const ti=document.getElementById('f-title').value;
       const ca=document.getElementById('f-category').value;
