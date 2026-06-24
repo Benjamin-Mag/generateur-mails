@@ -685,7 +685,7 @@ function updateExtraFieldsAndPreview(){
   const sel=document.getElementById('templateSelect'),template=appData.templates.find(t=>t.id===sel.value);
   const ew=document.getElementById('extraFields'),sw=document.getElementById('previewSubjectWrap'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
   if(!template){ew.innerHTML='';sw.style.display='none';be.textContent=followType?'Choisis un modèle pour commencer.':'Choisis un type de suivi puis un modèle pour commencer.';ac.style.display='none';smsw.style.display='none';return;}
-  let vars=extractVars((template.subject||'')+' '+template.body);
+  let vars=extractVars((template.subject||'')+' '+template.body+' '+(template.smsCompanion||''));
   if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
