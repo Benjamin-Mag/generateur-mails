@@ -783,14 +783,20 @@ function getFilteredTemplateList(){
 /* ========== Générer tab ========== */
 function updateCategoryBlockVisibility(){document.getElementById('categoryBlock').style.display=followType?'block':'none';}
 /* ===== Panneau flottant ===== */
-let _genFloating=false;
+let _genFloating=false,_genFloatParent=null,_genFloatSibling=null;
 function showGenPanel(){
   const el=document.getElementById('genFormCol');
   if(!el||_genFloating)return;
   _genFloating=true;
+  // Mémorise la place d'origine
+  _genFloatParent=el.parentNode;
+  _genFloatSibling=el.nextSibling;
+  // Déplace physiquement dans body pour éviter les stacking contexts
+  document.body.appendChild(el);
+  // Backdrop
   const bd=document.createElement('div');
   bd.className='gen-backdrop';bd.id='genBackdrop';
-  document.body.appendChild(bd);
+  document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
 }
 function settleGenPanel(){
@@ -798,38 +804,46 @@ function settleGenPanel(){
   const bd=document.getElementById('genBackdrop');
   if(!el||!_genFloating)return;
   _genFloating=false;
-  // FLIP : mesure la position courante (floating)
+  // FLIP — mesure la position flottante actuelle
   const startRect=el.getBoundingClientRect();
-  // Retire la classe pour mesurer la position finale dans le flux
+  // Remet dans le flux d'origine pour mesurer la position finale
   el.classList.remove('is-floating');
-  el.style.visibility='hidden';el.style.pointerEvents='none';
+  if(_genFloatSibling)_genFloatParent.insertBefore(el,_genFloatSibling);
+  else _genFloatParent.appendChild(el);
+  el.style.visibility='hidden';
   const endRect=el.getBoundingClientRect();
-  el.style.visibility='';el.style.pointerEvents='';
+  el.style.visibility='';
   // Calcule le delta
   const dx=startRect.left-endRect.left;
   const dy=startRect.top-endRect.top;
   const sx=startRect.width/endRect.width;
-  const sy=startRect.height/endRect.height;
+  const sy=Math.min(startRect.height/endRect.height,3); // clamp pour éviter distorsion
   // Applique le transform inversé (remet visuellement au point de départ)
   el.style.transformOrigin='top left';
   el.style.transition='none';
   el.style.transform=`translate(${dx}px,${dy}px) scale(${sx},${sy})`;
-  el.getBoundingClientRect(); // force reflow
+  el.getBoundingClientRect();
   // Anime vers la position finale
-  el.style.transition='transform .52s cubic-bezier(.22,1,.36,1),box-shadow .4s ease,border-radius .4s ease';
+  el.style.transition='transform .5s cubic-bezier(.22,1,.36,1)';
   el.style.transform='none';
   // Backdrop disparaît
-  if(bd){bd.style.transition='opacity .35s ease';bd.style.opacity='0';setTimeout(()=>bd.remove(),360);}
+  if(bd){bd.style.transition='opacity .32s ease';bd.style.opacity='0';setTimeout(()=>bd.remove(),340);}
   el.addEventListener('transitionend',()=>{
     el.style.transform='';el.style.transition='';el.style.transformOrigin='';
   },{once:true});
+  _genFloatParent=null;_genFloatSibling=null;
 }
 function teardownGenPanel(){
   const el=document.getElementById('genFormCol');
   const bd=document.getElementById('genBackdrop');
-  if(el){el.classList.remove('is-floating');el.style.transform='';el.style.transition='';el.style.transformOrigin='';}
+  if(el&&_genFloating&&_genFloatParent){
+    el.classList.remove('is-floating');
+    el.style.transform='';el.style.transition='';el.style.transformOrigin='';
+    if(_genFloatSibling)_genFloatParent.insertBefore(el,_genFloatSibling);
+    else _genFloatParent.appendChild(el);
+  }else if(el){el.classList.remove('is-floating');el.style.transform='';el.style.transition='';el.style.transformOrigin='';}
   if(bd)bd.remove();
-  _genFloating=false;
+  _genFloating=false;_genFloatParent=null;_genFloatSibling=null;
 }
 
 function makeSeg(name,options,checkedVal){
