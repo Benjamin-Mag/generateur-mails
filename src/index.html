@@ -1134,11 +1134,10 @@ function buildAnamModalHTML(){
     +'<button type="button" class="tpl-modal-tab" data-aud="patient">Patient</button>'
     +'<button type="button" class="tpl-modal-tab" data-aud="partenaire">Partenaire</button>'
     +'<button type="button" class="tpl-modal-tab active" data-aud="anamnese">Anamnèse</button>'
-    +'</div><div class="modal"><h2 style="margin-top:4px;">Modèles d\'anamnèse</h2>'
+    +'</div><div class="modal"><div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:16px;"><h2 style="margin:0;">Modèles d\'anamnèse</h2><button type="button" class="btn-outline" id="addCustomSituationBtn" style="font-size:.82rem;padding:5px 12px;">+ Nouvelle situation</button></div>'
     +entriesHtml
     +'<div id="newCustomSituationArea"></div>'
-    +'<div class="modal-foot" style="justify-content:space-between;">'
-    +'<button type="button" class="btn-outline" id="addCustomSituationBtn">+ Nouvelle situation</button>'
+    +'<div class="modal-foot" style="justify-content:flex-end;">'
     +'<div style="display:flex;gap:10px;"><button class="btn-outline" id="cancelBtn">Fermer</button>'
     +'<button class="btn-primary" id="saveAnamBtn">Enregistrer</button></div>'
     +'</div></div></div></div>';
