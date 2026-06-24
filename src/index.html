@@ -799,6 +799,7 @@ function showGenPanel(){
   // Backdrop
   const bd=document.createElement('div');
   bd.className='gen-backdrop';bd.id='genBackdrop';
+  bd.addEventListener('click',settleGenPanel);
   document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
 }
@@ -847,6 +848,7 @@ function showAnamPanel(){
   document.body.appendChild(el);
   const bd=document.createElement('div');
   bd.className='gen-backdrop';bd.id='anamBackdrop';
+  bd.addEventListener('click',settleAnamPanel);
   document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
 }
