@@ -205,6 +205,31 @@ input,textarea,select{font-family:inherit;}
 .btn-danger{background:none;border:1px solid var(--accent);border-radius:6px;padding:9px 15px;font-size:.85rem;color:var(--accent);}
 .btn-danger:hover{background:var(--accent);color:#fff;}
 
+.template-pill-grid{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.tpl-pill{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;border-radius:10px;
+  border:2px solid var(--line);background:var(--card-bg);
+  font-size:.88rem;font-weight:500;color:var(--ink);
+  cursor:pointer;text-align:left;width:100%;
+  transition:border-color .18s,background .18s,color .18s,transform .15s,box-shadow .18s;
+  position:relative;overflow:hidden;
+}
+.tpl-pill .tpl-pill-dot{width:9px;height:9px;border-radius:50%;background:var(--line);flex-shrink:0;transition:background .18s,transform .2s;}
+.tpl-pill .tpl-pill-type{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;flex-shrink:0;background:var(--accent-soft);color:#1A3D7A;}
+.tpl-pill .tpl-pill-type.sms{background:var(--success-soft);color:#244A35;}
+.tpl-pill:hover{border-color:var(--accent);color:var(--accent);transform:translateX(3px);}
+.tpl-pill.active{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(27,79,155,.3);transform:translateX(3px);}
+.tpl-pill.active .tpl-pill-dot{background:rgba(255,255,255,.75);transform:scale(1.5);}
+.tpl-pill.active .tpl-pill-type{background:rgba(255,255,255,.2);color:#fff;}
+.tpl-pill-empty{font-size:.84rem;color:var(--muted-ink);padding:12px 4px;text-align:center;}
+@keyframes tplPillIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.tpl-pill{animation:tplPillIn .2s ease both;}
+.tpl-pill:nth-child(1){animation-delay:.03s;}
+.tpl-pill:nth-child(2){animation-delay:.07s;}
+.tpl-pill:nth-child(3){animation-delay:.11s;}
+.tpl-pill:nth-child(4){animation-delay:.15s;}
+.tpl-pill:nth-child(5){animation-delay:.19s;}
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
 .tag-insert-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 4px;}
 .tag-insert-label{font-size:.72rem;font-weight:600;color:var(--muted-ink);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
@@ -343,7 +368,7 @@ input,textarea,select{font-family:inherit;}
           <div class="civility-group" id="categoryRow"></div>
         </div>
         <label class="field-label" style="margin-top:18px;">Modèle</label>
-        <select id="templateSelect" disabled><option value="">— Choisis d'abord un type de suivi —</option></select>
+        <div id="templateSelect" class="template-pill-grid"></div>
         <div id="extraFields" class="extra-fields"></div>
       </div>
       <div class="gen-col preview-col">
@@ -505,7 +530,7 @@ const DEFAULT_EMAIL_FOOTER = "_________________________________________________\
 /* ========== App state ========== */
 let appData = {templates:[],anamnese:{},signatureName:'Benjamin Magnier',emailFooter:DEFAULT_EMAIL_FOOTER};
 let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
-let manualValues={}, civilite=null, followType=null, selectedCategory=null;
+let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
 let timePickerOpenVar=null, timePickerState={};
 let selectedSituation=null, anamneseGenre=null, renouvellementType=null;
@@ -698,7 +723,7 @@ function switchTab(name){
 }
 function resetTabState(name){
   closeDatePicker();
-  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;datePickerView={};renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}
+  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}
   else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();}
   else if(name==='modeles'){templateSearch='';templateTypeFilter='all';const s=document.getElementById('searchTemplates');if(s)s.value='';renderTypeChips();renderTemplatesGrid();}
 }
@@ -750,17 +775,25 @@ function renderCategoryRow(){
   w.querySelectorAll('input[name="selected-category"]').forEach(r=>r.addEventListener('change',e=>{selectedCategory=e.target.value;manualValues={};civilite=null;datePickerView={};renderTemplateSelect();updateExtraFieldsAndPreview();}));
 }
 function renderTemplateSelect(){
-  const sel=document.getElementById('templateSelect');
-  if(!followType){sel.innerHTML="<option value=''>— Choisis d'abord un type de suivi —</option>";sel.disabled=true;return;}
-  if(!selectedCategory){sel.innerHTML="<option value=''>— Choisis d'abord une catégorie —</option>";sel.disabled=true;return;}
-  const cur=sel.value,fil=appData.templates.filter(t=>{if(t.audience!==followType)return false;return followType==='partenaire'?t.partnerCategory===selectedCategory:(t.patientCategory==='all'||t.patientCategory===selectedCategory);});
-  sel.disabled=false;
-  sel.innerHTML="<option value=''>— Choisir un modèle —</option>"+fil.map(t=>"<option value='"+t.id+"'>"+escapeHtml(t.title)+'</option>').join('');
-  if(fil.some(t=>t.id===cur))sel.value=cur;
+  const w=document.getElementById('templateSelect');
+  if(!followType||!selectedCategory){
+    w.innerHTML='<div class="tpl-pill-empty">'+(followType?'Choisis une catégorie pour voir les modèles':'Choisis un type de suivi pour commencer')+'</div>';
+    return;
+  }
+  const fil=appData.templates.filter(t=>{if(t.audience!==followType)return false;return followType==='partenaire'?t.partnerCategory===selectedCategory:(t.patientCategory==='all'||t.patientCategory===selectedCategory);});
+  if(!fil.length){w.innerHTML='<div class="tpl-pill-empty">Aucun modèle dans cette catégorie</div>';return;}
+  if(!fil.some(t=>t.id===selectedTemplateId))selectedTemplateId=null;
+  w.innerHTML=fil.map(t=>`<button type="button" class="tpl-pill${selectedTemplateId===t.id?' active':''}" data-tpl-id="${escapeHtml(t.id)}"><span class="tpl-pill-dot"></span><span style="flex:1">${escapeHtml(t.title)}</span><span class="tpl-pill-type${t.type==='sms'?' sms':''}">${t.type==='sms'?'SMS':'Email'}</span></button>`).join('');
+  w.querySelectorAll('.tpl-pill').forEach(btn=>btn.addEventListener('click',()=>{
+    selectedTemplateId=btn.dataset.tplId;
+    manualValues={};civilite=null;datePickerView={};
+    w.querySelectorAll('.tpl-pill').forEach(b=>b.classList.toggle('active',b===btn));
+    updateExtraFieldsAndPreview();
+  }));
 }
 function updateExtraFieldsAndPreview(){
   closeDatePicker();
-  const sel=document.getElementById('templateSelect'),template=appData.templates.find(t=>t.id===sel.value);
+  const template=appData.templates.find(t=>t.id===selectedTemplateId);
   const ew=document.getElementById('extraFields'),sw=document.getElementById('previewSubjectWrap'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
   if(!template){ew.innerHTML='';sw.style.display='none';be.textContent=followType?'Choisis un modèle pour commencer.':'Choisis un type de suivi puis un modèle pour commencer.';ac.style.display='none';smsw.style.display='none';return;}
   let vars=extractVars((template.subject||'')+' '+template.body+' '+(template.smsCompanion||''));
@@ -771,7 +804,7 @@ function updateExtraFieldsAndPreview(){
   if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
-    if(v==='nom')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label><div class="civility-group"><label class="civility-option"><input type="radio" name="civilite" value="Monsieur" '+(civilite==='Monsieur'?'checked':'')+'>  M.</label><label class="civility-option"><input type="radio" name="civilite" value="Madame" '+(civilite==='Madame'?'checked':'')+'>  Mme</label></div></div><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"></div>';
+    if(v==='nom')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label>'+makeSeg('civilite',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],civilite)+'</div><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"></div>';
     if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
     if(isDateVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'" readonly><button type="button" class="date-icon-btn" data-date-toggle="'+escapeHtml(v)+'" aria-label="Choisir une date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div></div>';
     return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><input id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'"></div>';
@@ -783,7 +816,7 @@ function updateExtraFieldsAndPreview(){
   renderPreviewOnly();
 }
 function renderPreviewOnly(){
-  const sel=document.getElementById('templateSelect'),template=appData.templates.find(t=>t.id===sel.value);
+  const template=appData.templates.find(t=>t.id===selectedTemplateId);
   if(!template)return;
   const sw=document.getElementById('previewSubjectWrap'),se=document.getElementById('previewSubject'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
   const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()}),genre=getEffectiveGenre();
@@ -798,7 +831,7 @@ function needsGenreChoice(){return !!document.querySelector('#extraFields input[
 function getCurrentAnamneseKey(){if(selectedSituation==='renouvellement')return renouvellementType?'renouvellement_'+renouvellementType:null;return selectedSituation;}
 function renderGenreRow(){
   const w=document.getElementById('anamneseGenreRow');
-  w.innerHTML='<label class="civility-option"><input type="radio" name="anamnese-genre" value="Monsieur" '+(anamneseGenre==='Monsieur'?'checked':'')+'>  M.</label><label class="civility-option"><input type="radio" name="anamnese-genre" value="Madame" '+(anamneseGenre==='Madame'?'checked':'')+'>  Mme</label>';
+  w.innerHTML=makeSeg('anamnese-genre',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],anamneseGenre);
   w.querySelectorAll('input[name="anamnese-genre"]').forEach(r=>r.addEventListener('change',e=>{
     anamneseGenre=e.target.value;
     const ta=document.getElementById('anamneseTextarea');
@@ -916,7 +949,7 @@ function openSettingsForm(){
     if(!nn)return;
     await renameSignature(appData.signatureName,nn);
     closeModal();renderTemplatesGrid();renderTemplateSelect();
-    if(document.getElementById('templateSelect').value)updateExtraFieldsAndPreview();
+    if(selectedTemplateId)updateExtraFieldsAndPreview();
     if(selectedSituation)renderAnamneseContent();
     showToast('Réglages enregistrés ✓');
   }
@@ -1033,15 +1066,14 @@ function confirmDeleteTemplate(id){
   renderAll();
 
   document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)switchTab(b.dataset.tab);});
-  document.getElementById('templateSelect').addEventListener('change',()=>{manualValues={};civilite=null;datePickerView={};updateExtraFieldsAndPreview();});
   document.getElementById('copyBodyBtn').addEventListener('click',async()=>{
-    const t=appData.templates.find(t=>t.id===document.getElementById('templateSelect').value);if(!t)return;
+    const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
     const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()});
     showToast(await copyText(resolveGenre(buildFilledText(t.body,vals),getEffectiveGenre()))?'Message copié ✓':"Impossible de copier.");
   });
   document.getElementById('copySmsBtn').addEventListener('click',async()=>{
-    const t=appData.templates.find(t=>t.id===document.getElementById('templateSelect').value);if(!t||!t.smsCompanion)return;
+    const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t||!t.smsCompanion)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
     const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()});
     showToast(await copyText(resolveGenre(buildFilledText(t.smsCompanion,vals),getEffectiveGenre()))?'SMS copié ✓':"Impossible de copier.");
