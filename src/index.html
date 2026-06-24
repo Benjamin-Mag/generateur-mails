@@ -849,6 +849,10 @@ function renderFormCategoryField(av,cc){
   const l=av==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES_FORM,w=document.getElementById('formCategoryField');
   if(!w)return;
   w.innerHTML='<label>Catégorie</label><div class="radio-row">'+l.map(o=>'<label><input type="radio" name="f-category" value="'+o.id+'" '+(cc===o.id?'checked':'')+'>  '+o.label+'</label>').join('')+'</div>';
+  w.querySelectorAll('input[name="f-category"]').forEach(r=>r.addEventListener('change',e=>{
+    const etiq=document.getElementById('f-category');
+    if(etiq)etiq.value=e.target.value;
+  }));
 }
 function buildModalHTML(aud,editing,nl,ni){
   const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
