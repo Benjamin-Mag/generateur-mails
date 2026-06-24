@@ -531,8 +531,7 @@ const PATIENT_CATEGORIES_FORM = [{id:'Reconfirmation',label:'Reconfirmation'},{i
 const FIELD_LABELS = {nom:"Nom du patient",heure:"Heure du RDV"};
 const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const WEEKDAYS_FR = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
-const ANAMNESE_SITUATIONS = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement',label:'Renouvellement'}];
-const ANAMNESE_EDIT_ENTRIES = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement_avec_ordonnance',label:'Renouvellement – Avec ordonnance'},{id:'renouvellement_sans_ordonnance',label:'Renouvellement – Sans ordonnance'}];
+const DEFAULT_SITUATIONS = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement_avec_ordonnance',label:'Renouvellement – Avec ordonnance'},{id:'renouvellement_sans_ordonnance',label:'Renouvellement – Sans ordonnance'}];
 const RENOUVELLEMENT_OPTIONS = [{id:'avec_ordonnance',label:'Avec ordonnance'},{id:'sans_ordonnance',label:'Sans ordonnance'}];
 const DEFAULT_ANAMNESE = {
   depistage_simple:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
@@ -584,7 +583,7 @@ async function loadData(){
   const parsed=(raw&&raw.trim())?JSON.parse(raw):{};
   appData.templates=parsed.templates||[];
   appData.anamnese=parsed.anamnese||{};
-  appData.customSituations=Array.isArray(parsed.customSituations)?parsed.customSituations:[];
+  appData.customSituations=Array.isArray(parsed.customSituations)&&parsed.customSituations.length?parsed.customSituations:DEFAULT_SITUATIONS.map(s=>({...s}));
   appData.signatureName=(typeof parsed.signatureName==='string'&&parsed.signatureName)?parsed.signatureName:'Benjamin Magnier';
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
 
@@ -992,7 +991,7 @@ function renderGenreRow(){
 }
 function renderSituationRow(){
   const w=document.getElementById('situationRow');
-  const allSituations=[...ANAMNESE_SITUATIONS,...(appData.customSituations||[])];
+  const allSituations=appData.customSituations||[];
   w.innerHTML=makeSeg('situation',allSituations,selectedSituation);
   w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();}));
 }
@@ -1113,14 +1112,16 @@ function openSettingsForm(){
 
 /* ========== Modal Anamnèse ========== */
 function buildAnamModalHTML(){
-  const customs=appData.customSituations||[];
-  const fixedHtml=ANAMNESE_EDIT_ENTRIES.map(e=>{
+  const situations=appData.customSituations||[];
+  const entriesHtml=situations.map(e=>{
     const text=escapeHtml((appData.anamnese[e.id]||{text:''}).text||'');
-    return '<div class="anam-modal-entry"><label class="field-label">'+escapeHtml(e.label)+'</label><textarea class="anam-modal-textarea" data-anam-id="'+e.id+'" rows="4">'+text+'</textarea></div>';
-  }).join('');
-  const customHtml=customs.map(e=>{
-    const text=escapeHtml((appData.anamnese[e.id]||{text:''}).text||'');
-    return '<div class="anam-modal-entry"><div class="field-row-header"><label class="field-label" style="margin-bottom:0;">'+escapeHtml(e.label)+'</label><button type="button" class="copy-mini danger" data-del-custom-anam="'+e.id+'">Supprimer</button></div><textarea class="anam-modal-textarea" data-anam-id="'+e.id+'" rows="4">'+text+'</textarea></div>';
+    return '<div class="anam-modal-entry">'
+      +'<div class="field-row-header">'
+      +'<input class="anam-modal-label-input field-label" data-anam-label-id="'+e.id+'" value="'+escapeHtml(e.label)+'" style="margin-bottom:0;border:none;background:transparent;font-weight:600;font-size:inherit;padding:0;width:100%;cursor:text;">'
+      +'<button type="button" class="copy-mini danger" data-del-anam="'+e.id+'">Supprimer</button>'
+      +'</div>'
+      +'<textarea class="anam-modal-textarea" data-anam-id="'+e.id+'" rows="4">'+text+'</textarea>'
+      +'</div>';
   }).join('');
   return '<div class="overlay" id="overlay">'
     +'<div class="tpl-modal-wrapper"><div class="tpl-modal-tabs">'
@@ -1128,7 +1129,7 @@ function buildAnamModalHTML(){
     +'<button type="button" class="tpl-modal-tab" data-aud="partenaire">Partenaire</button>'
     +'<button type="button" class="tpl-modal-tab active" data-aud="anamnese">Anamnèse</button>'
     +'</div><div class="modal"><h2 style="margin-top:4px;">Modèles d\'anamnèse</h2>'
-    +fixedHtml+customHtml
+    +entriesHtml
     +'<div id="newCustomSituationArea"></div>'
     +'<div class="modal-foot" style="justify-content:space-between;">'
     +'<button type="button" class="btn-outline" id="addCustomSituationBtn">+ Nouvelle situation</button>'
@@ -1140,8 +1141,12 @@ function wireAnamModal(root,openAnam){
   document.getElementById('cancelBtn').addEventListener('click',closeModal);
   document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
   document.getElementById('saveAnamBtn').addEventListener('click',async()=>{
+    root.querySelectorAll('.anam-modal-label-input').forEach(inp=>{
+      const s=appData.customSituations.find(s=>s.id===inp.dataset.anamLabelId);
+      if(s)s.label=inp.value.trim()||s.label;
+    });
     root.querySelectorAll('.anam-modal-textarea').forEach(ta=>{appData.anamnese[ta.dataset.anamId]={text:ta.value};});
-    await persist();
+    await persist();renderSituationRow();
     if(selectedSituation)renderAnamneseContent();
     closeModal();showToast('Anamnèses enregistrées ✓');
   });
@@ -1160,8 +1165,8 @@ function wireAnamModal(root,openAnam){
       await persist();renderSituationRow();openAnam();showToast('Situation ajoutée ✓');
     });
   });
-  root.querySelectorAll('[data-del-custom-anam]').forEach(btn=>btn.addEventListener('click',async()=>{
-    const id=btn.dataset.delCustomAnam;
+  root.querySelectorAll('[data-del-anam]').forEach(btn=>btn.addEventListener('click',async()=>{
+    const id=btn.dataset.delAnam;
     appData.customSituations=appData.customSituations.filter(s=>s.id!==id);
     delete appData.anamnese[id];
     await persist();renderSituationRow();openAnam();showToast('Supprimé ✓');
