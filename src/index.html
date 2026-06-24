@@ -169,12 +169,12 @@ input,textarea,select{font-family:inherit;}
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
 
 /* Onglets marque-page du modal template */
-.tpl-modal-wrapper{display:flex;flex-direction:column;max-width:480px;width:100%;}
+.tpl-modal-wrapper{display:flex;flex-direction:column;width:50vw;min-width:480px;max-width:860px;height:90vh;}
 .tpl-modal-tabs{display:flex;gap:4px;padding:0;align-self:flex-start;}
 .tpl-modal-tab{background:var(--paper);border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;padding:9px 22px;font-size:.85rem;font-weight:600;color:var(--muted-ink);cursor:pointer;transition:background .15s,color .15s;position:relative;bottom:-1px;}
 .tpl-modal-tab:hover{color:var(--ink);background:var(--card-bg);}
 .tpl-modal-tab.active{background:var(--card-bg);color:var(--accent);border-bottom-color:var(--card-bg);}
-.tpl-modal-wrapper .modal{border-radius:0 6px 6px 6px;margin-top:0;}
+.tpl-modal-wrapper .modal{border-radius:0 6px 6px 6px;margin-top:0;flex:1;overflow-y:auto;max-height:none;}
 .folder-row span{flex:1;font-size:.85rem;color:var(--muted-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100;}
