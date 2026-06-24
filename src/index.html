@@ -281,6 +281,10 @@ input,textarea,select{font-family:inherit;}
 /* ===== Modal Anamnèse ===== */
 .anam-modal-entry{margin-bottom:18px;}
 .anam-modal-entry .anam-modal-textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:10px 12px;font-size:.88rem;color:var(--ink);resize:vertical;min-height:80px;line-height:1.6;}
+.anam-label-wrap{display:inline-flex;align-items:center;gap:5px;max-width:calc(100% - 90px);}
+.anam-modal-label-input{border:none;background:transparent;font-weight:600;font-size:inherit;color:var(--ink);padding:2px 4px;border-radius:4px;cursor:text;width:100%;outline:none;}
+.anam-modal-label-input:focus{outline:2px solid var(--accent);background:var(--card-bg);}
+.anam-label-pencil{color:var(--muted,#999);font-size:.8rem;flex-shrink:0;pointer-events:none;}
 .new-custom-form{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:10px;}
 .new-custom-form input,.new-custom-form textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:9px 11px;font-size:.88rem;color:var(--ink);margin-top:4px;}
 .new-custom-form textarea{resize:vertical;min-height:80px;}
@@ -1116,8 +1120,11 @@ function buildAnamModalHTML(){
   const entriesHtml=situations.map(e=>{
     const text=escapeHtml((appData.anamnese[e.id]||{text:''}).text||'');
     return '<div class="anam-modal-entry">'
-      +'<div class="field-row-header">'
-      +'<input class="anam-modal-label-input field-label" data-anam-label-id="'+e.id+'" value="'+escapeHtml(e.label)+'" style="margin-bottom:0;border:none;background:transparent;font-weight:600;font-size:inherit;padding:0;width:100%;cursor:text;">'
+      +'<div class="field-row-header" style="margin-bottom:5px;">'
+      +'<div class="anam-label-wrap">'
+      +'<input class="anam-modal-label-input" data-anam-label-id="'+e.id+'" value="'+escapeHtml(e.label)+'">'
+      +'<span class="anam-label-pencil">✏️</span>'
+      +'</div>'
       +'<button type="button" class="copy-mini danger" data-del-anam="'+e.id+'">Supprimer</button>'
       +'</div>'
       +'<textarea class="anam-modal-textarea" data-anam-id="'+e.id+'" rows="4">'+text+'</textarea>'
