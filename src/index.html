@@ -801,6 +801,7 @@ function settleGenPanel(){
   const bd=document.getElementById('genBackdrop');
   if(!el||!_genFloating)return;
   _genFloating=false;
+  el.querySelectorAll('.panel-close-btn').forEach(b=>b.remove());
   // FLIP — mesure la position flottante actuelle
   const startRect=el.getBoundingClientRect();
   // Remet dans le flux d'origine pour mesurer la position finale
@@ -851,6 +852,7 @@ function settleAnamPanel(){
   const bd=document.getElementById('anamBackdrop');
   if(!el||!_anamFloating)return;
   _anamFloating=false;
+  el.querySelectorAll('.panel-close-btn').forEach(b=>b.remove());
   const startRect=el.getBoundingClientRect();
   el.classList.remove('is-floating');
   if(_anamFloatSibling)_anamFloatParent.insertBefore(el,_anamFloatSibling);
