@@ -280,6 +280,13 @@ input,textarea,select{font-family:inherit;}
 .tutorial-step-count{font-size:.74rem;color:var(--muted-ink);white-space:nowrap;}
 .tutorial-nav{display:flex;gap:8px;}
 
+/* ===== Bouton fermeture panneau flottant ===== */
+.panel-close-btn{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.3rem;color:var(--muted-ink);cursor:pointer;line-height:1;padding:4px;border-radius:4px;z-index:1;}
+.panel-close-btn:hover{color:var(--ink);background:var(--accent-soft);}
+/* ===== Alerte genre ===== */
+@keyframes shakeGenre{0%,100%{transform:translateX(0);}15%{transform:translateX(-7px);}35%{transform:translateX(7px);}55%{transform:translateX(-5px);}75%{transform:translateX(5px);}90%{transform:translateX(-2px);}}
+.genre-alert{animation:shakeGenre .45s ease both;outline:2px solid #c0392b;outline-offset:4px;border-radius:6px;}
+
 /* ===== Animations sur composants ===== */
 #app{animation:fadeInUp .5s ease both;}
 .tab-panel.active{animation:fadeIn .25s ease both;}
@@ -802,6 +809,7 @@ function showGenPanel(){
   bd.addEventListener('click',settleGenPanel);
   document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
+  const cb=document.createElement('button');cb.type='button';cb.className='panel-close-btn';cb.setAttribute('aria-label','Fermer');cb.textContent='×';cb.addEventListener('click',settleGenPanel);el.appendChild(cb);
 }
 function settleGenPanel(){
   const el=document.getElementById('genFormCol');
@@ -851,6 +859,7 @@ function showAnamPanel(){
   bd.addEventListener('click',settleAnamPanel);
   document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
+  const cb=document.createElement('button');cb.type='button';cb.className='panel-close-btn';cb.setAttribute('aria-label','Fermer');cb.textContent='×';cb.addEventListener('click',settleAnamPanel);el.appendChild(cb);
 }
 function settleAnamPanel(){
   const el=document.getElementById('anamFormCol');
@@ -987,7 +996,7 @@ function renderGenreRow(){
 function renderSituationRow(){
   const w=document.getElementById('situationRow');
   w.innerHTML=makeSeg('situation',ANAMNESE_SITUATIONS,selectedSituation);
-  w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();}));
+  w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();if(!anamneseGenre){const gr=document.getElementById('anamneseGenreRow');gr.classList.remove('genre-alert');void gr.offsetWidth;gr.classList.add('genre-alert');gr.addEventListener('animationend',()=>gr.classList.remove('genre-alert'),{once:true});}}));
 }
 function renderRenouvellementSubRow(){
   const w=document.getElementById('renouvellementSubRow');
