@@ -1167,7 +1167,7 @@ function wireAnamModal(root,openAnam){
     await persist();renderSituationRow();openAnam();showToast('Supprimé ✓');
   }));
   root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
-    if(btn.dataset.aud!=='anamnese')openTemplateForm(null,btn.dataset.aud);
+    if(btn.dataset.aud!=='anamnese')openTemplateForm(null,btn.dataset.aud,true);
   }));
 }
 
@@ -1208,7 +1208,7 @@ function buildModalHTML(aud,editing,nl,ni){
     +'</div>'
     +'</div></div></div>';
 }
-function openTemplateForm(editing,initialAud){
+function openTemplateForm(editing,initialAud,noAnim){
   const root=document.getElementById('modalRoot');
   if(initialAud==='anamnese'){
     function openAnam(){root.innerHTML=buildAnamModalHTML();wireAnamModal(root,openAnam);}
@@ -1269,7 +1269,7 @@ function openTemplateForm(editing,initialAud){
       document.getElementById('nextTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i<l.length-1)openTemplateForm(l[i+1]);});
     }
   }
-  render();
+  render(noAnim);
 }
 
 /* ========== Delete ========== */
