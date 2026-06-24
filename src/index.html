@@ -282,10 +282,6 @@ input,textarea,select{font-family:inherit;}
 .panel-close-btn{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.3rem;color:var(--muted-ink);cursor:pointer;line-height:1;padding:4px;border-radius:4px;z-index:1;}
 .panel-close-btn:hover{color:var(--ink);background:var(--accent-soft);}
 /* ===== Alerte genre ===== */
-@keyframes tabSlideFromRight{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
-@keyframes tabSlideFromLeft{from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:translateX(0);}}
-.tab-slide-from-right{animation:tabSlideFromRight .22s cubic-bezier(.22,1,.36,1) both;}
-.tab-slide-from-left{animation:tabSlideFromLeft .22s cubic-bezier(.22,1,.36,1) both;}
 @keyframes shakeGenre{0%,100%{transform:translateX(0);}15%{transform:translateX(-7px);}35%{transform:translateX(7px);}55%{transform:translateX(-5px);}75%{transform:translateX(5px);}90%{transform:translateX(-2px);}}
 .genre-alert{animation:shakeGenre .45s ease both;}
 
@@ -1145,13 +1141,10 @@ function openTemplateForm(editing){
   const root=document.getElementById('modalRoot');
   let aud=editing?(editing.audience||'patient'):'patient';
   const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
-  function render(skipAnim,slideDir){
+  function render(skipAnim){
     const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
     root.innerHTML=buildModalHTML(aud,editing,nl,ni);
-    if(skipAnim){
-      const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';
-      const m=root.querySelector('.modal');if(m)m.style.animation=slideDir==='right'?'tabSlideFromRight .22s cubic-bezier(.22,1,.36,1) both':'tabSlideFromLeft .22s cubic-bezier(.22,1,.36,1) both';
-    }
+    if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
     renderFormCategoryField(aud,ic);
     root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
       // Sauvegarde les valeurs en cours avant de changer d'onglet
@@ -1160,9 +1153,8 @@ function openTemplateForm(editing){
       const su=document.getElementById('f-subject').value;
       const bo=document.getElementById('f-body').value;
       const sm=document.getElementById('f-sms').value;
-      const prevAud=aud;
       aud=btn.dataset.aud;
-      render(true,aud==='partenaire'&&prevAud==='patient'?'right':'left');
+      render(true);
       // Restaure les valeurs communes
       document.getElementById('f-title').value=ti;
       document.getElementById('f-category').value=ca;
