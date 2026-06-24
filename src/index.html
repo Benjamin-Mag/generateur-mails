@@ -167,6 +167,10 @@ input,textarea,select{font-family:inherit;}
 .btn-danger:hover{background:var(--accent);color:#fff;}
 
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
+.tag-insert-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 4px;}
+.tag-insert-label{font-size:.72rem;font-weight:600;color:var(--muted-ink);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.tag-chip{background:var(--accent-soft);color:#7A2A20;border:1px solid var(--accent);border-radius:4px;padding:3px 9px;font-size:.78rem;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;cursor:pointer;transition:background .12s;}
+.tag-chip:hover{background:var(--accent);color:#fff;}
 
 /* Onglets marque-page du modal template */
 .tpl-modal-wrapper{display:flex;flex-direction:column;width:50vw;min-width:520px;max-width:900px;height:90vh;}
@@ -871,6 +875,7 @@ function buildModalHTML(aud,editing,nl,ni){
     +'<label>Titre'+req+'</label><input id="f-title" value="'+(editing?escapeHtml(editing.title):'')+'">'
     +'<label>Étiquette <span style="font-weight:400;text-transform:none;font-size:.75rem;color:var(--muted-ink);">(optionnel)</span></label><input id="f-category" value="'+(editing?escapeHtml(editing.category||''):'')+'">'
     +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
+    +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button></div>'
     +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing?escapeHtml(editing.body):escapeHtml('\n\n'+appData.emailFooter))+'</textarea>'
     +(aud==='patient'?'<div id="smsCompanionField"><label>SMS'+req+'</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):'')+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS'+req+'</label><textarea id="f-sms"></textarea></div>')
     +'<div class="err-msg" id="f-err">Le titre et le corps du mail sont obligatoires.</div>'
@@ -905,6 +910,18 @@ function openTemplateForm(editing){
     }));
     document.getElementById('cancelBtn').addEventListener('click',closeModal);
     document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+    // Insertion de tags au curseur
+    let _lastField=null;
+    ['f-subject','f-body','f-sms'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('focus',()=>_lastField=el);});
+    root.querySelectorAll('.tag-chip').forEach(btn=>btn.addEventListener('click',()=>{
+      const tag=btn.dataset.tag;
+      const f=_lastField||document.getElementById('f-body');
+      if(!f)return;
+      const s=f.selectionStart,e2=f.selectionEnd;
+      f.value=f.value.substring(0,s)+tag+f.value.substring(e2);
+      f.selectionStart=f.selectionEnd=s+tag.length;
+      f.focus();
+    }));
     async function saveForm(){
       const ti=document.getElementById('f-title').value.trim(),ca=document.getElementById('f-category').value.trim();
       const cc=root.querySelector('input[name="f-category"]:checked');
