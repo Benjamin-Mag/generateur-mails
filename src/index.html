@@ -355,17 +355,19 @@ input,textarea,select{font-family:inherit;}
 
   <section id="tab-anamnese" class="tab-panel active">
     <p class="hint">Choisis le genre du patient puis la situation : le texte s'affiche en dessous, modifiable et enregistré automatiquement.</p>
-    <div class="situation-block">
-      <label class="field-label">Genre du patient</label>
-      <div class="civility-group" id="anamneseGenreRow"></div>
-    </div>
-    <div class="situation-block">
-      <label class="field-label">Situation</label>
-      <div class="civility-group" id="situationRow"></div>
-    </div>
-    <div class="situation-block" id="renouvellementSubBlock" style="display:none;">
-      <label class="field-label">Type de renouvellement</label>
-      <div class="civility-group" id="renouvellementSubRow"></div>
+    <div id="anamFormCol">
+      <div class="situation-block">
+        <label class="field-label">Genre du patient</label>
+        <div class="civility-group" id="anamneseGenreRow"></div>
+      </div>
+      <div class="situation-block">
+        <label class="field-label">Situation</label>
+        <div class="civility-group" id="situationRow"></div>
+      </div>
+      <div class="situation-block" id="renouvellementSubBlock" style="display:none;">
+        <label class="field-label">Type de renouvellement</label>
+        <div class="civility-group" id="renouvellementSubRow"></div>
+      </div>
     </div>
     <div id="anamneseContent" class="anamnese-content" style="display:none;">
       <div class="anamnese-block">
@@ -744,8 +746,9 @@ function switchTab(name){
 function resetTabState(name){
   closeDatePicker();
   teardownGenPanel();
+  teardownAnamPanel();
   if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();showGenPanel();}
-  else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();}
+  else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();showAnamPanel();}
   else if(name==='modeles'){templateSearch='';templateTypeFilter='all';const s=document.getElementById('searchTemplates');if(s)s.value='';renderTypeChips();renderTemplatesGrid();}
 }
 
@@ -833,6 +836,61 @@ function settleGenPanel(){
   },{once:true});
   _genFloatParent=null;_genFloatSibling=null;
 }
+/* ===== Panneau flottant Anamnèse ===== */
+let _anamFloating=false,_anamFloatParent=null,_anamFloatSibling=null;
+function showAnamPanel(){
+  const el=document.getElementById('anamFormCol');
+  if(!el||_anamFloating)return;
+  _anamFloating=true;
+  _anamFloatParent=el.parentNode;
+  _anamFloatSibling=el.nextSibling;
+  document.body.appendChild(el);
+  const bd=document.createElement('div');
+  bd.className='gen-backdrop';bd.id='anamBackdrop';
+  document.body.insertBefore(bd,el);
+  el.classList.add('is-floating');
+}
+function settleAnamPanel(){
+  const el=document.getElementById('anamFormCol');
+  const bd=document.getElementById('anamBackdrop');
+  if(!el||!_anamFloating)return;
+  _anamFloating=false;
+  const startRect=el.getBoundingClientRect();
+  el.classList.remove('is-floating');
+  if(_anamFloatSibling)_anamFloatParent.insertBefore(el,_anamFloatSibling);
+  else _anamFloatParent.appendChild(el);
+  el.style.visibility='hidden';
+  const endRect=el.getBoundingClientRect();
+  el.style.visibility='';
+  const dx=startRect.left-endRect.left;
+  const dy=startRect.top-endRect.top;
+  const sx=startRect.width/endRect.width;
+  const sy=Math.min(startRect.height/endRect.height,3);
+  el.style.transformOrigin='top left';
+  el.style.transition='none';
+  el.style.transform=`translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+  el.getBoundingClientRect();
+  el.style.transition='transform .5s cubic-bezier(.22,1,.36,1)';
+  el.style.transform='none';
+  if(bd){bd.style.transition='opacity .32s ease';bd.style.opacity='0';setTimeout(()=>bd.remove(),340);}
+  el.addEventListener('transitionend',()=>{
+    el.style.transform='';el.style.transition='';el.style.transformOrigin='';
+  },{once:true});
+  _anamFloatParent=null;_anamFloatSibling=null;
+}
+function teardownAnamPanel(){
+  const el=document.getElementById('anamFormCol');
+  const bd=document.getElementById('anamBackdrop');
+  if(el&&_anamFloating&&_anamFloatParent){
+    el.classList.remove('is-floating');
+    el.style.transform='';el.style.transition='';el.style.transformOrigin='';
+    if(_anamFloatSibling)_anamFloatParent.insertBefore(el,_anamFloatSibling);
+    else _anamFloatParent.appendChild(el);
+  }else if(el){el.classList.remove('is-floating');el.style.transform='';el.style.transition='';el.style.transformOrigin='';}
+  if(bd)bd.remove();
+  _anamFloating=false;_anamFloatParent=null;_anamFloatSibling=null;
+}
+
 function teardownGenPanel(){
   const el=document.getElementById('genFormCol');
   const bd=document.getElementById('genBackdrop');
@@ -926,12 +984,12 @@ function renderGenreRow(){
 }
 function renderSituationRow(){
   const w=document.getElementById('situationRow');
-  w.innerHTML=ANAMNESE_SITUATIONS.map(s=>'<label class="civility-option"><input type="radio" name="situation" value="'+s.id+'" '+(selectedSituation===s.id?'checked':'')+'>  '+escapeHtml(s.label)+'</label>').join('');
+  w.innerHTML=makeSeg('situation',ANAMNESE_SITUATIONS,selectedSituation);
   w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();}));
 }
 function renderRenouvellementSubRow(){
   const w=document.getElementById('renouvellementSubRow');
-  w.innerHTML=RENOUVELLEMENT_OPTIONS.map(o=>'<label class="civility-option"><input type="radio" name="renouvellement-type" value="'+o.id+'" '+(renouvellementType===o.id?'checked':'')+'>  '+escapeHtml(o.label)+'</label>').join('');
+  w.innerHTML=makeSeg('renouvellement-type',RENOUVELLEMENT_OPTIONS,renouvellementType);
   w.querySelectorAll('input[name="renouvellement-type"]').forEach(r=>r.addEventListener('change',e=>{renouvellementType=e.target.value;renderAnamneseContent();}));
 }
 function renderAnamneseContent(){
@@ -940,6 +998,7 @@ function renderAnamneseContent(){
   if(!key){cw.style.display='none';return;}
   cw.style.display='block';
   document.getElementById('anamneseTextarea').value=(appData.anamnese[key]||{text:''}).text||'';
+  settleAnamPanel();
 }
 
 /* ========== Modals ========== */
