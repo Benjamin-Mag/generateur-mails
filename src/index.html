@@ -391,7 +391,7 @@ async function requestPermission(handle) {
 const OLD_SEED_IDS = ['seed-t1', 'seed-t2'];
 const NEW_TEMPLATE = {
   id:'tpl-confirmation-rdv', title:"Confirmation de votre rendez-vous", category:"Rendez-vous",
-  audience:"patient", patientCategory:"Reconfirmation", type:"email",
+  audience:"patient", patientCategory:"all", type:"email",
   subject:"Confirmation de votre rendez-vous du {{date}}",
   body:"Bonjour {{nom}},\n\nJe me permets de vous rappeler votre rendez-vous chez notre partenaire audioprothésiste, prévu le {{date}}.\n\nPourriez-vous me confirmer votre présence par retour d'e-mail ou par téléphone au 09 74 99 99 99 ?\n\nJe vous remercie par avance pour votre réactivité et reste à votre disposition pour toute question.\n\nBien cordialement,\nBenjamin Magnier",
   smsCompanion:"Petit rappel de votre rendez-vous avec notre partenaire audioprothésiste prévu le {{date}} à {{heure}}.\n\nJe vous remercie par avance de me confirmer que ce RDV vous convient toujours en me répondant OK.\nNotre partenaire audioprothésiste se réjouit déjà de vous accueillir !\nBien cordialement,\nBenjamin Magnier\nVotre conseiller Audibene\n09 74 99 99 99"
@@ -409,6 +409,7 @@ const PATIENT_TEMPLATES = [
 const FOLLOW_TYPES = [{id:'patient',label:'Suivi patient'},{id:'partenaire',label:'Suivi Partenaire'}];
 const PARTNER_CATEGORIES = [{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
 const PATIENT_CATEGORIES = [{id:'Reconfirmation',label:'Reconfirmation'},{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
+const PATIENT_CATEGORIES_FORM = [{id:'all',label:'Toutes'},{id:'Reconfirmation',label:'Reconfirmation'},{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
 const FIELD_LABELS = {nom:"Nom du patient",heure:"Heure du RDV"};
 const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const WEEKDAYS_FR = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
@@ -478,6 +479,8 @@ async function loadData(){
   appData.templates=appData.templates.filter(t=>OLD_SEED_IDS.indexOf(t.id)===-1);
   if(appData.templates.length!==bl)changed=true;
   if(!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
+  const _ct=appData.templates.find(t=>t.id===NEW_TEMPLATE.id);
+  if(_ct&&_ct.patientCategory!=='all'){_ct.patientCategory='all';changed=true;}
   SUIVI_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
   PATIENT_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
   appData.templates.forEach(t=>{
@@ -675,7 +678,7 @@ function renderTemplateSelect(){
   const sel=document.getElementById('templateSelect');
   if(!followType){sel.innerHTML="<option value=''>— Choisis d'abord un type de suivi —</option>";sel.disabled=true;return;}
   if(!selectedCategory){sel.innerHTML="<option value=''>— Choisis d'abord une catégorie —</option>";sel.disabled=true;return;}
-  const cur=sel.value,fil=appData.templates.filter(t=>{if(t.audience!==followType)return false;return followType==='partenaire'?t.partnerCategory===selectedCategory:t.patientCategory===selectedCategory;});
+  const cur=sel.value,fil=appData.templates.filter(t=>{if(t.audience!==followType)return false;return followType==='partenaire'?t.partnerCategory===selectedCategory:(t.patientCategory==='all'||t.patientCategory===selectedCategory);});
   sel.disabled=false;
   sel.innerHTML="<option value=''>— Choisir un modèle —</option>"+fil.map(t=>"<option value='"+t.id+"'>"+escapeHtml(t.title)+'</option>').join('');
   if(fil.some(t=>t.id===cur))sel.value=cur;
@@ -839,7 +842,7 @@ function openSettingsForm(){
 
 /* ========== Template modal ========== */
 function renderFormCategoryField(av,cc){
-  const l=av==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES,w=document.getElementById('formCategoryField');
+  const l=av==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES_FORM,w=document.getElementById('formCategoryField');
   if(!w)return;
   w.innerHTML='<label>Catégorie</label><div class="radio-row">'+l.map(o=>'<label><input type="radio" name="f-category" value="'+o.id+'" '+(cc===o.id?'checked':'')+'>  '+o.label+'</label>').join('')+'</div>';
 }
