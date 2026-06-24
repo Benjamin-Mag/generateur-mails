@@ -1031,7 +1031,7 @@ const MODELES_TUTORIAL_STEPS=[
   {target:'#typeChips',title:'Filtrer',text:"Affiche uniquement Email ou SMS."},
   {target:'#templatesGrid',title:'Mails patients et partenaires',text:"Deux groupes. « Modifier » pour changer, « Supprimer » pour effacer.",tooltipPosition:'above'}
 ];
-function startTutorial(steps){activeTutorialSteps=steps;tutorialStepIndex=0;renderTutorialStep();}
+function startTutorial(steps){teardownGenPanel();teardownAnamPanel();activeTutorialSteps=steps;tutorialStepIndex=0;renderTutorialStep();}
 function startAnamneseTutorial(){startTutorial(ANAMNESE_TUTORIAL_STEPS);}
 function startGenererTutorial(){startTutorial(GENERER_TUTORIAL_STEPS);}
 function startModelesTutorial(){startTutorial(MODELES_TUTORIAL_STEPS);}
@@ -1063,6 +1063,7 @@ function _renderTutorialStepPositioned(step,steps,ov){
   document.getElementById('tutorialCloseBtn').addEventListener('click',closeTutorial);
   document.getElementById('tutorialPrevBtn').addEventListener('click',()=>{if(tutorialStepIndex>0){tutorialStepIndex--;renderTutorialStep();}});
   document.getElementById('tutorialNextBtn').addEventListener('click',()=>{if(tutorialStepIndex<steps.length-1){tutorialStepIndex++;renderTutorialStep();}else closeTutorial();});
+  const bdf=ov.querySelector('.tutorial-backdrop-full');if(bdf)bdf.addEventListener('click',closeTutorial);
 }
 
 /* ========== Réglages ========== */
