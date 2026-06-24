@@ -123,6 +123,16 @@ input,textarea,select{font-family:inherit;}
 .dp-today-link{background:none;border:none;color:var(--accent);font-size:.8rem;font-weight:600;}
 .dp-today-link:hover{text-decoration:underline;}
 
+.time-popover{position:absolute;top:calc(100% + 6px);left:0;z-index:60;background:var(--card-bg);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(43,42,40,.2);padding:16px 20px;width:180px;}
+.time-picker-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:14px;}
+.time-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.time-nav-btn{background:none;border:1px solid var(--line);border-radius:5px;width:34px;height:28px;font-size:1rem;color:var(--ink);display:flex;align-items:center;justify-content:center;line-height:1;}
+.time-nav-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.time-display{font-family:'Special Elite',monospace;font-size:1.5rem;color:var(--ink);min-width:34px;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:4px 6px;}
+.time-sep{font-family:'Special Elite',monospace;font-size:1.4rem;color:var(--muted-ink);padding-bottom:4px;}
+.time-confirm-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px;font-size:.85rem;font-weight:600;}
+.time-confirm-btn:hover{background:#962F25;}
+
 .preview-subject{background:var(--card-bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:.88rem;font-weight:600;margin-bottom:10px;}
 .preview-body{background:var(--card-bg);border:1px solid var(--line);border-radius:6px;padding:14px;font-size:.88rem;line-height:1.55;white-space:pre-wrap;min-height:160px;color:var(--muted-ink);}
 .preview-body mark.ph-empty{background:var(--accent-soft);color:#7A2A20;border-radius:3px;padding:0 2px;}
@@ -399,7 +409,7 @@ const PATIENT_TEMPLATES = [
 const FOLLOW_TYPES = [{id:'patient',label:'Suivi patient'},{id:'partenaire',label:'Suivi Partenaire'}];
 const PARTNER_CATEGORIES = [{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
 const PATIENT_CATEGORIES = [{id:'Reconfirmation',label:'Reconfirmation'},{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
-const FIELD_LABELS = {nom:"Nom du patient"};
+const FIELD_LABELS = {nom:"Nom du patient",heure:"Heure du RDV"};
 const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const WEEKDAYS_FR = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
 const ANAMNESE_SITUATIONS = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement',label:'Renouvellement'}];
@@ -424,6 +434,7 @@ let appData = {templates:[],anamnese:{},signatureName:'Benjamin Magnier',emailFo
 let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null;
 let datePickerOpenVar=null, datePickerView={};
+let timePickerOpenVar=null, timePickerState={};
 let selectedSituation=null, anamneseGenre=null, renouvellementType=null;
 let tutorialStepIndex=-1, activeTutorialSteps=null;
 
@@ -431,6 +442,7 @@ let tutorialStepIndex=-1, activeTutorialSteps=null;
 function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
 function fieldLabel(v){if(FIELD_LABELS[v])return FIELD_LABELS[v];const c=v.replace(/_/g,' ');return c.charAt(0).toUpperCase()+c.slice(1);}
 function isDateVar(v){return /date/i.test(v);}
+function isHeureVar(v){return /heure/i.test(v);}
 function getCurrentCategoryList(){return followType==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES;}
 function extractVars(text){const re=/\{\{\s*([^}]+?)\s*\}\}/g,seen=new Set(),vars=[];let m;while((m=re.exec(text))){const n=m[1].trim();if(n&&!seen.has(n)){seen.add(n);vars.push(n);}}return vars;}
 function buildFilledText(text,values){return text.replace(/\{\{\s*([^}]+?)\s*\}\}/g,(m,n)=>{const v=values[n.trim()];return(v&&String(v).trim().length)?v:m;});}
@@ -564,7 +576,35 @@ function renderDatePopover(v,anchorEl){
   pop.querySelectorAll('[data-dp-day]').forEach(btn=>btn.addEventListener('click',()=>{const d=new Date(btn.dataset.dpDay);manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();}));
   pop.querySelector('[data-dp-today]').addEventListener('click',()=>{const d=new Date();manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();});
 }
-document.addEventListener('click',()=>closeDatePicker());
+document.addEventListener('click',()=>{closeDatePicker();closeTimePicker();});
+
+/* ========== Time picker ========== */
+function parseHeureFr(s){if(!s)return null;const m=s.match(/^(\d{1,2})h(\d{2})$/);if(!m)return null;return{h:parseInt(m[1]),m:parseInt(m[2])};}
+function formatHeureFr(h,m){return String(h).padStart(2,'0')+'h'+String(m).padStart(2,'0');}
+function closeTimePicker(){timePickerOpenVar=null;document.querySelectorAll('.time-popover').forEach(e=>e.remove());}
+function openTimePicker(v,el){closeTimePicker();closeDatePicker();timePickerOpenVar=v;const ex=parseHeureFr(manualValues[v]);timePickerState[v]=ex?{h:ex.h,m:ex.m}:{h:9,m:0};renderTimePopover(v,el);}
+function renderTimePopover(v,anchorEl){
+  const st=timePickerState[v];
+  const pop=document.createElement('div');pop.className='time-popover';
+  pop.innerHTML='<div class="time-picker-row">'
+    +'<div class="time-col"><button type="button" class="time-nav-btn" data-tp-up-h>▲</button><div class="time-display" id="tp-h">'+String(st.h).padStart(2,'0')+'</div><button type="button" class="time-nav-btn" data-tp-dn-h>▼</button></div>'
+    +'<span class="time-sep">h</span>'
+    +'<div class="time-col"><button type="button" class="time-nav-btn" data-tp-up-m>▲</button><div class="time-display" id="tp-m">'+String(st.m).padStart(2,'0')+'</div><button type="button" class="time-nav-btn" data-tp-dn-m>▼</button></div>'
+    +'</div>'
+    +'<button type="button" class="time-confirm-btn" id="tp-confirm">Confirmer</button>';
+  pop.addEventListener('click',e=>e.stopPropagation());
+  anchorEl.closest('.date-field-wrap').appendChild(pop);
+  function upd(){pop.querySelector('#tp-h').textContent=String(st.h).padStart(2,'0');pop.querySelector('#tp-m').textContent=String(st.m).padStart(2,'0');}
+  pop.querySelector('[data-tp-up-h]').addEventListener('click',()=>{st.h=(st.h+1)%24;upd();});
+  pop.querySelector('[data-tp-dn-h]').addEventListener('click',()=>{st.h=(st.h+23)%24;upd();});
+  pop.querySelector('[data-tp-up-m]').addEventListener('click',()=>{st.m=(st.m+5)%60;upd();});
+  pop.querySelector('[data-tp-dn-m]').addEventListener('click',()=>{st.m=(st.m+55)%60;upd();});
+  pop.querySelector('#tp-confirm').addEventListener('click',()=>{
+    manualValues[v]=formatHeureFr(st.h,st.m);
+    const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];
+    closeTimePicker();renderPreviewOnly();
+  });
+}
 
 async function copyText(text){
   try{await navigator.clipboard.writeText(text);return true;}
@@ -650,12 +690,14 @@ function updateExtraFieldsAndPreview(){
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
     if(v==='nom')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label><div class="civility-group"><label class="civility-option"><input type="radio" name="civilite" value="Monsieur" '+(civilite==='Monsieur'?'checked':'')+'>  M.</label><label class="civility-option"><input type="radio" name="civilite" value="Madame" '+(civilite==='Madame'?'checked':'')+'>  Mme</label></div></div><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"></div>';
+    if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
     if(isDateVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'" readonly><button type="button" class="date-icon-btn" data-date-toggle="'+escapeHtml(v)+'" aria-label="Choisir une date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div></div>';
     return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><input id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'"></div>';
   }).join('');
   ew.querySelectorAll('input[data-extra-var]:not(.date-display-input)').forEach(i=>i.addEventListener('input',e=>{manualValues[e.target.dataset.extraVar]=e.target.value;renderPreviewOnly();}));
   ew.querySelectorAll('input[name="civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
-  ew.querySelectorAll('.date-display-input,[data-date-toggle]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const v=el.dataset.extraVar||el.dataset.dateToggle;if(datePickerOpenVar===v)closeDatePicker();else openDatePicker(v,el);}));
+  ew.querySelectorAll('.date-display-input[data-extra-var],[data-date-toggle]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const v=el.dataset.extraVar||el.dataset.dateToggle;if(!isHeureVar(v)){if(datePickerOpenVar===v)closeDatePicker();else openDatePicker(v,el);}}));
+  ew.querySelectorAll('[data-time-toggle],.date-display-input[data-extra-var]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const v=el.dataset.extraVar||el.dataset.timeToggle;if(isHeureVar(v)){if(timePickerOpenVar===v)closeTimePicker();else openTimePicker(v,el);}}));
   renderPreviewOnly();
 }
 function renderPreviewOnly(){
