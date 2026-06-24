@@ -107,9 +107,39 @@ input,textarea,select{font-family:inherit;}
 .extra-field label{display:block;font-size:.78rem;color:var(--muted-ink);margin-bottom:4px;}
 .field-row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
 .field-row-header label{margin-bottom:0;}
-.civility-group{display:flex;gap:12px;flex-wrap:wrap;}
+.civility-group{display:flex;gap:10px;flex-wrap:wrap;}
+/* Pill-card radio buttons */
 .civility-option{display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--ink);font-weight:500;cursor:pointer;margin-bottom:0;}
 .civility-option input[type="radio"]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;margin:0;}
+.seg-group{display:flex;gap:8px;flex-wrap:wrap;}
+.seg-option{position:relative;}
+.seg-option input[type="radio"]{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+.seg-label{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:50px;
+  border:2px solid var(--line);background:var(--card-bg);
+  font-size:.85rem;font-weight:600;color:var(--muted-ink);
+  cursor:pointer;user-select:none;
+  transition:border-color .2s,background .2s,color .2s,transform .18s,box-shadow .2s;
+}
+.seg-label .seg-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--line);
+  transition:background .2s,transform .2s;
+  flex-shrink:0;
+}
+.seg-option input:checked + .seg-label{
+  border-color:var(--accent);
+  background:var(--accent);
+  color:#fff;
+  box-shadow:0 4px 14px rgba(27,79,155,.35);
+  transform:translateY(-2px) scale(1.04);
+}
+.seg-option input:checked + .seg-label .seg-dot{background:rgba(255,255,255,.7);transform:scale(1.4);}
+.seg-label:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px);}
+.seg-option input:checked + .seg-label:hover{transform:translateY(-2px) scale(1.04);}
+@keyframes segPop{0%{transform:translateY(0) scale(1);}40%{transform:translateY(-4px) scale(1.07);}70%{transform:translateY(-1px) scale(1.02);}100%{transform:translateY(-2px) scale(1.04);}}
+.seg-option input:checked + .seg-label{animation:segPop .28s ease both;}
 
 .date-field-wrap{position:relative;}
 .date-display-input{padding-right:38px;cursor:pointer;background:var(--card-bg);}
@@ -706,14 +736,17 @@ function getFilteredTemplateList(){
 
 /* ========== Générer tab ========== */
 function updateCategoryBlockVisibility(){document.getElementById('categoryBlock').style.display=followType?'block':'none';}
+function makeSeg(name,options,checkedVal){
+  return '<div class="seg-group">'+options.map(o=>`<label class="seg-option"><input type="radio" name="${name}" value="${escapeHtml(o.id)}" ${checkedVal===o.id?'checked':''}><span class="seg-label"><span class="seg-dot"></span>${escapeHtml(o.label)}</span></label>`).join('')+'</div>';
+}
 function renderFollowTypeRow(){
   const w=document.getElementById('followTypeRow');
-  w.innerHTML=FOLLOW_TYPES.map(o=>'<label class="civility-option"><input type="radio" name="follow-type" value="'+o.id+'" '+(followType===o.id?'checked':'')+'>  '+escapeHtml(o.label)+'</label>').join('');
+  w.innerHTML=makeSeg('follow-type',FOLLOW_TYPES,followType);
   w.querySelectorAll('input[name="follow-type"]').forEach(r=>r.addEventListener('change',e=>{followType=e.target.value;selectedCategory=null;manualValues={};civilite=null;datePickerView={};renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}));
 }
 function renderCategoryRow(){
   const w=document.getElementById('categoryRow'),l=getCurrentCategoryList();
-  w.innerHTML=l.map(o=>'<label class="civility-option"><input type="radio" name="selected-category" value="'+o.id+'" '+(selectedCategory===o.id?'checked':'')+'>  '+escapeHtml(o.label)+'</label>').join('');
+  w.innerHTML=makeSeg('selected-category',l,selectedCategory);
   w.querySelectorAll('input[name="selected-category"]').forEach(r=>r.addEventListener('change',e=>{selectedCategory=e.target.value;manualValues={};civilite=null;datePickerView={};renderTemplateSelect();updateExtraFieldsAndPreview();}));
 }
 function renderTemplateSelect(){
