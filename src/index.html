@@ -995,7 +995,7 @@ function renderAnamneseContent(){
   if(!key){cw.style.display='none';return;}
   cw.style.display='block';
   document.getElementById('anamneseTextarea').value=(appData.anamnese[key]||{text:''}).text||'';
-  if(anamneseGenre){settleAnamPanel();}else{const gr=document.getElementById('anamneseGenreRow');gr.classList.remove('genre-alert');void gr.offsetWidth;gr.classList.add('genre-alert');gr.addEventListener('animationend',()=>gr.classList.remove('genre-alert'),{once:true});}
+  if(anamneseGenre){settleAnamPanel();}else{const gr=document.getElementById('anamneseGenreRow').querySelector('.seg-group');gr.classList.remove('genre-alert');void gr.offsetWidth;gr.classList.add('genre-alert');gr.addEventListener('animationend',()=>gr.classList.remove('genre-alert'),{once:true});}
 }
 
 /* ========== Modals ========== */
