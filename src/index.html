@@ -1141,9 +1141,10 @@ function openTemplateForm(editing){
   const root=document.getElementById('modalRoot');
   let aud=editing?(editing.audience||'patient'):'patient';
   const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
-  function render(){
+  function render(skipAnim){
     const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
     root.innerHTML=buildModalHTML(aud,editing,nl,ni);
+    if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';}
     renderFormCategoryField(aud,ic);
     root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
       // Sauvegarde les valeurs en cours avant de changer d'onglet
@@ -1153,7 +1154,7 @@ function openTemplateForm(editing){
       const bo=document.getElementById('f-body').value;
       const sm=document.getElementById('f-sms').value;
       aud=btn.dataset.aud;
-      render();
+      render(true);
       // Restaure les valeurs communes
       document.getElementById('f-title').value=ti;
       document.getElementById('f-category').value=ca;
