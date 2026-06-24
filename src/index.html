@@ -99,6 +99,26 @@ input,textarea,select{font-family:inherit;}
 .empty-state{color:var(--muted-ink);font-size:.88rem;padding:30px 0;text-align:center;}
 
 .gen-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;}
+/* ===== Panneau flottant ===== */
+@keyframes genPanelIn{from{opacity:0;transform:translate(-50%,-47%) scale(.92);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
+@keyframes genBackdropIn{from{opacity:0;}to{opacity:1;}}
+#genFormCol.is-floating{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:min(520px,92vw);max-height:88vh;overflow-y:auto;
+  z-index:45;
+  background:var(--card-bg);border-radius:20px;
+  padding:32px 28px 26px;
+  box-shadow:0 32px 80px rgba(27,79,155,.28),0 0 0 1px rgba(27,79,155,.1);
+  animation:genPanelIn .42s cubic-bezier(.22,1,.36,1) both;
+}
+.gen-backdrop{
+  position:fixed;inset:0;
+  background:rgba(18,38,82,.12);
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  z-index:44;
+  animation:genBackdropIn .3s ease both;
+}
 .field-label{font-size:.78rem;font-weight:600;color:var(--muted-ink);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;}
 .gen-col input,.gen-col select,.gen-col textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:10px 12px;font-size:.9rem;color:var(--ink);}
 .gen-col select:disabled{opacity:.55;cursor:not-allowed;}
@@ -360,7 +380,7 @@ input,textarea,select{font-family:inherit;}
 
   <section id="tab-generer" class="tab-panel">
     <div class="gen-layout">
-      <div class="gen-col">
+      <div class="gen-col" id="genFormCol">
         <label class="field-label">Type de suivi</label>
         <div class="civility-group" id="followTypeRow"></div>
         <div class="situation-block" id="categoryBlock" style="display:none;margin-top:18px;">
@@ -723,7 +743,8 @@ function switchTab(name){
 }
 function resetTabState(name){
   closeDatePicker();
-  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}
+  teardownGenPanel();
+  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();showGenPanel();}
   else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();}
   else if(name==='modeles'){templateSearch='';templateTypeFilter='all';const s=document.getElementById('searchTemplates');if(s)s.value='';renderTypeChips();renderTemplatesGrid();}
 }
@@ -761,6 +782,56 @@ function getFilteredTemplateList(){
 
 /* ========== Générer tab ========== */
 function updateCategoryBlockVisibility(){document.getElementById('categoryBlock').style.display=followType?'block':'none';}
+/* ===== Panneau flottant ===== */
+let _genFloating=false;
+function showGenPanel(){
+  const el=document.getElementById('genFormCol');
+  if(!el||_genFloating)return;
+  _genFloating=true;
+  const bd=document.createElement('div');
+  bd.className='gen-backdrop';bd.id='genBackdrop';
+  document.body.appendChild(bd);
+  el.classList.add('is-floating');
+}
+function settleGenPanel(){
+  const el=document.getElementById('genFormCol');
+  const bd=document.getElementById('genBackdrop');
+  if(!el||!_genFloating)return;
+  _genFloating=false;
+  // FLIP : mesure la position courante (floating)
+  const startRect=el.getBoundingClientRect();
+  // Retire la classe pour mesurer la position finale dans le flux
+  el.classList.remove('is-floating');
+  el.style.visibility='hidden';el.style.pointerEvents='none';
+  const endRect=el.getBoundingClientRect();
+  el.style.visibility='';el.style.pointerEvents='';
+  // Calcule le delta
+  const dx=startRect.left-endRect.left;
+  const dy=startRect.top-endRect.top;
+  const sx=startRect.width/endRect.width;
+  const sy=startRect.height/endRect.height;
+  // Applique le transform inversé (remet visuellement au point de départ)
+  el.style.transformOrigin='top left';
+  el.style.transition='none';
+  el.style.transform=`translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+  el.getBoundingClientRect(); // force reflow
+  // Anime vers la position finale
+  el.style.transition='transform .52s cubic-bezier(.22,1,.36,1),box-shadow .4s ease,border-radius .4s ease';
+  el.style.transform='none';
+  // Backdrop disparaît
+  if(bd){bd.style.transition='opacity .35s ease';bd.style.opacity='0';setTimeout(()=>bd.remove(),360);}
+  el.addEventListener('transitionend',()=>{
+    el.style.transform='';el.style.transition='';el.style.transformOrigin='';
+  },{once:true});
+}
+function teardownGenPanel(){
+  const el=document.getElementById('genFormCol');
+  const bd=document.getElementById('genBackdrop');
+  if(el){el.classList.remove('is-floating');el.style.transform='';el.style.transition='';el.style.transformOrigin='';}
+  if(bd)bd.remove();
+  _genFloating=false;
+}
+
 function makeSeg(name,options,checkedVal){
   return '<div class="seg-group">'+options.map(o=>`<label class="seg-option"><input type="radio" name="${name}" value="${escapeHtml(o.id)}" ${checkedVal===o.id?'checked':''}><span class="seg-label"><span class="seg-dot"></span>${escapeHtml(o.label)}</span></label>`).join('')+'</div>';
 }
@@ -788,6 +859,7 @@ function renderTemplateSelect(){
     selectedTemplateId=btn.dataset.tplId;
     manualValues={};civilite=null;datePickerView={};
     w.querySelectorAll('.tpl-pill').forEach(b=>b.classList.toggle('active',b===btn));
+    settleGenPanel();
     updateExtraFieldsAndPreview();
   }));
 }
