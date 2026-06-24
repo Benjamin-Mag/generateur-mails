@@ -1211,8 +1211,12 @@ function buildModalHTML(aud,editing,nl,ni){
 function openTemplateForm(editing,initialAud,noAnim){
   const root=document.getElementById('modalRoot');
   if(initialAud==='anamnese'){
-    function openAnam(){root.innerHTML=buildAnamModalHTML();wireAnamModal(root,openAnam);}
-    openAnam();return;
+    function openAnam(skipAnim){
+      root.innerHTML=buildAnamModalHTML();
+      if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
+      wireAnamModal(root,openAnam);
+    }
+    openAnam(noAnim);return;
   }
   let aud=initialAud||(editing?(editing.audience||'patient'):'patient');
   const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
