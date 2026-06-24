@@ -278,6 +278,13 @@ input,textarea,select{font-family:inherit;}
 .tutorial-step-count{font-size:.74rem;color:var(--muted-ink);white-space:nowrap;}
 .tutorial-nav{display:flex;gap:8px;}
 
+/* ===== Modal Anamnèse ===== */
+.anam-modal-entry{margin-bottom:18px;}
+.anam-modal-entry .anam-modal-textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:10px 12px;font-size:.88rem;color:var(--ink);resize:vertical;min-height:80px;line-height:1.6;}
+.new-custom-form{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:10px;}
+.new-custom-form input,.new-custom-form textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:9px 11px;font-size:.88rem;color:var(--ink);margin-top:4px;}
+.new-custom-form textarea{resize:vertical;min-height:80px;}
+
 /* ===== Bouton fermeture panneau flottant ===== */
 .panel-close-btn{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.3rem;color:var(--muted-ink);cursor:pointer;line-height:1;padding:4px;border-radius:4px;z-index:1;}
 .panel-close-btn:hover{color:var(--ink);background:var(--accent-soft);}
@@ -525,6 +532,7 @@ const FIELD_LABELS = {nom:"Nom du patient",heure:"Heure du RDV"};
 const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const WEEKDAYS_FR = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
 const ANAMNESE_SITUATIONS = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement',label:'Renouvellement'}];
+const ANAMNESE_EDIT_ENTRIES = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement_avec_ordonnance',label:'Renouvellement – Avec ordonnance'},{id:'renouvellement_sans_ordonnance',label:'Renouvellement – Sans ordonnance'}];
 const RENOUVELLEMENT_OPTIONS = [{id:'avec_ordonnance',label:'Avec ordonnance'},{id:'sans_ordonnance',label:'Sans ordonnance'}];
 const DEFAULT_ANAMNESE = {
   depistage_simple:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
@@ -542,7 +550,7 @@ const OLD_FOOTERS = [
 const DEFAULT_EMAIL_FOOTER = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
 
 /* ========== App state ========== */
-let appData = {templates:[],anamnese:{},signatureName:'Benjamin Magnier',emailFooter:DEFAULT_EMAIL_FOOTER};
+let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',emailFooter:DEFAULT_EMAIL_FOOTER};
 let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
@@ -576,6 +584,7 @@ async function loadData(){
   const parsed=(raw&&raw.trim())?JSON.parse(raw):{};
   appData.templates=parsed.templates||[];
   appData.anamnese=parsed.anamnese||{};
+  appData.customSituations=Array.isArray(parsed.customSituations)?parsed.customSituations:[];
   appData.signatureName=(typeof parsed.signatureName==='string'&&parsed.signatureName)?parsed.signatureName:'Benjamin Magnier';
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
 
@@ -983,7 +992,8 @@ function renderGenreRow(){
 }
 function renderSituationRow(){
   const w=document.getElementById('situationRow');
-  w.innerHTML=makeSeg('situation',ANAMNESE_SITUATIONS,selectedSituation);
+  const allSituations=[...ANAMNESE_SITUATIONS,...(appData.customSituations||[])];
+  w.innerHTML=makeSeg('situation',allSituations,selectedSituation);
   w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();}));
 }
 function renderRenouvellementSubRow(){
@@ -1101,6 +1111,66 @@ function openSettingsForm(){
   document.getElementById('saveSettingsBtn').addEventListener('click',save);
 }
 
+/* ========== Modal Anamnèse ========== */
+function buildAnamModalHTML(){
+  const customs=appData.customSituations||[];
+  const fixedHtml=ANAMNESE_EDIT_ENTRIES.map(e=>{
+    const text=escapeHtml((appData.anamnese[e.id]||{text:''}).text||'');
+    return '<div class="anam-modal-entry"><label class="field-label">'+escapeHtml(e.label)+'</label><textarea class="anam-modal-textarea" data-anam-id="'+e.id+'" rows="4">'+text+'</textarea></div>';
+  }).join('');
+  const customHtml=customs.map(e=>{
+    const text=escapeHtml((appData.anamnese[e.id]||{text:''}).text||'');
+    return '<div class="anam-modal-entry"><div class="field-row-header"><label class="field-label" style="margin-bottom:0;">'+escapeHtml(e.label)+'</label><button type="button" class="copy-mini danger" data-del-custom-anam="'+e.id+'">Supprimer</button></div><textarea class="anam-modal-textarea" data-anam-id="'+e.id+'" rows="4">'+text+'</textarea></div>';
+  }).join('');
+  return '<div class="overlay" id="overlay">'
+    +'<div class="tpl-modal-wrapper"><div class="tpl-modal-tabs">'
+    +'<button type="button" class="tpl-modal-tab" data-aud="patient">Patient</button>'
+    +'<button type="button" class="tpl-modal-tab" data-aud="partenaire">Partenaire</button>'
+    +'<button type="button" class="tpl-modal-tab active" data-aud="anamnese">Anamnèse</button>'
+    +'</div><div class="modal"><h2 style="margin-top:4px;">Modèles d\'anamnèse</h2>'
+    +fixedHtml+customHtml
+    +'<div id="newCustomSituationArea"></div>'
+    +'<div class="modal-foot" style="justify-content:space-between;">'
+    +'<button type="button" class="btn-outline" id="addCustomSituationBtn">+ Nouvelle situation</button>'
+    +'<div style="display:flex;gap:10px;"><button class="btn-outline" id="cancelBtn">Fermer</button>'
+    +'<button class="btn-primary" id="saveAnamBtn">Enregistrer</button></div>'
+    +'</div></div></div></div>';
+}
+function wireAnamModal(root,openAnam){
+  document.getElementById('cancelBtn').addEventListener('click',closeModal);
+  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('saveAnamBtn').addEventListener('click',async()=>{
+    root.querySelectorAll('.anam-modal-textarea').forEach(ta=>{appData.anamnese[ta.dataset.anamId]={text:ta.value};});
+    await persist();
+    if(selectedSituation)renderAnamneseContent();
+    closeModal();showToast('Anamnèses enregistrées ✓');
+  });
+  document.getElementById('addCustomSituationBtn').addEventListener('click',()=>{
+    const area=document.getElementById('newCustomSituationArea');
+    if(area.querySelector('.new-custom-form'))return;
+    area.innerHTML='<div class="new-custom-form"><label class="field-label">Titre</label><input id="new-custom-title" placeholder="Ex. Suivi post-appareillage"><label class="field-label" style="margin-top:10px;">Texte</label><textarea id="new-custom-text" rows="4"></textarea><div style="margin-top:10px;display:flex;gap:8px;"><button type="button" class="btn-primary" id="confirmAddCustomBtn">Ajouter</button><button type="button" class="btn-outline" id="cancelAddCustomBtn">Annuler</button></div></div>';
+    document.getElementById('cancelAddCustomBtn').addEventListener('click',()=>{area.innerHTML='';});
+    document.getElementById('confirmAddCustomBtn').addEventListener('click',async()=>{
+      const label=document.getElementById('new-custom-title').value.trim();
+      const text=document.getElementById('new-custom-text').value;
+      if(!label)return;
+      const id='custom-'+Date.now();
+      appData.customSituations.push({id,label});
+      appData.anamnese[id]={text};
+      await persist();renderSituationRow();openAnam();showToast('Situation ajoutée ✓');
+    });
+  });
+  root.querySelectorAll('[data-del-custom-anam]').forEach(btn=>btn.addEventListener('click',async()=>{
+    const id=btn.dataset.delCustomAnam;
+    appData.customSituations=appData.customSituations.filter(s=>s.id!==id);
+    delete appData.anamnese[id];
+    await persist();renderSituationRow();openAnam();showToast('Supprimé ✓');
+  }));
+  root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
+    if(btn.dataset.aud!=='anamnese')openTemplateForm(null,btn.dataset.aud);
+  }));
+}
+
 /* ========== Template modal ========== */
 function renderFormCategoryField(av,cc){
   const l=av==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES_FORM,w=document.getElementById('formCategoryField');
@@ -1120,6 +1190,7 @@ function buildModalHTML(aud,editing,nl,ni){
     +'<div class="tpl-modal-tabs">'
     +'<button type="button" class="tpl-modal-tab'+(aud==='patient'?' active':'')+'" data-aud="patient">Patient</button>'
     +'<button type="button" class="tpl-modal-tab'+(aud==='partenaire'?' active':'')+'" data-aud="partenaire">Partenaire</button>'
+    +'<button type="button" class="tpl-modal-tab" data-aud="anamnese">Anamnèse</button>'
     +'</div>'
     +'<div class="modal">'
     +'<div style="padding:0 0 4px;">'
@@ -1137,9 +1208,13 @@ function buildModalHTML(aud,editing,nl,ni){
     +'</div>'
     +'</div></div></div>';
 }
-function openTemplateForm(editing){
+function openTemplateForm(editing,initialAud){
   const root=document.getElementById('modalRoot');
-  let aud=editing?(editing.audience||'patient'):'patient';
+  if(initialAud==='anamnese'){
+    function openAnam(){root.innerHTML=buildAnamModalHTML();wireAnamModal(root,openAnam);}
+    openAnam();return;
+  }
+  let aud=initialAud||(editing?(editing.audience||'patient'):'patient');
   const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
   function render(skipAnim){
     const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
@@ -1147,6 +1222,7 @@ function openTemplateForm(editing){
     if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
     renderFormCategoryField(aud,ic);
     root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
+      if(btn.dataset.aud==='anamnese'){openTemplateForm(editing,'anamnese');return;}
       // Sauvegarde les valeurs en cours avant de changer d'onglet
       const ti=document.getElementById('f-title').value;
       const ca=document.getElementById('f-category').value;
