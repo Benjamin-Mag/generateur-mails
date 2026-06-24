@@ -281,10 +281,9 @@ input,textarea,select{font-family:inherit;}
 /* ===== Modal Anamnèse ===== */
 .anam-modal-entry{margin-bottom:18px;}
 .anam-modal-entry .anam-modal-textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:10px 12px;font-size:.88rem;color:var(--ink);resize:vertical;min-height:80px;line-height:1.6;}
-.anam-label-wrap{display:inline-flex;align-items:center;gap:5px;max-width:calc(100% - 90px);}
-.anam-modal-label-input{border:none;background:transparent;font-weight:600;font-size:inherit;color:var(--ink);padding:2px 4px;border-radius:4px;cursor:text;width:100%;outline:none;}
+.anam-label-wrap{display:inline-flex;align-items:center;max-width:calc(100% - 90px);}
+.anam-modal-label-input{border:none;background:transparent;font-weight:600;font-size:inherit;color:var(--ink);padding:2px 4px;border-radius:4px;cursor:text;width:auto;min-width:4ch;max-width:100%;outline:none;}
 .anam-modal-label-input:focus{outline:2px solid var(--accent);background:var(--card-bg);}
-.anam-label-pencil{color:var(--muted,#999);font-size:.8rem;flex-shrink:0;pointer-events:none;}
 .new-custom-form{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:10px;}
 .new-custom-form input,.new-custom-form textarea{width:100%;border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:9px 11px;font-size:.88rem;color:var(--ink);margin-top:4px;}
 .new-custom-form textarea{resize:vertical;min-height:80px;}
@@ -1123,7 +1122,6 @@ function buildAnamModalHTML(){
       +'<div class="field-row-header" style="margin-bottom:5px;">'
       +'<div class="anam-label-wrap">'
       +'<input class="anam-modal-label-input" data-anam-label-id="'+e.id+'" value="'+escapeHtml(e.label)+'">'
-      +'<span class="anam-label-pencil">✏️</span>'
       +'</div>'
       +'<button type="button" class="copy-mini danger" data-del-anam="'+e.id+'">Supprimer</button>'
       +'</div>'
@@ -1147,6 +1145,11 @@ function buildAnamModalHTML(){
 function wireAnamModal(root,openAnam){
   document.getElementById('cancelBtn').addEventListener('click',closeModal);
   document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  function resizeLabelInput(inp){inp.style.width=(inp.value.length||1)+'ch';}
+  root.querySelectorAll('.anam-modal-label-input').forEach(inp=>{
+    resizeLabelInput(inp);
+    inp.addEventListener('input',()=>resizeLabelInput(inp));
+  });
   document.getElementById('saveAnamBtn').addEventListener('click',async()=>{
     root.querySelectorAll('.anam-modal-label-input').forEach(inp=>{
       const s=appData.customSituations.find(s=>s.id===inp.dataset.anamLabelId);
