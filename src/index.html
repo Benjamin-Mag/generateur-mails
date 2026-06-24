@@ -409,7 +409,7 @@ const PATIENT_TEMPLATES = [
 const FOLLOW_TYPES = [{id:'patient',label:'Suivi patient'},{id:'partenaire',label:'Suivi Partenaire'}];
 const PARTNER_CATEGORIES = [{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
 const PATIENT_CATEGORIES = [{id:'Reconfirmation',label:'Reconfirmation'},{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
-const PATIENT_CATEGORIES_FORM = [{id:'all',label:'Toutes'},{id:'Reconfirmation',label:'Reconfirmation'},{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
+const PATIENT_CATEGORIES_FORM = [{id:'Reconfirmation',label:'Reconfirmation'},{id:'CC1',label:'CC1'},{id:'CC2',label:'CC2'},{id:'CC3',label:'CC3'},{id:'CC4',label:'CC4'}];
 const FIELD_LABELS = {nom:"Nom du patient",heure:"Heure du RDV"};
 const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const WEEKDAYS_FR = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
@@ -689,11 +689,7 @@ function updateExtraFieldsAndPreview(){
   const ew=document.getElementById('extraFields'),sw=document.getElementById('previewSubjectWrap'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
   if(!template){ew.innerHTML='';sw.style.display='none';be.textContent=followType?'Choisis un modèle pour commencer.':'Choisis un type de suivi puis un modèle pour commencer.';ac.style.display='none';smsw.style.display='none';return;}
   let vars=extractVars((template.subject||'')+' '+template.body+' '+(template.smsCompanion||''));
-  // Injecte {{heure}} juste après {{date}} si date est présent et heure absent
-  if(vars.some(v=>isDateVar(v))&&!vars.some(v=>isHeureVar(v))){
-    const di=vars.findIndex(v=>isDateVar(v));
-    vars.splice(di+1,0,'heure');
-  }
+
   if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
