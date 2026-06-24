@@ -728,7 +728,11 @@ function getCurrentAnamneseKey(){if(selectedSituation==='renouvellement')return 
 function renderGenreRow(){
   const w=document.getElementById('anamneseGenreRow');
   w.innerHTML='<label class="civility-option"><input type="radio" name="anamnese-genre" value="Monsieur" '+(anamneseGenre==='Monsieur'?'checked':'')+'>  M.</label><label class="civility-option"><input type="radio" name="anamnese-genre" value="Madame" '+(anamneseGenre==='Madame'?'checked':'')+'>  Mme</label>';
-  w.querySelectorAll('input[name="anamnese-genre"]').forEach(r=>r.addEventListener('change',e=>{anamneseGenre=e.target.value;}));
+  w.querySelectorAll('input[name="anamnese-genre"]').forEach(r=>r.addEventListener('change',e=>{
+    anamneseGenre=e.target.value;
+    const ta=document.getElementById('anamneseTextarea');
+    if(ta&&ta.value)ta.value=resolveGenre(ta.value,anamneseGenre);
+  }));
 }
 function renderSituationRow(){
   const w=document.getElementById('situationRow');
