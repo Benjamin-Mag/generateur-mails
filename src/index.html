@@ -81,30 +81,42 @@ input,textarea,select{font-family:inherit;}
 .chip.active{background:var(--accent-soft);border-color:var(--accent);color:#1A3D7A;}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;}
-.model-group-title{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin:0 0 20px;text-align:center;}
-.template-group{
-  background:var(--card-bg);
-  border:1.5px solid var(--line);
-  border-radius:16px;
-  padding:28px 24px 20px;
-  margin-bottom:28px;
-  position:relative;
-  box-shadow:0 4px 18px rgba(27,79,155,.07);
+/* ===== Groupes Modèles ===== */
+@keyframes cardDeal{
+  0%{opacity:0;transform:translateY(-28px) scale(.88) rotate(-1.5deg);}
+  65%{transform:translateY(3px) scale(1.02) rotate(.4deg);}
+  100%{opacity:1;transform:translateY(0) scale(1) rotate(0);}
 }
-.template-group::before{
-  content:'';
-  position:absolute;top:0;left:40px;right:40px;height:3px;
-  background:linear-gradient(90deg,transparent,var(--accent),transparent);
-  border-radius:0 0 4px 4px;
+.model-group-title{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin:0;text-align:center;transition:color .2s;}
+.template-group{background:var(--card-bg);border:1.5px solid var(--line);border-radius:16px;margin-bottom:20px;overflow:hidden;box-shadow:0 3px 14px rgba(27,79,155,.06);transition:box-shadow .2s;}
+.template-group:hover{box-shadow:0 6px 24px rgba(27,79,155,.11);}
+.group-header{
+  display:flex;align-items:center;justify-content:center;
+  padding:22px 52px;cursor:pointer;position:relative;user-select:none;
+  border-bottom:1.5px solid transparent;transition:background .18s,border-color .18s;
 }
-.template-group.partenaire::before{
-  background:linear-gradient(90deg,transparent,var(--success),transparent);
-}
+.group-header:hover{background:rgba(27,79,155,.03);}
+.template-group.open .group-header{border-bottom-color:var(--line);}
+.group-count{position:absolute;left:22px;font-size:.75rem;font-weight:600;color:var(--muted-ink);background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:2px 10px;}
+.group-chevron{position:absolute;right:20px;color:var(--muted-ink);display:flex;align-items:center;transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.template-group.open .group-chevron{transform:rotate(180deg);}
+.group-body{display:none;padding:24px;}
+.template-group.open .group-body{display:block;}
+/* Patient */
+.template-group.patient .model-group-title{color:var(--accent);}
+.template-group.patient.open .group-header{border-bottom-color:var(--accent);}
+/* Partenaire */
 .template-group.partenaire .model-group-title{color:var(--success);}
-.template-group.anamnese::before{
-  background:linear-gradient(90deg,transparent,#7C4DFF,transparent);
-}
+.template-group.partenaire.open .group-header{border-bottom-color:var(--success);}
+/* Anamnèse */
 .template-group.anamnese .model-group-title{color:#7C4DFF;}
+.template-group.anamnese.open .group-header{border-bottom-color:#7C4DFF;}
+/* Deal animation sur les cartes */
+.template-group.open .card,
+.template-group.open .anam-card-modeles{
+  animation:cardDeal .4s cubic-bezier(.22,1,.36,1) both;
+  animation-delay:calc(var(--i,0) * 60ms);
+}
 .anam-card-modeles{
   position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:5px;
   padding:18px 16px 14px;text-align:left;
@@ -832,15 +844,24 @@ function renderTemplatesGrid(){
     const sma=templateTypeFilter==='sms'&&t.smsCompanion;
     return '<div class="card"><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(sma?t.smsCompanion:t.body)+'</p>'+(!sma&&t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
   }
+  function makeGroup(type,label,cards,emptyMsg){
+    const chevron='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+    const indexed=cards.map((c,i)=>c.replace(/style="/,'style="--i:'+i+';').replace('<div class="card"','<div class="card" style="--i:'+i+'"').replace('<div class="anam-card-modeles"','<div class="anam-card-modeles" style="--i:'+i+'"'));
+    const body=cards.length?'<div class="grid">'+indexed.join('')+'</div>':'<div class="empty-state">'+emptyMsg+'</div>';
+    return '<div class="template-group '+type+'">'
+      +'<div class="group-header" data-toggle-group>'
+      +'<span class="group-count">'+cards.length+'</span>'
+      +'<span class="model-group-title">'+label+'</span>'
+      +'<span class="group-chevron">'+chevron+'</span>'
+      +'</div>'
+      +'<div class="group-body">'+body+'</div>'
+      +'</div>';
+  }
   const pl=list.filter(t=>t.audience!=='partenaire'),pal=list.filter(t=>t.audience==='partenaire'),isS=templateTypeFilter==='sms';
-  let html='<div class="template-group"><div class="model-group-title">'+(isS?'SMS patients':'Mails patients')+'</div>';
-  html+=pl.length?'<div class="grid">'+pl.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle patient.</div>';
-  html+='</div>';
+  const plCards=pl.map(rc),palCards=pal.map(rc);
+  let html=makeGroup('patient',isS?'SMS patients':'Mails patients',plCards,'Aucun modèle patient.');
   if(!isS){
-    html+='<div class="template-group partenaire"><div class="model-group-title">Mails partenaires</div>';
-    html+=pal.length?'<div class="grid">'+pal.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle partenaire.</div>';
-    html+='</div>';
-    // Groupe anamnèses
+    html+=makeGroup('partenaire','Mails partenaires',palCards,'Aucun modèle partenaire.');
     const situations=appData.customSituations||[];
     const anamCards=situations.map(s=>{
       const text=(appData.anamnese[s.id]||{text:''}).text||'';
@@ -851,11 +872,15 @@ function renderTemplatesGrid(){
         +'<div class="card-foot"><button class="copy-mini" data-edit-anam="'+escapeHtml(s.id)+'">Modifier</button></div>'
         +'</div>';
     });
-    html+='<div class="template-group anamnese"><div class="model-group-title">Anamnèses</div>';
-    html+=anamCards.length?'<div class="grid">'+anamCards.join('')+'</div>':'<div class="empty-state">Aucune anamnèse.</div>';
-    html+='</div>';
+    html+=makeGroup('anamnese','Anamnèses',anamCards,'Aucune anamnèse.');
   }
   grid.innerHTML=html;
+  grid.querySelectorAll('[data-toggle-group]').forEach(header=>{
+    header.addEventListener('click',()=>{
+      const group=header.closest('.template-group');
+      group.classList.toggle('open');
+    });
+  });
 }
 function getFilteredTemplateList(){
   const term=templateSearch.toLowerCase();
