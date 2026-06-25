@@ -54,10 +54,11 @@ input,textarea,select{font-family:inherit;}
 #permBanner p{margin:0;font-size:.85rem;color:#1A3D7A;}
 
 #app{max-width:1080px;margin:0 auto;padding:24px 20px 60px;}
-.topbar{display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;background:linear-gradient(135deg,rgba(27,79,155,.06) 0%,rgba(208,232,247,.4) 100%);border-radius:12px;padding:20px;margin-bottom:8px;}
-.topbar-right{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
-.eyebrow{font-family:'Poppins',sans-serif;font-size:.72rem;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;display:block;margin-bottom:4px;}
-.topbar h1{font-family:'Poppins',sans-serif;font-size:1.6rem;margin:0;color:var(--ink);font-weight:400;}
+.topbar{display:flex;flex-direction:row;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(27,79,155,.06) 0%,rgba(208,232,247,.4) 100%);border-radius:12px;padding:10px 20px;margin-bottom:8px;gap:16px;}
+.topbar-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.eyebrow{display:none;}
+.topbar h1{font-family:'Poppins',sans-serif;font-size:1rem;margin:0;color:var(--ink);font-weight:600;white-space:nowrap;}
 
 .tabs{display:flex;gap:6px;background:var(--card-bg);border:1px solid var(--line);border-radius:8px;padding:4px;flex-wrap:wrap;}
 .tab{background:none;border:none;border-radius:6px;padding:8px 16px;font-size:.86rem;font-weight:600;color:var(--muted-ink);transition:background .18s,color .18s,box-shadow .18s;}
@@ -99,7 +100,7 @@ input,textarea,select{font-family:inherit;}
 .copy-mini.danger:hover{border-color:var(--accent);background:var(--accent);color:#fff;}
 .empty-state{color:var(--muted-ink);font-size:.88rem;padding:30px 0;text-align:center;}
 
-.gen-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;}
+.gen-layout{display:flex;flex-direction:column;gap:20px;max-width:720px;margin:0 auto;}
 /* ===== Panneau flottant ===== */
 @keyframes genPanelIn{from{opacity:0;transform:translate(-50%,-47%) scale(.92);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
 @keyframes genBackdropIn{from{opacity:0;}to{opacity:1;}}
@@ -342,14 +343,15 @@ input,textarea,select{font-family:inherit;}
 
 <div id="app">
   <div class="topbar">
-    <span class="eyebrow">Boîte à outils mails</span>
-    <h1>Générateur de mails &amp; SMS</h1>
+    <div class="topbar-left">
+      <h1>Générateur de mails &amp; SMS</h1>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="anamnese">Anamnèse</button>
+      <button class="tab" data-tab="generer">Générer</button>
+      <button class="tab" data-tab="modeles">Modèles</button>
+    </div>
     <div class="topbar-right">
-      <div class="tabs" id="tabs">
-        <button class="tab active" data-tab="anamnese">Anamnèse</button>
-        <button class="tab" data-tab="generer">Générer</button>
-        <button class="tab" data-tab="modeles">Modèles</button>
-      </div>
       <button class="btn-outline small" id="settingsBtn" type="button">⚙ Réglages</button>
     </div>
   </div>
