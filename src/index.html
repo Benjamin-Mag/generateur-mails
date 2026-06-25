@@ -462,11 +462,13 @@ input,textarea,select{font-family:inherit;}
           <label class="field-label">Catégorie</label>
           <div class="civility-group" id="categoryRow"></div>
         </div>
-        <label class="field-label" style="margin-top:18px;">Modèle</label>
-        <div id="templateSelect" class="template-pill-grid"></div>
-        <div id="extraFields" class="extra-fields"></div>
+        <div id="modeleBlock" style="display:none;">
+          <label class="field-label" style="margin-top:18px;">Modèle</label>
+          <div id="templateSelect" class="template-pill-grid"></div>
+          <div id="extraFields" class="extra-fields"></div>
+        </div>
       </div>
-      <div class="gen-col preview-col">
+      <div class="gen-col preview-col" id="apercuBlock" style="display:none;">
         <label class="field-label">Aperçu</label>
         <div id="previewSubjectWrap" style="display:none;">
           <div class="preview-subject" id="previewSubject"></div>
@@ -890,7 +892,10 @@ function getFilteredTemplateList(){
 }
 
 /* ========== Générer tab ========== */
-function updateCategoryBlockVisibility(){document.getElementById('categoryBlock').style.display=followType?'block':'none';}
+function updateCategoryBlockVisibility(){
+  document.getElementById('categoryBlock').style.display=followType?'block':'none';
+  if(!selectedCategory){document.getElementById('modeleBlock').style.display='none';document.getElementById('apercuBlock').style.display='none';}
+}
 /* ===== Panneau flottant ===== */
 let _genFloating=false,_genFloatParent=null,_genFloatSibling=null;
 function showGenPanel(){
@@ -1063,7 +1068,7 @@ function renderFollowTypeRow(){
 function renderCategoryRow(){
   const w=document.getElementById('categoryRow'),l=getCurrentCategoryList();
   w.innerHTML=makeSeg('selected-category',l,selectedCategory);
-  w.querySelectorAll('input[name="selected-category"]').forEach(r=>r.addEventListener('change',e=>{selectedCategory=e.target.value;manualValues={};civilite=null;datePickerView={};renderTemplateSelect();updateExtraFieldsAndPreview();}));
+  w.querySelectorAll('input[name="selected-category"]').forEach(r=>r.addEventListener('change',e=>{selectedCategory=e.target.value;manualValues={};civilite=null;datePickerView={};document.getElementById('modeleBlock').style.display='block';renderTemplateSelect();updateExtraFieldsAndPreview();}));
 }
 function renderTemplateSelect(){
   const w=document.getElementById('templateSelect');
@@ -1087,7 +1092,8 @@ function updateExtraFieldsAndPreview(){
   closeDatePicker();
   const template=appData.templates.find(t=>t.id===selectedTemplateId);
   const ew=document.getElementById('extraFields'),sw=document.getElementById('previewSubjectWrap'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
-  if(!template){ew.innerHTML='';sw.style.display='none';be.textContent=followType?'Choisis un modèle pour commencer.':'Choisis un type de suivi puis un modèle pour commencer.';ac.style.display='none';smsw.style.display='none';return;}
+  if(!template){ew.innerHTML='';sw.style.display='none';be.textContent=followType?'Choisis un modèle pour commencer.':'Choisis un type de suivi puis un modèle pour commencer.';ac.style.display='none';smsw.style.display='none';document.getElementById('apercuBlock').style.display='none';return;}
+  document.getElementById('apercuBlock').style.display='block';
   let vars=extractVars((template.subject||'')+' '+template.body+' '+(template.smsCompanion||''));
   if(vars.some(v=>isDateVar(v))&&!vars.some(v=>isHeureVar(v))){
     const di=vars.findIndex(v=>isDateVar(v));
