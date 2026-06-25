@@ -965,7 +965,7 @@ function renderGenSummary(){
   const typeLabel=followType==='partenaire'?'Partenaire':'Patient';
   const catLabel=selectedCategory||'';
   const tplLabel=template?template.title:'';
-  el.querySelectorAll('.situation-block,#modeleBlock').forEach(b=>b.style.display='none');
+  Array.from(el.children).forEach(b=>b.style.display='none');
   const bar=document.createElement('div');
   bar.className='anam-summary-bar';bar.id='genSummaryBar';
   bar.innerHTML=`<span class="anam-summary-chip genre">${escapeHtml(typeLabel)}</span><span class="anam-summary-sep">›</span><span class="anam-summary-chip sit">${escapeHtml(catLabel)}</span><span class="anam-summary-sep">›</span><span class="anam-summary-chip sit">${escapeHtml(tplLabel)}</span><span class="anam-summary-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifier</span>`;
