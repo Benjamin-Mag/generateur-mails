@@ -101,6 +101,20 @@ input,textarea,select{font-family:inherit;}
   background:linear-gradient(90deg,transparent,var(--success),transparent);
 }
 .template-group.partenaire .model-group-title{color:var(--success);}
+.template-group.anamnese::before{
+  background:linear-gradient(90deg,transparent,#7C4DFF,transparent);
+}
+.template-group.anamnese .model-group-title{color:#7C4DFF;}
+.anam-card-modeles{
+  position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:5px;
+  padding:18px 16px 14px;text-align:left;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.anam-card-modeles:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(124,77,255,.12);border-color:#7C4DFF;}
+.anam-card-modeles .anam-tag{position:absolute;top:-9px;right:14px;font-size:.66rem;padding:3px 9px;border-radius:2px;letter-spacing:.03em;background:#EDE7FF;color:#4A148C;font-family:'Poppins',sans-serif;}
+.anam-card-modeles h3{font-family:'Poppins',sans-serif;font-weight:400;font-size:1rem;margin:6px 0 8px;}
+.anam-card-modeles p{font-size:.82rem;color:var(--muted-ink);margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;}
+.anam-card-modeles .card-foot{display:flex;justify-content:flex-end;gap:8px;}
 .group-divider{border:none;border-top:1px solid var(--line);margin:28px 0;}
 
 .card{position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:5px;padding:18px 16px 14px;text-align:left;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
@@ -822,7 +836,25 @@ function renderTemplatesGrid(){
   let html='<div class="template-group"><div class="model-group-title">'+(isS?'SMS patients':'Mails patients')+'</div>';
   html+=pl.length?'<div class="grid">'+pl.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle patient.</div>';
   html+='</div>';
-  if(!isS){html+='<div class="template-group partenaire"><div class="model-group-title">Mails partenaires</div>';html+=pal.length?'<div class="grid">'+pal.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle partenaire.</div>';html+='</div>';}
+  if(!isS){
+    html+='<div class="template-group partenaire"><div class="model-group-title">Mails partenaires</div>';
+    html+=pal.length?'<div class="grid">'+pal.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle partenaire.</div>';
+    html+='</div>';
+    // Groupe anamnèses
+    const situations=appData.customSituations||[];
+    const anamCards=situations.map(s=>{
+      const text=(appData.anamnese[s.id]||{text:''}).text||'';
+      return '<div class="anam-card-modeles">'
+        +'<span class="anam-tag">Anamnèse</span>'
+        +'<h3>'+escapeHtml(s.label)+'</h3>'
+        +'<p>'+(text?escapeHtml(text):'<em>Aucun texte saisi</em>')+'</p>'
+        +'<div class="card-foot"><button class="copy-mini" data-edit-anam="'+escapeHtml(s.id)+'">Modifier</button></div>'
+        +'</div>';
+    });
+    html+='<div class="template-group anamnese"><div class="model-group-title">Anamnèses</div>';
+    html+=anamCards.length?'<div class="grid">'+anamCards.join('')+'</div>':'<div class="empty-state">Aucune anamnèse.</div>';
+    html+='</div>';
+  }
   grid.innerHTML=html;
 }
 function getFilteredTemplateList(){
@@ -1386,8 +1418,10 @@ function confirmDeleteTemplate(id){
   document.getElementById('modelesTutorialBtn').addEventListener('click',startModelesTutorial);
   document.getElementById('templatesGrid').addEventListener('click',e=>{
     const ed=e.target.closest('[data-edit-template]'),dl=e.target.closest('[data-del-template]');
+    const ea=e.target.closest('[data-edit-anam]');
     if(ed)openTemplateForm(appData.templates.find(t=>t.id===ed.dataset.editTemplate));
     if(dl)confirmDeleteTemplate(dl.dataset.delTemplate);
+    if(ea)openTemplateForm(null,'anamnese',true);
   });
   document.getElementById('addTemplateBtn').addEventListener('click',()=>openTemplateForm(null));
   document.getElementById('searchTemplates').addEventListener('input',e=>{templateSearch=e.target.value;renderTemplatesGrid();});
