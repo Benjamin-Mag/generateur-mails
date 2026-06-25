@@ -1328,10 +1328,20 @@ function buildModalHTML(aud,editing,nl,ni){
     +'<h2 style="margin-top:4px;">'+(editing?'Modifier le modèle':'Nouveau modèle')+'</h2>'
     +'<div id="formCategoryField"></div>'
     +'<label>Titre'+req+'</label><input id="f-title" value="'+(editing?escapeHtml(editing.title):'')+'">'
+    +(aud==='patient'?'<label>Type</label><div class="seg-group" id="formTypeGroup">'
+      +'<label class="seg-option"><input type="radio" name="f-type" value="email" '+((!editing||editing.type!=='sms')?'checked':'')+' id="f-type-email"><span class="seg-label">Email</span></label>'
+      +'<label class="seg-option"><input type="radio" name="f-type" value="sms" '+(editing&&editing.type==='sms'?'checked':'')+' id="f-type-sms"><span class="seg-label">SMS uniquement</span></label>'
+      +'</div>':'')
+    +'<div id="emailFields" style="'+(aud==='patient'&&editing&&editing.type==='sms'?'display:none':'')+'">'
     +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button></div>'
-    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing?escapeHtml(editing.body):escapeHtml('\n\n'+appData.emailFooter))+'</textarea>'
-    +(aud==='patient'?'<div id="smsCompanionField"><label>SMS'+req+'</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):'')+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS'+req+'</label><textarea id="f-sms"></textarea></div>')
+    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml('\n\n'+appData.emailFooter))+'</textarea>'
+    +'</div>'
+    +'<div id="smsOnlyField" style="'+(aud!=='patient'||!editing||editing.type!=='sms'?'display:none':''')+'">'
+    +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button></div>'
+    +'<label>SMS'+req+'</label><textarea id="f-sms-only" placeholder="Texte du SMS…">'+(editing&&editing.type==='sms'?escapeHtml(editing.body):'')+'</textarea>'
+    +'</div>'
+    +(aud==='patient'?'<div id="smsCompanionField" style="'+(editing&&editing.type==='sms'?'display:none':'')+'"><label>SMS accompagnateur</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):'')+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS</label><textarea id="f-sms"></textarea></div>')
     +'<div class="err-msg" id="f-err">Le titre et le corps du mail sont obligatoires.</div>'
     +navRow
     +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">'+(editing?'Enregistrer':'Ajouter')+'</button></div>'
@@ -1359,24 +1369,31 @@ function openTemplateForm(editing,initialAud,noAnim){
       if(btn.dataset.aud==='anamnese'){openTemplateForm(editing,'anamnese',true);return;}
       // Sauvegarde les valeurs en cours avant de changer d'onglet
       const ti=document.getElementById('f-title').value;
-      const ca=document.getElementById('f-category').value;
-      const su=document.getElementById('f-subject').value;
-      const bo=document.getElementById('f-body').value;
-      const sm=document.getElementById('f-sms').value;
+      const su=(document.getElementById('f-subject')||{}).value||'';
+      const bo=(document.getElementById('f-body')||{}).value||'';
+      const sm=(document.getElementById('f-sms')||{}).value||'';
       aud=btn.dataset.aud;
       render(true);
-      // Restaure les valeurs communes
       document.getElementById('f-title').value=ti;
-      document.getElementById('f-category').value=ca;
-      document.getElementById('f-subject').value=su;
-      document.getElementById('f-body').value=bo;
-      document.getElementById('f-sms').value=sm;
+      if(document.getElementById('f-subject'))document.getElementById('f-subject').value=su;
+      if(document.getElementById('f-body'))document.getElementById('f-body').value=bo;
+      if(document.getElementById('f-sms'))document.getElementById('f-sms').value=sm;
     }));
     document.getElementById('cancelBtn').addEventListener('click',closeModal);
     document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+    // Toggle Email / SMS uniquement
+    const ftg=document.getElementById('formTypeGroup');
+    if(ftg){
+      ftg.querySelectorAll('input[name="f-type"]').forEach(r=>r.addEventListener('change',()=>{
+        const isSms=document.getElementById('f-type-sms').checked;
+        document.getElementById('emailFields').style.display=isSms?'none':'';
+        document.getElementById('smsOnlyField').style.display=isSms?'':'none';
+        document.getElementById('smsCompanionField').style.display=isSms?'none':'';
+      }));
+    }
     // Insertion de tags au curseur
     let _lastField=null;
-    ['f-subject','f-body','f-sms'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('focus',()=>_lastField=el);});
+    ['f-subject','f-body','f-sms','f-sms-only'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('focus',()=>_lastField=el);});
     root.querySelectorAll('.tag-chip').forEach(btn=>btn.addEventListener('click',()=>{
       const tag=btn.dataset.tag;
       const f=_lastField||document.getElementById('f-body');
@@ -1387,14 +1404,19 @@ function openTemplateForm(editing,initialAud,noAnim){
       f.focus();
     }));
     async function saveForm(){
-      const ti=document.getElementById('f-title').value.trim(),ca=document.getElementById('f-category').value.trim();
+      const ti=document.getElementById('f-title').value.trim();
       const cc=root.querySelector('input[name="f-category"]:checked');
       const cv=cc?cc.value:(aud==='partenaire'?'CC1':'Reconfirmation');
-      const su=document.getElementById('f-subject').value.trim(),bo=document.getElementById('f-body').value.trim(),sm=(document.getElementById('f-sms').value||'').trim();
+      const tc=root.querySelector('input[name="f-type"]:checked');
+      const ty=aud==='patient'&&tc?tc.value:'email';
+      const isSmsOnly=ty==='sms';
+      const su=(!isSmsOnly&&document.getElementById('f-subject'))?document.getElementById('f-subject').value.trim():'';
+      const bo=isSmsOnly?(document.getElementById('f-sms-only')?document.getElementById('f-sms-only').value.trim():''):(document.getElementById('f-body')?document.getElementById('f-body').value.trim():'');
+      const sm=(!isSmsOnly&&document.getElementById('f-sms'))?(document.getElementById('f-sms').value||'').trim():'';
       const er=document.getElementById('f-err');
       if(!ti||!bo){er.style.display='block';return false;}er.style.display='none';
-      if(editing){editing.title=ti;editing.category=ca;editing.type='email';editing.audience=aud;editing.subject=su;editing.body=bo;editing.partnerCategory=aud==='partenaire'?cv:undefined;editing.patientCategory=aud==='patient'?cv:undefined;editing.smsCompanion=aud==='patient'?(sm||undefined):undefined;}
-      else{appData.templates.push({id:'user-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),title:ti,category:ca,type:'email',audience:aud,partnerCategory:aud==='partenaire'?cv:undefined,patientCategory:aud==='patient'?cv:undefined,smsCompanion:aud==='patient'?(sm||undefined):undefined,subject:su,body:bo,createdAt:Date.now()});}
+      if(editing){editing.title=ti;editing.type=ty;editing.audience=aud;editing.subject=isSmsOnly?undefined:su;editing.body=bo;editing.partnerCategory=aud==='partenaire'?cv:undefined;editing.patientCategory=aud==='patient'?cv:undefined;editing.smsCompanion=aud==='patient'&&!isSmsOnly?(sm||undefined):undefined;}
+      else{appData.templates.push({id:'user-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),title:ti,type:ty,audience:aud,partnerCategory:aud==='partenaire'?cv:undefined,patientCategory:aud==='patient'?cv:undefined,smsCompanion:aud==='patient'&&!isSmsOnly?(sm||undefined):undefined,subject:isSmsOnly?undefined:su,body:bo,createdAt:Date.now()});}
       await persist();renderTemplatesGrid();renderTemplateSelect();return true;
     }
     document.getElementById('saveBtn').addEventListener('click',async()=>{const ok=await saveForm();if(ok){closeModal();showToast(editing?'Modèle mis à jour ✓':'Modèle ajouté ✓');}});
