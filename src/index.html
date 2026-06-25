@@ -994,9 +994,15 @@ function settleAnamPanel(){
 function renderAnamSummary(){
   const el=document.getElementById('anamFormCol');
   if(!el)return;
-  // Si les choix sont incomplets, on remet l'affichage normal sans widget
+  // Si les choix sont incomplets, affichage progressif
   if(!anamneseGenre||!getCurrentAnamneseKey()){
-    el.querySelectorAll('.situation-block').forEach(b=>b.style.display='');
+    const blocks=el.querySelectorAll('.situation-block');
+    // Genre toujours visible
+    if(blocks[0])blocks[0].style.display='';
+    // Situation visible seulement si genre choisi
+    if(blocks[1])blocks[1].style.display=anamneseGenre?'':'none';
+    // Renouvellement géré par renderRenouvellementSubRow
+    if(blocks[2])blocks[2].style.display='none';
     return;
   }
   // Cache les blocs de sélection
@@ -1122,7 +1128,12 @@ function renderGenreRow(){
     anamneseGenre=e.target.value;
     const ta=document.getElementById('anamneseTextarea');
     if(ta&&ta.value)ta.value=resolveGenre(ta.value,anamneseGenre);
-    if(selectedSituation&&getCurrentAnamneseKey())settleAnamPanel();
+    if(selectedSituation&&getCurrentAnamneseKey()){settleAnamPanel();return;}
+    // Mode inline : révéler le bloc Situation
+    if(!_anamFloating){
+      const col=document.getElementById('anamFormCol');
+      if(col){const blocks=col.querySelectorAll('.situation-block');if(blocks[1])blocks[1].style.display='';}
+    }
   }));
 }
 function renderSituationRow(){
