@@ -1115,6 +1115,7 @@ function renderTemplateSelect(){
     w.querySelectorAll('.tpl-pill').forEach(b=>b.classList.toggle('active',b===btn));
     settleGenPanel();
     updateExtraFieldsAndPreview();
+    if(!_genFloating)renderGenSummary();
   }));
 }
 function updateExtraFieldsAndPreview(){
