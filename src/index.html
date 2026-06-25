@@ -994,6 +994,11 @@ function settleAnamPanel(){
 function renderAnamSummary(){
   const el=document.getElementById('anamFormCol');
   if(!el)return;
+  // Si les choix sont incomplets, on remet l'affichage normal sans widget
+  if(!anamneseGenre||!getCurrentAnamneseKey()){
+    el.querySelectorAll('.situation-block').forEach(b=>b.style.display='');
+    return;
+  }
   // Cache les blocs de sélection
   el.querySelectorAll('.situation-block').forEach(b=>b.style.display='none');
   // Labels
