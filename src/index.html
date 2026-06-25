@@ -81,7 +81,26 @@ input,textarea,select{font-family:inherit;}
 .chip.active{background:var(--accent-soft);border-color:var(--accent);color:#1A3D7A;}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;}
-.model-group-title{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin:0 0 16px;text-align:center;}
+.model-group-title{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin:0 0 20px;text-align:center;}
+.template-group{
+  background:var(--card-bg);
+  border:1.5px solid var(--line);
+  border-radius:16px;
+  padding:28px 24px 20px;
+  margin-bottom:28px;
+  position:relative;
+  box-shadow:0 4px 18px rgba(27,79,155,.07);
+}
+.template-group::before{
+  content:'';
+  position:absolute;top:0;left:40px;right:40px;height:3px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  border-radius:0 0 4px 4px;
+}
+.template-group.partenaire::before{
+  background:linear-gradient(90deg,transparent,var(--success),transparent);
+}
+.template-group.partenaire .model-group-title{color:var(--success);}
 .group-divider{border:none;border-top:1px solid var(--line);margin:28px 0;}
 
 .card{position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:5px;padding:18px 16px 14px;text-align:left;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
@@ -800,9 +819,10 @@ function renderTemplatesGrid(){
     return '<div class="card"><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(sma?t.smsCompanion:t.body)+'</p>'+(!sma&&t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
   }
   const pl=list.filter(t=>t.audience!=='partenaire'),pal=list.filter(t=>t.audience==='partenaire'),isS=templateTypeFilter==='sms';
-  let html='<div class="model-group-title">'+(isS?'SMS patients':'Mails patients')+'</div>';
+  let html='<div class="template-group"><div class="model-group-title">'+(isS?'SMS patients':'Mails patients')+'</div>';
   html+=pl.length?'<div class="grid">'+pl.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle patient.</div>';
-  if(!isS){html+='<hr class="group-divider"><div class="model-group-title">Mails partenaires</div>';html+=pal.length?'<div class="grid">'+pal.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle partenaire.</div>';}
+  html+='</div>';
+  if(!isS){html+='<div class="template-group partenaire"><div class="model-group-title">Mails partenaires</div>';html+=pal.length?'<div class="grid">'+pal.map(rc).join('')+'</div>':'<div class="empty-state">Aucun modèle partenaire.</div>';html+='</div>';}
   grid.innerHTML=html;
 }
 function getFilteredTemplateList(){
