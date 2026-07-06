@@ -1113,7 +1113,7 @@ function renderGenreRow(){
 function renderCategoryRow(){
   const w=document.getElementById('categoryRow'),l=getCurrentCategoryList();
   w.innerHTML=makeSeg('selected-category',l,selectedCategory);
-  w.querySelectorAll('input[name="selected-category"]').forEach(r=>r.addEventListener('change',e=>{selectedCategory=e.target.value;manualValues={};civilite=null;datePickerView={};document.getElementById('modeleBlock').style.display='block';renderTemplateSelect();updateExtraFieldsAndPreview();}));
+  w.querySelectorAll('input[name="selected-category"]').forEach(r=>r.addEventListener('change',e=>{selectedCategory=e.target.value;manualValues={};datePickerView={};document.getElementById('modeleBlock').style.display='block';renderTemplateSelect();updateExtraFieldsAndPreview();}));
 }
 function renderTemplateSelect(){
   const w=document.getElementById('templateSelect');
