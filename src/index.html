@@ -1370,63 +1370,120 @@ function showOnboardingModal(){
 }
 
 /* ========== Modal Anamnèse ========== */
-function buildAnamModalHTML(){
+function buildAnamModalHTML(idx,drafts){
   const situations=appData.customSituations||[];
-  const entriesHtml=situations.map(e=>{
-    const text=escapeHtml((appData.anamnese[e.id]||{text:''}).text||'');
-    return '<div class="anam-card">'
-      +'<div class="anam-card-title" contenteditable="true" data-anam-label-id="'+e.id+'" data-placeholder="Titre de la situation">'+escapeHtml(e.label)+'</div>'
-      +'<textarea class="anam-card-textarea" data-anam-id="'+e.id+'" rows="4">'+text+'</textarea>'
-      +'<button type="button" class="anam-card-del" data-del-anam="'+e.id+'" title="Supprimer">🗑</button>'
-      +'</div>';
-  }).join('');
-  return '<div class="overlay" id="overlay">'
-    +'<div class="tpl-modal-wrapper"><div class="tpl-modal-tabs">'
+  const tabs='<div class="tpl-modal-tabs">'
     +'<button type="button" class="tpl-modal-tab" data-aud="patient">Patient</button>'
     +'<button type="button" class="tpl-modal-tab" data-aud="partenaire">Partenaire</button>'
     +'<button type="button" class="tpl-modal-tab active" data-aud="anamnese">Anamnèse</button>'
-    +'</div><div class="modal"><div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:16px;"><h2 style="margin:0;">Modèles d\'anamnèse</h2><button type="button" class="btn-outline" id="addCustomSituationBtn" style="font-size:.82rem;padding:5px 12px;">+ Nouvelle situation</button></div>'
-    +entriesHtml
+    +'</div>';
+  if(!situations.length){
+    return '<div class="overlay" id="overlay"><div class="tpl-modal-wrapper">'+tabs
+      +'<div class="modal"><div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:16px;">'
+      +'<h2 style="margin:0;">Modèles d\'anamnèse</h2>'
+      +'<button type="button" class="btn-outline" id="addCustomSituationBtn" style="font-size:.82rem;padding:5px 12px;">+ Nouvelle situation</button>'
+      +'</div><p style="color:var(--muted);text-align:center;padding:24px 0;">Aucune situation. Crée-en une !</p>'
+      +'<div id="newCustomSituationArea"></div>'
+      +'<div class="modal-foot" style="justify-content:flex-end;"><button class="btn-outline" id="cancelBtn">Fermer</button></div>'
+      +'</div></div></div>';
+  }
+  const i=Math.max(0,Math.min(idx,situations.length-1));
+  const e=situations[i];
+  const storedLabel=(drafts&&drafts[e.id]!==undefined)?drafts[e.id].label:e.label;
+  const storedText=(drafts&&drafts[e.id]!==undefined)?drafts[e.id].text:((appData.anamnese[e.id]||{}).text||'');
+  const navRow='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
+    +'<button type="button" class="btn-outline small" id="prevAnamBtn"'+(i<=0?' disabled':'')+'>‹ Précédent</button>'
+    +'<span style="font-size:.85rem;color:var(--muted);">'+(i+1)+' / '+situations.length+'</span>'
+    +'<button type="button" class="btn-outline small" id="nextAnamBtn"'+(i>=situations.length-1?' disabled':'')+'>Suivant ›</button>'
+    +'</div>';
+  return '<div class="overlay" id="overlay"><div class="tpl-modal-wrapper">'+tabs
+    +'<div class="modal">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:12px;">'
+    +'<h2 style="margin:0;">Modèles d\'anamnèse</h2>'
+    +'<button type="button" class="btn-outline" id="addCustomSituationBtn" style="font-size:.82rem;padding:5px 12px;">+ Nouvelle situation</button>'
+    +'</div>'
+    +navRow
+    +'<label class="field-label">Titre</label>'
+    +'<input id="anam-label" value="'+escapeHtml(storedLabel)+'" placeholder="Titre de la situation" style="margin-bottom:12px;">'
+    +'<label class="field-label">Texte</label>'
+    +'<textarea id="anam-text" rows="8" style="width:100%;resize:vertical;">'+escapeHtml(storedText)+'</textarea>'
     +'<div id="newCustomSituationArea"></div>'
-    +'<div class="modal-foot" style="justify-content:flex-end;">'
+    +'<div style="display:flex;justify-content:flex-end;margin-top:8px;">'
+    +'<button type="button" class="btn-outline" style="font-size:.82rem;color:#c0392b;" id="delAnamBtn" data-del-idx="'+i+'">🗑 Supprimer</button>'
+    +'</div>'
+    +'<div class="modal-foot" style="justify-content:flex-end;margin-top:12px;">'
     +'<div style="display:flex;gap:10px;"><button class="btn-outline" id="cancelBtn">Fermer</button>'
     +'<button class="btn-primary" id="saveAnamBtn">Enregistrer</button></div>'
     +'</div></div></div></div>';
 }
-function wireAnamModal(root,openAnam){
+function wireAnamModal(root,openAnam,idx,drafts){
+  idx=idx||0;drafts=drafts||{};
+  const situations=appData.customSituations||[];
+  function collectCurrent(){
+    const labelEl=document.getElementById('anam-label');
+    const textEl=document.getElementById('anam-text');
+    if(!labelEl||!textEl)return;
+    const e=situations[idx];
+    if(e)drafts[e.id]={label:labelEl.value,text:textEl.value};
+  }
+  function navigate(newIdx){
+    collectCurrent();
+    root.innerHTML=buildAnamModalHTML(newIdx,drafts);
+    wireAnamModal(root,openAnam,newIdx,drafts);
+  }
   document.getElementById('cancelBtn').addEventListener('click',closeModal);
-  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
-  document.getElementById('saveAnamBtn').addEventListener('click',async()=>{
-    root.querySelectorAll('[data-anam-label-id]').forEach(el=>{
-      const s=appData.customSituations.find(s=>s.id===el.dataset.anamLabelId);
-      if(s){const v=(el.textContent||'').trim();if(v)s.label=v;}
+  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});
+  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
+  const prevBtn=document.getElementById('prevAnamBtn');
+  const nextBtn=document.getElementById('nextAnamBtn');
+  if(prevBtn)prevBtn.addEventListener('click',()=>navigate(idx-1));
+  if(nextBtn)nextBtn.addEventListener('click',()=>navigate(idx+1));
+  const saveBtn=document.getElementById('saveAnamBtn');
+  if(saveBtn)saveBtn.addEventListener('click',async()=>{
+    collectCurrent();
+    Object.keys(drafts).forEach(id=>{
+      const s=appData.customSituations.find(s=>s.id===id);
+      if(s&&drafts[id].label)s.label=drafts[id].label;
+      appData.anamnese[id]={text:drafts[id].text};
     });
-    root.querySelectorAll('.anam-modal-textarea').forEach(ta=>{appData.anamnese[ta.dataset.anamId]={text:ta.value};});
     await persist();renderSituationRow();
     if(selectedSituation)renderAnamneseContent();
     closeModal();showToast('Anamnèses enregistrées ✓');
   });
+  const delBtn=document.getElementById('delAnamBtn');
+  if(delBtn)delBtn.addEventListener('click',async()=>{
+    const i=parseInt(delBtn.dataset.delIdx);
+    const e=situations[i];
+    if(!e)return;
+    appData.customSituations=appData.customSituations.filter(s=>s.id!==e.id);
+    delete appData.anamnese[e.id];
+    delete drafts[e.id];
+    await persist();renderSituationRow();
+    const newIdx=Math.min(i,appData.customSituations.length-1);
+    root.innerHTML=buildAnamModalHTML(Math.max(0,newIdx),drafts);
+    wireAnamModal(root,openAnam,Math.max(0,newIdx),drafts);
+    showToast('Supprimé ✓');
+  });
   document.getElementById('addCustomSituationBtn').addEventListener('click',()=>{
     const area=document.getElementById('newCustomSituationArea');
     if(area.querySelector('.new-custom-form'))return;
-    area.innerHTML='<div class="new-custom-form"><label class="field-label">Titre</label><input id="new-custom-title" placeholder="Ex. Suivi post-appareillage"><label class="field-label" style="margin-top:10px;">Texte</label><textarea id="new-custom-text" rows="4"></textarea><div style="margin-top:10px;display:flex;gap:8px;"><button type="button" class="btn-primary" id="confirmAddCustomBtn">Ajouter</button><button type="button" class="btn-outline" id="cancelAddCustomBtn">Annuler</button></div></div>';
+    area.innerHTML='<div class="new-custom-form" style="margin-top:12px;"><label class="field-label">Titre</label><input id="new-custom-title" placeholder="Ex. Suivi post-appareillage"><label class="field-label" style="margin-top:10px;">Texte</label><textarea id="new-custom-text" rows="4"></textarea><div style="margin-top:10px;display:flex;gap:8px;"><button type="button" class="btn-primary" id="confirmAddCustomBtn">Ajouter</button><button type="button" class="btn-outline" id="cancelAddCustomBtn">Annuler</button></div></div>';
     document.getElementById('cancelAddCustomBtn').addEventListener('click',()=>{area.innerHTML='';});
     document.getElementById('confirmAddCustomBtn').addEventListener('click',async()=>{
       const label=document.getElementById('new-custom-title').value.trim();
       const text=document.getElementById('new-custom-text').value;
       if(!label)return;
+      collectCurrent();
       const id='custom-'+Date.now();
       appData.customSituations.push({id,label});
       appData.anamnese[id]={text};
-      await persist();renderSituationRow();openAnam();showToast('Situation ajoutée ✓');
+      await persist();renderSituationRow();
+      const newIdx=appData.customSituations.length-1;
+      root.innerHTML=buildAnamModalHTML(newIdx,drafts);
+      wireAnamModal(root,openAnam,newIdx,drafts);
+      showToast('Situation ajoutée ✓');
     });
   });
-  root.querySelectorAll('[data-del-anam]').forEach(btn=>btn.addEventListener('click',async()=>{
-    const id=btn.dataset.delAnam;
-    appData.customSituations=appData.customSituations.filter(s=>s.id!==id);
-    delete appData.anamnese[id];
-    await persist();renderSituationRow();openAnam();showToast('Supprimé ✓');
-  }));
   root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
     if(btn.dataset.aud!=='anamnese')openTemplateForm(null,btn.dataset.aud,true);
   }));
