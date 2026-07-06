@@ -1200,7 +1200,7 @@ function closeModal(){document.getElementById('modalRoot').innerHTML='';}
 function showCenterAlert(msg){
   const r=document.getElementById('modalRoot');
   r.innerHTML='<div class="overlay" id="overlay"><div class="modal"><p style="font-size:.9rem;color:var(--ink);margin:6px 0 18px;text-align:center;">'+escapeHtml(msg)+'</p><div class="modal-foot" style="justify-content:center;"><button class="btn-primary" id="alertOkBtn">Compris</button></div></div></div>';
-  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
   document.getElementById('alertOkBtn').addEventListener('click',closeModal);
 }
 
@@ -1302,7 +1302,7 @@ function openSettingsForm(){
     if(ok){closeModal();showToast('Dossier mis à jour ✓');}
   });
   document.getElementById('cancelBtn').addEventListener('click',closeModal);
-  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
   document.getElementById('f-signature').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save();}});
   document.getElementById('f-phone').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save();}});
   async function save(){
@@ -1381,7 +1381,7 @@ function buildAnamModalHTML(){
 }
 function wireAnamModal(root,openAnam){
   document.getElementById('cancelBtn').addEventListener('click',closeModal);
-  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
   document.getElementById('saveAnamBtn').addEventListener('click',async()=>{
     root.querySelectorAll('[data-anam-label-id]').forEach(el=>{
       const s=appData.customSituations.find(s=>s.id===el.dataset.anamLabelId);
@@ -1495,7 +1495,7 @@ function openTemplateForm(editing,initialAud,noAnim){
       if(document.getElementById('f-sms'))document.getElementById('f-sms').value=sm;
     }));
     document.getElementById('cancelBtn').addEventListener('click',closeModal);
-    document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+    document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
     // Toggle Email / SMS uniquement
     const ftg=document.getElementById('formTypeGroup');
     if(ftg){
@@ -1549,7 +1549,7 @@ function confirmDeleteTemplate(id){
   if(!item)return;
   root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Supprimer ?</h2><p style="font-size:.88rem;color:var(--muted-ink);">Veux-tu vraiment supprimer "'+escapeHtml(item.title)+'" ? Cette action est définitive.</p><div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-danger" id="confirmDelBtn">Supprimer</button></div></div></div>';
   document.getElementById('cancelBtn').addEventListener('click',closeModal);
-  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
   document.getElementById('confirmDelBtn').addEventListener('click',async()=>{appData.templates=appData.templates.filter(t=>t.id!==id);await persist();closeModal();renderTemplatesGrid();renderTemplateSelect();showToast('Supprimé ✓');});
 }
 
