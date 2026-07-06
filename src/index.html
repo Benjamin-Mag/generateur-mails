@@ -1504,7 +1504,11 @@ function confirmDeleteTemplate(id){
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
     const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()});
-    showToast(await copyText(resolveGenre(buildFilledText(t.body,vals),getEffectiveGenre()))?'Message copié ✓':"Impossible de copier.");
+    const genre=getEffectiveGenre();
+    const subject=t.subject?resolveGenre(buildFilledText(t.subject,vals),genre):'';
+    const body=resolveGenre(buildFilledText(t.body,vals),genre);
+    const toCopy=subject?subject+'\n'+body:body;
+    showToast(await copyText(toCopy)?'Message copié ✓':"Impossible de copier.");
   });
   document.getElementById('copySmsBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t||!t.smsCompanion)return;
