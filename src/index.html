@@ -621,7 +621,7 @@ const OLD_FOOTERS = [
 const DEFAULT_EMAIL_FOOTER = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
 
 /* ========== App state ========== */
-let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',phone:'',emailFooter:DEFAULT_EMAIL_FOOTER};
+let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',phone:'',advisorGenre:'M',emailFooter:DEFAULT_EMAIL_FOOTER};
 let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
@@ -630,6 +630,7 @@ let selectedSituation=null, anamneseGenre=null, renouvellementType=null;
 let tutorialStepIndex=-1, activeTutorialSteps=null;
 
 /* ========== Helpers ========== */
+function advisorTitle(){return appData.advisorGenre==='F'?'Votre conseillère Audibene':'Votre conseiller Audibene';}
 function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
 function fieldLabel(v){if(FIELD_LABELS[v])return FIELD_LABELS[v];const c=v.replace(/_/g,' ');return c.charAt(0).toUpperCase()+c.slice(1);}
 function isDateVar(v){return /date/i.test(v);}
@@ -658,6 +659,7 @@ async function loadData(){
   appData.customSituations=Array.isArray(parsed.customSituations)&&parsed.customSituations.length?parsed.customSituations:DEFAULT_SITUATIONS.map(s=>({...s}));
   appData.signatureName=(typeof parsed.signatureName==='string'&&parsed.signatureName)?parsed.signatureName:'Benjamin Magnier';
   appData.phone=(typeof parsed.phone==='string')?parsed.phone:'';
+  appData.advisorGenre=(parsed.advisorGenre==='F')?'F':'M';
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
 
   let changed=false;
@@ -1273,7 +1275,26 @@ async function renameSignature(oldName,newName){
 function openSettingsForm(){
   const root=document.getElementById('modalRoot');
   const folderName=dirHandle?dirHandle.name:'(non défini)';
-  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Réglages</h2><label>Nom de signature</label><div class="input-clear-wrap"><input id="f-signature" value="'+escapeHtml(appData.signatureName||'')+'" placeholder="Ex. Benjamin Magnier"><button type="button" class="input-clear-btn" id="clearSignatureBtn">×</button></div><p class="hint">Remplace automatiquement ce nom partout dans les modèles.</p><label>Téléphone</label><div class="input-clear-wrap"><input id="f-phone" value="'+escapeHtml(appData.phone||'')+'" placeholder="Ex. {{telephone}}"><button type="button" class="input-clear-btn" id="clearPhoneBtn">×</button></div><p class="hint">Utilisé comme variable {{telephone}} dans les modèles.</p><label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div><p class="hint">Les données sont sauvegardées dans ce dossier. Changer le dossier ne déplace pas les données existantes.</p><div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div></div></div>';
+  const isFemme=appData.advisorGenre==='F';
+  const genreHtml=[
+    '<label>Tu es</label>',
+    '<div style="display:flex;gap:16px;margin:8px 0 14px;">',
+    '<label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;cursor:pointer;">',
+    '<input type="radio" name="s-genre" value="M"'+(isFemme?'':' checked')+'> Conseiller</label>',
+    '<label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;cursor:pointer;">',
+    '<input type="radio" name="s-genre" value="F"'+(isFemme?' checked':'')+'> Conseillère</label>',
+    '</div>'
+  ].join('');
+  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Réglages</h2>'
+    +'<label>Nom de signature</label><div class="input-clear-wrap"><input id="f-signature" value="'+escapeHtml(appData.signatureName||'')+'" placeholder="Ex. Benjamin Magnier"><button type="button" class="input-clear-btn" id="clearSignatureBtn">×</button></div>'
+    +'<p class="hint">Remplace automatiquement ce nom partout dans les modèles.</p>'
+    +genreHtml
+    +'<label>Téléphone</label><div class="input-clear-wrap"><input id="f-phone" value="'+escapeHtml(appData.phone||'')+'" placeholder="Ex. 09 74 99 99 99"><button type="button" class="input-clear-btn" id="clearPhoneBtn">×</button></div>'
+    +'<p class="hint">Affiché dans la signature.</p>'
+    +'<label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div>'
+    +'<p class="hint">Les données sont sauvegardées dans ce dossier.</p>'
+    +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div>'
+    +'</div></div>';
   document.getElementById('clearSignatureBtn').addEventListener('click',()=>{const i=document.getElementById('f-signature');i.value='';i.focus();});
   document.getElementById('clearPhoneBtn').addEventListener('click',()=>{const i=document.getElementById('f-phone');i.value='';i.focus();});
   document.getElementById('changeFolderBtn').addEventListener('click',async()=>{
@@ -1288,8 +1309,10 @@ function openSettingsForm(){
     const nn=document.getElementById('f-signature').value.trim();
     if(!nn)return;
     const ph=document.getElementById('f-phone').value.trim();
+    const sg=document.querySelector('input[name="s-genre"]:checked');
     await renameSignature(appData.signatureName,nn);
     appData.phone=ph;
+    if(sg)appData.advisorGenre=sg.value;
     await persist();
     closeModal();renderTemplatesGrid();renderTemplateSelect();
     if(selectedTemplateId)updateExtraFieldsAndPreview();
@@ -1301,13 +1324,31 @@ function openSettingsForm(){
 
 function showOnboardingModal(){
   const root=document.getElementById('modalRoot');
-  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Bienvenue 👋</h2><p class="hint" style="margin-bottom:16px;">Avant de commencer, renseigne tes informations personnelles. Tu pourras les modifier à tout moment dans les Réglages.</p><label>Ton nom complet</label><input id="ob-name" placeholder="Ex. Benjamin Magnier" value=""><label>Ton numéro de téléphone</label><input id="ob-phone" placeholder="Ex. {{telephone}}" value=""><div class="modal-foot"><button class="btn-primary" id="ob-save">C\'est parti !</button></div></div></div>';
+  const html=[
+    '<div class="overlay" id="overlay"><div class="modal">',
+    '<h2>Bienvenue 👋</h2>',
+    '<p class="hint" style="margin-bottom:16px;">Avant de commencer, renseigne tes informations. Tu pourras les modifier dans les Réglages.</p>',
+    '<label>Ton nom complet</label><input id="ob-name" placeholder="Ex. Benjamin Magnier" value="">',
+    '<label>Tu es</label>',
+    '<div style="display:flex;gap:16px;margin:8px 0 14px;">',
+    '<label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;cursor:pointer;">',
+    '<input type="radio" name="ob-genre" value="M" checked> Conseiller</label>',
+    '<label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;cursor:pointer;">',
+    '<input type="radio" name="ob-genre" value="F"> Conseillère</label>',
+    '</div>',
+    '<label>Ton numéro de téléphone</label><input id="ob-phone" placeholder="Ex. 09 74 99 99 99" value="">',
+    '<div class="modal-foot"><button class="btn-primary" id="ob-save">C\'est parti !</button></div>',
+    '</div></div>'
+  ].join('');
+  root.innerHTML=html;
   document.getElementById('ob-save').addEventListener('click',async()=>{
     const name=document.getElementById('ob-name').value.trim();
     const phone=document.getElementById('ob-phone').value.trim();
+    const genre=document.querySelector('input[name="ob-genre"]:checked').value;
     if(!name){document.getElementById('ob-name').focus();return;}
     await renameSignature(appData.signatureName,name);
     appData.phone=phone;
+    appData.advisorGenre=genre;
     await persist();
     closeModal();renderTemplatesGrid();renderTemplateSelect();
     showToast('Bienvenue '+name+' !');
@@ -1409,13 +1450,13 @@ function buildModalHTML(aud,editing,nl,ni){
     +'<div id="emailFields" style="'+(aud==='patient'&&editing&&editing.type==='sms'?'display:none':'')+'">'
     +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button><button type="button" class="tag-chip" data-tag="{{telephone}}">{{telephone}}</button></div>'
-    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml('\n\nBien cordialement,\n'+appData.signatureName+'\nVotre conseiller Audibene\n'+(appData.phone||'')))+'</textarea>'
+    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml('\n\nBien cordialement,\n'+appData.signatureName+'\n'+advisorTitle()+'\n'+(appData.phone||'')))+'</textarea>'
     +'</div>'
     +'<div id="smsOnlyField" style="'+(aud!=='patient'||!editing||editing.type!=='sms'?'display:none':'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button><button type="button" class="tag-chip" data-tag="{{telephone}}">{{telephone}}</button></div>'
     +'<label>SMS'+req+'</label><textarea id="f-sms-only" placeholder="Texte du SMS…">'+(editing&&editing.type==='sms'?escapeHtml(editing.body):'')+'</textarea>'
     +'</div>'
-    +(aud==='patient'?'<div id="smsCompanionField" style="'+(editing&&editing.type==='sms'?'display:none':'')+'"><label>SMS accompagnateur</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):escapeHtml('\n\nBien cordialement,\n'+appData.signatureName+'\nVotre conseiller Audibene\n'+(appData.phone||'')))+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS</label><textarea id="f-sms"></textarea></div>')
+    +(aud==='patient'?'<div id="smsCompanionField" style="'+(editing&&editing.type==='sms'?'display:none':'')+'"><label>SMS accompagnateur</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):escapeHtml('\n\nBien cordialement,\n'+appData.signatureName+'\n'+advisorTitle()+'\n'+(appData.phone||'')))+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS</label><textarea id="f-sms"></textarea></div>')
     +'<div class="err-msg" id="f-err">Le titre et le corps du mail sont obligatoires.</div>'
     +navRow
     +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">'+(editing?'Enregistrer':'Ajouter')+'</button></div>'
