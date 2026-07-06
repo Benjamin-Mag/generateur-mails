@@ -1407,11 +1407,11 @@ function buildModalHTML(aud,editing,nl,ni){
       +'</div>':'')
     +'<div id="emailFields" style="'+(aud==='patient'&&editing&&editing.type==='sms'?'display:none':'')+'">'
     +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
-    +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button></div>'
+    +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button><button type="button" class="tag-chip" data-tag="{{telephone}}">{{telephone}}</button></div>'
     +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml('\n\nBien cordialement,\n'+appData.signatureName))+'</textarea>'
     +'</div>'
     +'<div id="smsOnlyField" style="'+(aud!=='patient'||!editing||editing.type!=='sms'?'display:none':'')+'">'
-    +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button></div>'
+    +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button><button type="button" class="tag-chip" data-tag="{{telephone}}">{{telephone}}</button></div>'
     +'<label>SMS'+req+'</label><textarea id="f-sms-only" placeholder="Texte du SMS…">'+(editing&&editing.type==='sms'?escapeHtml(editing.body):'')+'</textarea>'
     +'</div>'
     +(aud==='patient'?'<div id="smsCompanionField" style="'+(editing&&editing.type==='sms'?'display:none':'')+'"><label>SMS accompagnateur</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):'')+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS</label><textarea id="f-sms"></textarea></div>')
