@@ -677,6 +677,7 @@ async function loadData(){
   const before=appData.templates.length;
   appData.templates=appData.templates.filter(t=>!REMOVED_IDS.includes(t.id));
   if(appData.templates.length!==before)changed=true;
+  if(appData.phone){appData.templates.forEach(t=>{if(t.body&&t.body.includes('{{telephone}}')){t.body=t.body.split('{{telephone}}').join(appData.phone);changed=true;}if(t.smsCompanion&&t.smsCompanion.includes('{{telephone}}')){t.smsCompanion=t.smsCompanion.split('{{telephone}}').join(appData.phone);changed=true;}});}
   appData.templates.forEach(t=>{
     if(!t.audience){t.audience=(t.id===NEW_TEMPLATE.id)?'patient':(SUIVI_TEMPLATES.some(s=>s.id===t.id)?'partenaire':'patient');changed=true;}
     if(t.audience==='partenaire'&&!t.partnerCategory){const s=SUIVI_TEMPLATES.find(s=>s.id===t.id);t.partnerCategory=s?s.partnerCategory:'CC1';changed=true;}
