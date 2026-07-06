@@ -1127,7 +1127,7 @@ function renderTemplateSelect(){
   w.innerHTML=fil.map(t=>`<button type="button" class="tpl-pill${selectedTemplateId===t.id?' active':''}" data-tpl-id="${escapeHtml(t.id)}"><span class="tpl-pill-dot"></span><span style="flex:1">${escapeHtml(t.title)}</span><span class="tpl-pill-type${t.type==='sms'?' sms':''}">${t.type==='sms'?'SMS':'Email'}</span></button>`).join('');
   w.querySelectorAll('.tpl-pill').forEach(btn=>btn.addEventListener('click',()=>{
     selectedTemplateId=btn.dataset.tplId;
-    manualValues={};civilite=null;datePickerView={};
+    manualValues={};datePickerView={};
     w.querySelectorAll('.tpl-pill').forEach(b=>b.classList.toggle('active',b===btn));
     settleGenPanel();
     updateExtraFieldsAndPreview();
