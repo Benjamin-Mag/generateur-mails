@@ -756,7 +756,7 @@ async function initStorageAndLoad(){
 
 function renderAll(){
   renderTypeChips();renderTemplatesGrid();renderTemplateSelect();
-  renderGenreRow();renderSituationRow();renderRenouvellementSubRow();
+  renderAnamneseGenreRow();renderSituationRow();renderRenouvellementSubRow();
   renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();
 }
 
@@ -833,7 +833,7 @@ function resetTabState(name){
   teardownGenPanel();
   teardownAnamPanel();
   if(name==='generer'){manualValues={};civilite=null;followType='patient';selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();showGenPanel();}
-  else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();showAnamPanel();}
+  else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderAnamneseGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();showAnamPanel();}
   else if(name==='modeles'){templateSearch='';templateTypeFilter='all';const s=document.getElementById('searchTemplates');if(s)s.value='';renderTypeChips();renderTemplatesGrid();}
 }
 
@@ -1173,7 +1173,7 @@ function needsGenreChoice(){return !!document.querySelector('#extraFields input[
 
 /* ========== Anamnèse ========== */
 function getCurrentAnamneseKey(){if(selectedSituation==='renouvellement')return renouvellementType?'renouvellement_'+renouvellementType:null;return selectedSituation;}
-function renderGenreRow(){
+function renderAnamneseGenreRow(){
   const w=document.getElementById('anamneseGenreRow');
   w.innerHTML=makeSeg('anamnese-genre',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],anamneseGenre);
   w.querySelectorAll('input[name="anamnese-genre"]').forEach(r=>r.addEventListener('change',e=>{
