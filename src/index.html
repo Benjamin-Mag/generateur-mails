@@ -621,7 +621,7 @@ const OLD_FOOTERS = [
 const DEFAULT_EMAIL_FOOTER = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
 
 /* ========== App state ========== */
-let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',phone:'',emailFooter:DEFAULT_EMAIL_FOOTER};
+let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',phone:'',advisorGenre:'Monsieur',emailFooter:DEFAULT_EMAIL_FOOTER};
 let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
@@ -637,7 +637,8 @@ function isHeureVar(v){return /heure/i.test(v);}
 function getCurrentCategoryList(){return followType==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES;}
 function extractVars(text){const re=/\{\{\s*([^}]+?)\s*\}\}/g,seen=new Set(),vars=[];let m;while((m=re.exec(text))){const n=m[1].trim();if(n&&!seen.has(n)){seen.add(n);vars.push(n);}}return vars;}
 function buildFilledText(text,values){return text.replace(/\{\{\s*([^}]+?)\s*\}\}/g,(m,n)=>{const v=values[n.trim()];return(v&&String(v).trim().length)?v:m;});}
-function resolveGenre(text,genre){if(!genre)return text;text=text.replace(/(\S+?)er\(ère\)/g,(m,w)=>genre==='Madame'?w+'ère':w+'er');text=text.replace(/(\S+?)\(e\)/g,(m,w)=>genre==='Madame'?w+'e':w);return text;}
+function resolveAdvisorGenre(text){const g=appData.advisorGenre;return text.replace(/(\S+?)er\(ère\)/g,(m,w)=>g==='Madame'?w+'ère':w+'er');}
+function resolveGenre(text,genre){if(!genre)return text;return text.replace(/(\S+?)\(e\)/g,(m,w)=>genre==='Madame'?w+'e':w);}
 function previewHtml(text,values,genre){let f=buildFilledText(text,values);f=resolveGenre(f,genre);return escapeHtml(f).replace(/\{\{\s*([^}]+?)\s*\}\}/g,m=>'<mark class="ph-empty">'+m+'</mark>');}
 function getEffectiveGenre(){return civilite;}
 function getRecipientNomValue(){const r=(manualValues['nom']||'').trim();if(!r)return '';return civilite?civilite+' '+r:r;}
@@ -658,6 +659,7 @@ async function loadData(){
   appData.customSituations=Array.isArray(parsed.customSituations)&&parsed.customSituations.length?parsed.customSituations:DEFAULT_SITUATIONS.map(s=>({...s}));
   appData.signatureName=(typeof parsed.signatureName==='string'&&parsed.signatureName)?parsed.signatureName:'Benjamin Magnier';
   appData.phone=(typeof parsed.phone==='string')?parsed.phone:'';
+  appData.advisorGenre=(parsed.advisorGenre==='Madame')?'Madame':'Monsieur';
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
 
   let changed=false;
@@ -1272,7 +1274,7 @@ async function renameSignature(oldName,newName){
 function openSettingsForm(){
   const root=document.getElementById('modalRoot');
   const folderName=dirHandle?dirHandle.name:'(non défini)';
-  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Réglages</h2><label>Nom de signature</label><div class="input-clear-wrap"><input id="f-signature" value="'+escapeHtml(appData.signatureName||'')+'" placeholder="Ex. Benjamin Magnier"><button type="button" class="input-clear-btn" id="clearSignatureBtn">×</button></div><p class="hint">Remplace automatiquement ce nom partout dans les modèles.</p><label>Téléphone</label><div class="input-clear-wrap"><input id="f-phone" value="'+escapeHtml(appData.phone||'')+'" placeholder="Ex. {{telephone}}"><button type="button" class="input-clear-btn" id="clearPhoneBtn">×</button></div><p class="hint">Utilisé comme variable {{telephone}} dans les modèles.</p><label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div><p class="hint">Les données sont sauvegardées dans ce dossier. Changer le dossier ne déplace pas les données existantes.</p><div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div></div></div>';
+  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Réglages</h2><label>Nom de signature</label><div class="input-clear-wrap"><input id="f-signature" value="'+escapeHtml(appData.signatureName||'')+'" placeholder="Ex. Benjamin Magnier"><button type="button" class="input-clear-btn" id="clearSignatureBtn">×</button></div><p class="hint">Remplace automatiquement ce nom partout dans les modèles.</p><label>Tu es</label><div style="display:flex;gap:12px;margin:6px 0 10px;"><label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;"><input type="radio" name="s-genre" value="Monsieur"'+(appData.advisorGenre!==\'Madame\'?\' checked\':\'\')+\'> Conseiller</label><label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;"><input type="radio" name="s-genre" value="Madame"\'+(appData.advisorGenre===\'Madame\'?\' checked\':\'\')+\'> Conseillère</label></div><label>Téléphone</label><div class="input-clear-wrap"><input id="f-phone" value="'+escapeHtml(appData.phone||\'\')+\'" placeholder="Ex. 09 74 99 99 99"><button type="button" class="input-clear-btn" id="clearPhoneBtn">×</button></div><p class="hint">Utilisé comme variable {{telephone}} dans les modèles.</p><label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div><p class="hint">Les données sont sauvegardées dans ce dossier. Changer le dossier ne déplace pas les données existantes.</p><div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div></div></div>';
   document.getElementById('clearSignatureBtn').addEventListener('click',()=>{const i=document.getElementById('f-signature');i.value='';i.focus();});
   document.getElementById('clearPhoneBtn').addEventListener('click',()=>{const i=document.getElementById('f-phone');i.value='';i.focus();});
   document.getElementById('changeFolderBtn').addEventListener('click',async()=>{
@@ -1287,8 +1289,10 @@ function openSettingsForm(){
     const nn=document.getElementById('f-signature').value.trim();
     if(!nn)return;
     const ph=document.getElementById('f-phone').value.trim();
+    const sg=document.querySelector('input[name="s-genre"]:checked');
     await renameSignature(appData.signatureName,nn);
     appData.phone=ph;
+    if(sg)appData.advisorGenre=sg.value;
     await persist();
     closeModal();renderTemplatesGrid();renderTemplateSelect();
     if(selectedTemplateId)updateExtraFieldsAndPreview();
@@ -1300,13 +1304,15 @@ function openSettingsForm(){
 
 function showOnboardingModal(){
   const root=document.getElementById('modalRoot');
-  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Bienvenue 👋</h2><p class="hint" style="margin-bottom:16px;">Avant de commencer, renseigne tes informations personnelles. Tu pourras les modifier à tout moment dans les Réglages.</p><label>Ton nom complet</label><input id="ob-name" placeholder="Ex. Benjamin Magnier" value=""><label>Ton numéro de téléphone</label><input id="ob-phone" placeholder="Ex. {{telephone}}" value=""><div class="modal-foot"><button class="btn-primary" id="ob-save">C\'est parti !</button></div></div></div>';
+  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Bienvenue 👋</h2><p class="hint" style="margin-bottom:16px;">Avant de commencer, renseigne tes informations personnelles. Tu pourras les modifier à tout moment dans les Réglages.</p><label>Ton nom complet</label><input id="ob-name" placeholder="Ex. Benjamin Magnier" value=""><label>Tu es</label><div style="display:flex;gap:12px;margin:6px 0 10px;"><label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;"><input type="radio" name="ob-genre" value="Monsieur" checked> Conseiller</label><label style="display:flex;align-items:center;gap:6px;font-size:.9rem;font-weight:normal;text-transform:none;letter-spacing:0;"><input type="radio" name="ob-genre" value="Madame"> Conseillère</label></div><label>Ton numéro de téléphone</label><input id="ob-phone" placeholder="Ex. 09 74 99 99 99" value=""><div class="modal-foot"><button class="btn-primary" id="ob-save">C\'est parti !</button></div></div></div>';
   document.getElementById('ob-save').addEventListener('click',async()=>{
     const name=document.getElementById('ob-name').value.trim();
     const phone=document.getElementById('ob-phone').value.trim();
+    const genre=document.querySelector('input[name="ob-genre"]:checked').value;
     if(!name){document.getElementById('ob-name').focus();return;}
     await renameSignature(appData.signatureName,name);
     appData.phone=phone;
+    appData.advisorGenre=genre;
     await persist();
     closeModal();renderTemplatesGrid();renderTemplateSelect();
     showToast('Bienvenue '+name+' !');
@@ -1522,8 +1528,8 @@ function confirmDeleteTemplate(id){
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
     const vals=Object.assign({},manualValues,{nom:getRecipientNomValue()});
     const genre=getEffectiveGenre();
-    const subject=t.subject?resolveGenre(buildFilledText(t.subject,vals),genre):'';
-    const body=resolveGenre(buildFilledText(t.body,vals),genre);
+    const subject=t.subject?resolveAdvisorGenre(resolveGenre(buildFilledText(t.subject,vals),genre)):'';
+    const body=resolveAdvisorGenre(resolveGenre(buildFilledText(t.body,vals),genre));
     const toCopy=subject?subject+'\n'+body:body;
     showToast(await copyText(toCopy)?'Message copié ✓':"Impossible de copier.");
   });
@@ -1531,7 +1537,7 @@ function confirmDeleteTemplate(id){
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t||!t.smsCompanion)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
     const vals=Object.assign({},manualValues,{nom:getRecipientNomValue(),telephone:appData.phone||''});
-    showToast(await copyText(resolveGenre(buildFilledText(t.smsCompanion,vals),getEffectiveGenre()))?'SMS copié ✓':"Impossible de copier.");
+    showToast(await copyText(resolveAdvisorGenre(resolveGenre(buildFilledText(t.smsCompanion,vals),getEffectiveGenre())))?'SMS copié ✓':"Impossible de copier.");
   });
   document.getElementById('anamneseTextarea').addEventListener('change',async e=>{const k=getCurrentAnamneseKey();if(!k)return;appData.anamnese[k]={text:e.target.value};await persist();showToast('Texte enregistré ✓');});
   document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}showToast(await copyText(resolveGenre(document.getElementById('anamneseTextarea').value,anamneseGenre))?'Texte copié ✓':"Impossible de copier.");});
