@@ -461,6 +461,10 @@ input,textarea,select{font-family:inherit;}
         <div id="genFormInner">
           <label class="field-label">Type de suivi</label>
           <div class="civility-group" id="followTypeRow"></div>
+          <div class="situation-block" id="genreBlock" style="display:none;margin-top:18px;">
+            <label class="field-label">Genre du patient</label>
+            <div class="civility-group" id="genreRow"></div>
+          </div>
           <div class="situation-block" id="categoryBlock" style="display:none;margin-top:18px;">
             <label class="field-label">Catégorie</label>
             <div class="civility-group" id="categoryRow"></div>
@@ -827,7 +831,7 @@ function resetTabState(name){
   closeDatePicker();
   teardownGenPanel();
   teardownAnamPanel();
-  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();showGenPanel();}
+  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();showGenPanel();}
   else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();showAnamPanel();}
   else if(name==='modeles'){templateSearch='';templateTypeFilter='all';const s=document.getElementById('searchTemplates');if(s)s.value='';renderTypeChips();renderTemplatesGrid();}
 }
@@ -1095,7 +1099,15 @@ function makeSeg(name,options,checkedVal){
 function renderFollowTypeRow(){
   const w=document.getElementById('followTypeRow');
   w.innerHTML=makeSeg('follow-type',FOLLOW_TYPES,followType);
-  w.querySelectorAll('input[name="follow-type"]').forEach(r=>r.addEventListener('change',e=>{followType=e.target.value;selectedCategory=null;manualValues={};civilite=null;datePickerView={};renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}));
+  w.querySelectorAll('input[name="follow-type"]').forEach(r=>r.addEventListener('change',e=>{followType=e.target.value;selectedCategory=null;manualValues={};civilite=null;datePickerView={};renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}));
+}
+function renderGenreRow(){
+  const block=document.getElementById('genreBlock');
+  const w=document.getElementById('genreRow');
+  if(!followType){block.style.display='none';return;}
+  block.style.display='block';
+  w.innerHTML=makeSeg('gen-civilite',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],civilite);
+  w.querySelectorAll('input[name="gen-civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
 }
 function renderCategoryRow(){
   const w=document.getElementById('categoryRow'),l=getCurrentCategoryList();
