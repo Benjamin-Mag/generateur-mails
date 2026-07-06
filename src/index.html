@@ -1534,15 +1534,16 @@ function buildModalHTML(aud,editing,nl,ni){
     +'</div>'
     +'</div></div></div>';
 }
-function openTemplateForm(editing,initialAud,noAnim){
+function openTemplateForm(editing,initialAud,noAnim,anamIdx){
   const root=document.getElementById('modalRoot');
   if(initialAud==='anamnese'){
-    function openAnam(skipAnim){
-      root.innerHTML=buildAnamModalHTML();
+    function openAnam(skipAnim,idx,drafts){
+      const i=(idx!=null)?idx:0;
+      root.innerHTML=buildAnamModalHTML(i,drafts);
       if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
-      wireAnamModal(root,openAnam);
+      wireAnamModal(root,openAnam,i,drafts);
     }
-    openAnam(noAnim);return;
+    openAnam(noAnim,anamIdx||0);return;
   }
   let aud=initialAud||(editing?(editing.audience||'patient'):'patient');
   const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
@@ -1656,7 +1657,7 @@ function confirmDeleteTemplate(id){
     const ea=e.target.closest('[data-edit-anam]');
     if(ed)openTemplateForm(appData.templates.find(t=>t.id===ed.dataset.editTemplate));
     if(dl)confirmDeleteTemplate(dl.dataset.delTemplate);
-    if(ea)openTemplateForm(null,'anamnese',true);
+    if(ea){const anamIdx=(appData.customSituations||[]).findIndex(s=>s.id===ea.dataset.editAnam);openTemplateForm(null,'anamnese',true,anamIdx>=0?anamIdx:0);}
   });
   document.getElementById('addTemplateBtn').addEventListener('click',()=>openTemplateForm(null));
   document.getElementById('searchTemplates').addEventListener('input',e=>{templateSearch=e.target.value;renderTemplatesGrid();});
