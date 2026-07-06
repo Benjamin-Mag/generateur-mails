@@ -688,7 +688,7 @@ async function loadData(){
     if(t.audience==='patient'&&!t.patientCategory){t.patientCategory=(t.id===NEW_TEMPLATE.id)?'Reconfirmation':'CC1';changed=true;}
     if(t.id===NEW_TEMPLATE.id&&!t.smsCompanion){t.smsCompanion=NEW_TEMPLATE.smsCompanion;changed=true;}
     if(!t.type){t.type='email';changed=true;}
-    if(t.type==='email'&&t.body.indexOf(appData.emailFooter)===-1){t.body=t.body+'\n\n'+appData.emailFooter;changed=true;}
+    if(t.type==='email'){const allFooters=[appData.emailFooter,...OLD_FOOTERS];allFooters.forEach(f=>{if(f&&t.body.indexOf(f)!==-1){t.body=t.body.split('\n\n'+f).join('').split(f).join('').trim();changed=true;}});}
   });
   if(appData.anamnese['depistage']){delete appData.anamnese['depistage'];changed=true;}
   if(appData.anamnese['renouvellement']){delete appData.anamnese['renouvellement'];changed=true;}
@@ -1391,7 +1391,7 @@ function buildModalHTML(aud,editing,nl,ni){
     +'<div id="emailFields" style="'+(aud==='patient'&&editing&&editing.type==='sms'?'display:none':'')+'">'
     +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button></div>'
-    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml('\n\nBien cordialement,\n'+appData.signatureName+'\n\n'+appData.emailFooter))+'</textarea>'
+    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml('\n\nBien cordialement,\n'+appData.signatureName))+'</textarea>'
     +'</div>'
     +'<div id="smsOnlyField" style="'+(aud!=='patient'||!editing||editing.type!=='sms'?'display:none':'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button></div>'
