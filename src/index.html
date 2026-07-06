@@ -625,7 +625,7 @@ const OLD_FOOTERS = [
 const DEFAULT_EMAIL_FOOTER = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
 
 /* ========== App state ========== */
-let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',phone:'',advisorGenre:'M',emailFooter:DEFAULT_EMAIL_FOOTER};
+let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',phone:'',advisorGenre:'M',onboardingDone:false,emailFooter:DEFAULT_EMAIL_FOOTER};
 let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
@@ -664,6 +664,7 @@ async function loadData(){
   appData.signatureName=(typeof parsed.signatureName==='string'&&parsed.signatureName)?parsed.signatureName:'Benjamin Magnier';
   appData.phone=(typeof parsed.phone==='string')?parsed.phone:'';
   appData.advisorGenre=(parsed.advisorGenre==='F')?'F':'M';
+  appData.onboardingDone=parsed.onboardingDone===true;
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
 
   let changed=false;
@@ -721,7 +722,7 @@ async function initStorageAndLoad(){
         dirHandle=handle;
         await loadData();
         renderAll();
-        if(!appData.phone||appData.signatureName==='Benjamin Magnier')showOnboardingModal();
+        if(!appData.onboardingDone)showOnboardingModal();
         return;
       }
     } catch(e){}
@@ -749,7 +750,7 @@ async function initStorageAndLoad(){
   setup.style.display='flex';
   document.getElementById('pickFolderBtn').onclick=async()=>{
     const ok=await pickFolder();
-    if(ok){setup.style.display='none';await loadData();renderAll();if(!appData.phone||appData.signatureName==='Benjamin Magnier')showOnboardingModal();}
+    if(ok){setup.style.display='none';await loadData();renderAll();if(!appData.onboardingDone)showOnboardingModal();}
   };
 }
 
@@ -1361,6 +1362,7 @@ function showOnboardingModal(){
     await renameSignature(appData.signatureName,name);
     appData.phone=phone;
     appData.advisorGenre=genre;
+    appData.onboardingDone=true;
     await persist();
     closeModal();renderTemplatesGrid();renderTemplateSelect();
     showToast('Bienvenue '+name+' !');
