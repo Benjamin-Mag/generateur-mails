@@ -673,8 +673,10 @@ async function loadData(){
   if(!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
   const _ct=appData.templates.find(t=>t.id===NEW_TEMPLATE.id);
   if(_ct&&_ct.patientCategory!=='all'){_ct.patientCategory='all';changed=true;}
-  SUIVI_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
-  PATIENT_TEMPLATES.forEach(tpl=>{if(!appData.templates.some(t=>t.id===tpl.id)){appData.templates.push(Object.assign({},tpl,{createdAt:Date.now()}));changed=true;}});
+  const REMOVED_IDS=['tpl-suivi-depistage','tpl-suivi-premier-rdv','tpl-suivi-renouvellement','tpl-suivi-adaptation','tpl-suivi-depistage-orl-patient','tpl-suivi-rdv-orl-patient'];
+  const before=appData.templates.length;
+  appData.templates=appData.templates.filter(t=>!REMOVED_IDS.includes(t.id));
+  if(appData.templates.length!==before)changed=true;
   appData.templates.forEach(t=>{
     if(!t.audience){t.audience=(t.id===NEW_TEMPLATE.id)?'patient':(SUIVI_TEMPLATES.some(s=>s.id===t.id)?'partenaire':'patient');changed=true;}
     if(t.audience==='partenaire'&&!t.partnerCategory){const s=SUIVI_TEMPLATES.find(s=>s.id===t.id);t.partnerCategory=s?s.partnerCategory:'CC1';changed=true;}
