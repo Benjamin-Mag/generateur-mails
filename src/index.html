@@ -1172,8 +1172,9 @@ function renderAnamneseGenreRow(){
   w.querySelectorAll('input[name="anamnese-genre"]').forEach(r=>r.addEventListener('change',e=>{
     anamneseGenre=e.target.value;
     const ta=document.getElementById('anamneseTextarea');
-    if(ta&&ta.value)ta.value=resolveGenre(ta.value,anamneseGenre);
-    if(selectedSituation&&getCurrentAnamneseKey()){settleAnamPanel();return;}
+    const key=getCurrentAnamneseKey();
+    if(ta&&key){const raw=(appData.anamnese[key]||{text:''}).text||'';ta.value=resolveGenre(raw,anamneseGenre);}
+    if(selectedSituation&&key){settleAnamPanel();return;}
   }));
 }
 function renderSituationRow(){
