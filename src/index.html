@@ -880,7 +880,7 @@ function renderTemplatesGrid(){
         +'<span class="anam-tag">Anamnèse</span>'
         +'<h3>'+escapeHtml(s.label)+'</h3>'
         +'<p>'+(text?escapeHtml(text):'<em>Aucun texte saisi</em>')+'</p>'
-        +'<div class="card-foot"><button class="copy-mini" data-edit-anam="'+escapeHtml(s.id)+'">Modifier</button></div>'
+        +'<div class="card-foot"><button class="copy-mini" data-edit-anam="'+escapeHtml(s.id)+'">Modifier</button><button class="copy-mini danger-mini" data-del-anam="'+escapeHtml(s.id)+'" style="color:var(--danger,#c0392b);border-color:var(--danger,#c0392b);">Supprimer</button></div>'
         +'</div>';
     });
     html+=makeGroup('anamnese','Anamnèses',anamCards,'Aucune anamnèse.');
@@ -1637,6 +1637,14 @@ function confirmDeleteTemplate(id){
   document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
   document.getElementById('confirmDelBtn').addEventListener('click',async()=>{appData.templates=appData.templates.filter(t=>t.id!==id);await persist();closeModal();renderTemplatesGrid();renderTemplateSelect();showToast('Supprimé ✓');});
 }
+function confirmDeleteAnam(id){
+  const root=document.getElementById('modalRoot'),item=(appData.customSituations||[]).find(s=>s.id===id);
+  if(!item)return;
+  root.innerHTML='<div class="overlay" id="overlay"><div class="modal"><h2>Supprimer ?</h2><p style="font-size:.88rem;color:var(--muted-ink);">Veux-tu vraiment supprimer "'+escapeHtml(item.label)+'" ? Cette action est définitive.</p><div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-danger" id="confirmDelBtn">Supprimer</button></div></div></div>';
+  document.getElementById('cancelBtn').addEventListener('click',closeModal);
+  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
+  document.getElementById('confirmDelBtn').addEventListener('click',async()=>{appData.customSituations=(appData.customSituations||[]).filter(s=>s.id!==id);delete appData.anamnese[id];await persist();closeModal();renderTemplatesGrid();showToast('Supprimé ✓');});
+}
 
 /* ========== Wiring ========== */
 (async function init(){
@@ -1666,10 +1674,11 @@ function confirmDeleteTemplate(id){
   document.getElementById('modelesTutorialBtn').addEventListener('click',startModelesTutorial);
   document.getElementById('templatesGrid').addEventListener('click',e=>{
     const ed=e.target.closest('[data-edit-template]'),dl=e.target.closest('[data-del-template]');
-    const ea=e.target.closest('[data-edit-anam]');
+    const ea=e.target.closest('[data-edit-anam]'),da=e.target.closest('[data-del-anam]');
     if(ed)openTemplateForm(appData.templates.find(t=>t.id===ed.dataset.editTemplate));
     if(dl)confirmDeleteTemplate(dl.dataset.delTemplate);
     if(ea){const anamIdx=(appData.customSituations||[]).findIndex(s=>s.id===ea.dataset.editAnam);openTemplateForm(null,'anamnese',true,anamIdx>=0?anamIdx:0);}
+    if(da)confirmDeleteAnam(da.dataset.delAnam);
   });
   document.getElementById('addTemplateBtn').addEventListener('click',()=>openTemplateForm(null));
   document.getElementById('searchTemplates').addEventListener('input',e=>{templateSearch=e.target.value;renderTemplatesGrid();});
