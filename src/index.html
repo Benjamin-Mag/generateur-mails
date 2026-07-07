@@ -438,10 +438,6 @@ input,textarea,select{font-family:inherit;}
         <label class="field-label">Genre du patient</label>
         <div class="civility-group" id="anamneseGenreRow"></div>
       </div>
-      <div class="situation-block" id="renouvellementSubBlock" style="display:none;">
-        <label class="field-label">Type de renouvellement</label>
-        <div class="civility-group" id="renouvellementSubRow"></div>
-      </div>
     </div>
     <div id="anamneseContent" class="anamnese-content" style="display:none;">
       <div class="anamnese-block">
@@ -1041,8 +1037,6 @@ function renderAnamSummary(){
     if(blocks[0])blocks[0].style.display='';
     // Genre visible seulement si situation choisie
     if(blocks[1])blocks[1].style.display=getCurrentAnamneseKey()||selectedSituation?'':'none';
-    // Renouvellement géré par renderRenouvellementSubRow
-    if(blocks[2])blocks[2].style.display='none';
     return;
   }
   // Cache les blocs de sélection
@@ -1171,7 +1165,7 @@ function renderPreviewOnly(){
 function needsGenreChoice(){return !!document.querySelector('#extraFields input[name="civilite"]');}
 
 /* ========== Anamnèse ========== */
-function getCurrentAnamneseKey(){if(selectedSituation==='renouvellement')return renouvellementType?'renouvellement_'+renouvellementType:null;return selectedSituation;}
+function getCurrentAnamneseKey(){return selectedSituation;}
 function renderAnamneseGenreRow(){
   const w=document.getElementById('anamneseGenreRow');
   w.innerHTML=makeSeg('anamnese-genre',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],anamneseGenre);
@@ -1198,7 +1192,6 @@ function renderRenouvellementSubRow(){
   w.querySelectorAll('input[name="renouvellement-type"]').forEach(r=>r.addEventListener('change',e=>{renouvellementType=e.target.value;renderAnamneseContent();}));
 }
 function renderAnamneseContent(){
-  document.getElementById('renouvellementSubBlock').style.display=selectedSituation==='renouvellement'?'block':'none';
   const cw=document.getElementById('anamneseContent'),key=getCurrentAnamneseKey();
   if(!key){cw.style.display='none';return;}
   cw.style.display='block';
