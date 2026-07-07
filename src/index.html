@@ -1660,7 +1660,6 @@ function confirmDeleteTemplate(id){
     const vals=Object.assign({},manualValues,{nom:getRecipientNomValue(),telephone:appData.phone||''});
     showToast(await copyText(resolveGenre(buildFilledText(t.smsCompanion,vals),getEffectiveGenre()))?'SMS copié ✓':"Impossible de copier.");
   });
-  document.getElementById('anamneseTextarea').addEventListener('change',async e=>{const k=getCurrentAnamneseKey();if(!k)return;appData.anamnese[k]={text:e.target.value};await persist();showToast('Texte enregistré ✓');});
   document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}showToast(await copyText(resolveGenre(document.getElementById('anamneseTextarea').value,anamneseGenre))?'Texte copié ✓':"Impossible de copier.");});
   document.getElementById('anamneseTutorialBtn').addEventListener('click',startAnamneseTutorial);
   document.getElementById('genererTutorialBtn').addEventListener('click',startGenererTutorial);
