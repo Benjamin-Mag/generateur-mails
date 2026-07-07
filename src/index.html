@@ -1368,20 +1368,52 @@ function showOnboardingModal(){
 }
 
 /* ========== Modal Anamnèse ========== */
+const ANAM_TABS='<div class="tpl-modal-tabs">'
+  +'<button type="button" class="tpl-modal-tab" data-aud="patient">Patient</button>'
+  +'<button type="button" class="tpl-modal-tab" data-aud="partenaire">Partenaire</button>'
+  +'<button type="button" class="tpl-modal-tab active" data-aud="anamnese">Anamnèse</button>'
+  +'</div>';
+
+/* ---- Création simple (sans navigation) ---- */
+function buildNewAnamHTML(){
+  return '<div class="overlay" id="overlay"><div class="tpl-modal-wrapper">'+ANAM_TABS
+    +'<div class="modal">'
+    +'<h2 style="margin-top:4px;margin-bottom:16px;">Nouvelle situation</h2>'
+    +'<label class="field-label">Titre</label>'
+    +'<input id="anam-label" placeholder="Ex. Suivi post-appareillage" style="margin-bottom:12px;">'
+    +'<label class="field-label">Texte</label>'
+    +'<textarea id="anam-text" rows="8" style="width:100%;resize:vertical;"></textarea>'
+    +'<div class="modal-foot" style="justify-content:flex-end;margin-top:16px;">'
+    +'<div style="display:flex;gap:10px;"><button class="btn-outline" id="cancelBtn">Annuler</button>'
+    +'<button class="btn-primary" id="saveNewAnamBtn">Ajouter</button></div>'
+    +'</div></div></div></div>';
+}
+function wireNewAnamModal(root){
+  document.getElementById('cancelBtn').addEventListener('click',closeModal);
+  document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});
+  document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
+  document.getElementById('saveNewAnamBtn').addEventListener('click',async()=>{
+    const label=document.getElementById('anam-label').value.trim();
+    const text=document.getElementById('anam-text').value;
+    if(!label)return;
+    const id='custom-'+Date.now();
+    appData.customSituations.push({id,label});
+    appData.anamnese[id]={text};
+    await persist();renderSituationRow();renderTemplatesGrid();
+    closeModal();showToast('Situation ajoutée ✓');
+  });
+  root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
+    if(btn.dataset.aud!=='anamnese')openTemplateForm(null,btn.dataset.aud,true);
+  }));
+}
+
+/* ---- Édition avec navigation (prev/next) ---- */
 function buildAnamModalHTML(idx,drafts){
   const situations=appData.customSituations||[];
-  const tabs='<div class="tpl-modal-tabs">'
-    +'<button type="button" class="tpl-modal-tab" data-aud="patient">Patient</button>'
-    +'<button type="button" class="tpl-modal-tab" data-aud="partenaire">Partenaire</button>'
-    +'<button type="button" class="tpl-modal-tab active" data-aud="anamnese">Anamnèse</button>'
-    +'</div>';
   if(!situations.length){
-    return '<div class="overlay" id="overlay"><div class="tpl-modal-wrapper">'+tabs
-      +'<div class="modal"><div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:16px;">'
-      +'<h2 style="margin:0;">Modèles d\'anamnèse</h2>'
-      +'<button type="button" class="btn-outline" id="addCustomSituationBtn" style="font-size:.82rem;padding:5px 12px;">+ Nouvelle situation</button>'
-      +'</div><p style="color:var(--muted);text-align:center;padding:24px 0;">Aucune situation. Crée-en une !</p>'
-      +'<div id="newCustomSituationArea"></div>'
+    return '<div class="overlay" id="overlay"><div class="tpl-modal-wrapper">'+ANAM_TABS
+      +'<div class="modal"><h2 style="margin-top:4px;margin-bottom:16px;">Modèles d\'anamnèse</h2>'
+      +'<p style="color:var(--muted);text-align:center;padding:24px 0;">Aucune situation.</p>'
       +'<div class="modal-foot" style="justify-content:flex-end;"><button class="btn-outline" id="cancelBtn">Fermer</button></div>'
       +'</div></div></div>';
   }
@@ -1394,18 +1426,14 @@ function buildAnamModalHTML(idx,drafts){
     +'<span style="font-size:.85rem;color:var(--muted);">'+(i+1)+' / '+situations.length+'</span>'
     +'<button type="button" class="btn-outline small" id="nextAnamBtn"'+(i>=situations.length-1?' disabled':'')+'>Suivant ›</button>'
     +'</div>';
-  return '<div class="overlay" id="overlay"><div class="tpl-modal-wrapper">'+tabs
+  return '<div class="overlay" id="overlay"><div class="tpl-modal-wrapper">'+ANAM_TABS
     +'<div class="modal">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:12px;">'
-    +'<h2 style="margin:0;">Modèles d\'anamnèse</h2>'
-    +'<button type="button" class="btn-outline" id="addCustomSituationBtn" style="font-size:.82rem;padding:5px 12px;">+ Nouvelle situation</button>'
-    +'</div>'
+    +'<h2 style="margin-top:4px;margin-bottom:12px;">Modifier l\'anamnèse</h2>'
     +navRow
     +'<label class="field-label">Titre</label>'
     +'<input id="anam-label" value="'+escapeHtml(storedLabel)+'" placeholder="Titre de la situation" style="margin-bottom:12px;">'
     +'<label class="field-label">Texte</label>'
     +'<textarea id="anam-text" rows="8" style="width:100%;resize:vertical;">'+escapeHtml(storedText)+'</textarea>'
-    +'<div id="newCustomSituationArea"></div>'
     +'<div style="display:flex;justify-content:flex-end;margin-top:8px;">'
     +'<button type="button" class="btn-outline" style="font-size:.82rem;color:#c0392b;" id="delAnamBtn" data-del-idx="'+i+'">🗑 Supprimer</button>'
     +'</div>'
@@ -1414,7 +1442,7 @@ function buildAnamModalHTML(idx,drafts){
     +'<button class="btn-primary" id="saveAnamBtn">Enregistrer</button></div>'
     +'</div></div></div></div>';
 }
-function wireAnamModal(root,openAnam,idx,drafts){
+function wireAnamModal(root,idx,drafts){
   idx=idx||0;drafts=drafts||{};
   const situations=appData.customSituations||[];
   function collectCurrent(){
@@ -1427,7 +1455,7 @@ function wireAnamModal(root,openAnam,idx,drafts){
   function navigate(newIdx){
     collectCurrent();
     root.innerHTML=buildAnamModalHTML(newIdx,drafts);
-    wireAnamModal(root,openAnam,newIdx,drafts);
+    wireAnamModal(root,newIdx,drafts);
   }
   document.getElementById('cancelBtn').addEventListener('click',closeModal);
   document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});
@@ -1444,7 +1472,7 @@ function wireAnamModal(root,openAnam,idx,drafts){
       if(s&&drafts[id].label)s.label=drafts[id].label;
       appData.anamnese[id]={text:drafts[id].text};
     });
-    await persist();renderSituationRow();
+    await persist();renderSituationRow();renderTemplatesGrid();
     if(selectedSituation)renderAnamneseContent();
     closeModal();showToast('Anamnèses enregistrées ✓');
   });
@@ -1456,31 +1484,12 @@ function wireAnamModal(root,openAnam,idx,drafts){
     appData.customSituations=appData.customSituations.filter(s=>s.id!==e.id);
     delete appData.anamnese[e.id];
     delete drafts[e.id];
-    await persist();renderSituationRow();
-    const newIdx=Math.min(i,appData.customSituations.length-1);
-    root.innerHTML=buildAnamModalHTML(Math.max(0,newIdx),drafts);
-    wireAnamModal(root,openAnam,Math.max(0,newIdx),drafts);
+    await persist();renderSituationRow();renderTemplatesGrid();
+    if(appData.customSituations.length===0){closeModal();return;}
+    const newIdx=Math.max(0,Math.min(i,appData.customSituations.length-1));
+    root.innerHTML=buildAnamModalHTML(newIdx,drafts);
+    wireAnamModal(root,newIdx,drafts);
     showToast('Supprimé ✓');
-  });
-  document.getElementById('addCustomSituationBtn').addEventListener('click',()=>{
-    const area=document.getElementById('newCustomSituationArea');
-    if(area.querySelector('.new-custom-form'))return;
-    area.innerHTML='<div class="new-custom-form" style="margin-top:12px;"><label class="field-label">Titre</label><input id="new-custom-title" placeholder="Ex. Suivi post-appareillage"><label class="field-label" style="margin-top:10px;">Texte</label><textarea id="new-custom-text" rows="4"></textarea><div style="margin-top:10px;display:flex;gap:8px;"><button type="button" class="btn-primary" id="confirmAddCustomBtn">Ajouter</button><button type="button" class="btn-outline" id="cancelAddCustomBtn">Annuler</button></div></div>';
-    document.getElementById('cancelAddCustomBtn').addEventListener('click',()=>{area.innerHTML='';});
-    document.getElementById('confirmAddCustomBtn').addEventListener('click',async()=>{
-      const label=document.getElementById('new-custom-title').value.trim();
-      const text=document.getElementById('new-custom-text').value;
-      if(!label)return;
-      collectCurrent();
-      const id='custom-'+Date.now();
-      appData.customSituations.push({id,label});
-      appData.anamnese[id]={text};
-      await persist();renderSituationRow();renderTemplatesGrid();
-      const newIdx=appData.customSituations.length-1;
-      root.innerHTML=buildAnamModalHTML(newIdx,drafts);
-      wireAnamModal(root,openAnam,newIdx,drafts);
-      showToast('Situation ajoutée ✓');
-    });
   });
   root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
     if(btn.dataset.aud!=='anamnese')openTemplateForm(null,btn.dataset.aud,true);
@@ -1536,13 +1545,18 @@ function buildModalHTML(aud,editing,nl,ni){
 function openTemplateForm(editing,initialAud,noAnim,anamIdx){
   const root=document.getElementById('modalRoot');
   if(initialAud==='anamnese'){
-    function openAnam(skipAnim,idx,drafts){
-      const i=(idx!=null)?idx:0;
-      root.innerHTML=buildAnamModalHTML(i,drafts);
-      if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
-      wireAnamModal(root,openAnam,i,drafts);
+    if(anamIdx!=null){
+      // Mode édition avec navigation
+      root.innerHTML=buildAnamModalHTML(anamIdx,{});
+      if(noAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
+      wireAnamModal(root,anamIdx,{});
+    } else {
+      // Mode création simple
+      root.innerHTML=buildNewAnamHTML();
+      if(noAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
+      wireNewAnamModal(root);
     }
-    openAnam(noAnim,anamIdx||0);return;
+    return;
   }
   let aud=initialAud||(editing?(editing.audience||'patient'):'patient');
   const nl=editing?getFilteredTemplateList():[],ni=editing?nl.findIndex(t=>t.id===editing.id):-1;
