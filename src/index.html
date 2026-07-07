@@ -120,14 +120,14 @@ input,textarea,select{font-family:inherit;}
 }
 .anam-card-modeles{
   position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:5px;
-  padding:18px 16px 14px;text-align:left;
+  padding:18px 16px 14px;text-align:left;cursor:grab;
   transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
 }
+.anam-card-modeles:active{cursor:grabbing;}
 .anam-card-modeles:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(124,77,255,.12);border-color:#7C4DFF;}
 .anam-card-modeles.drag-over{border:2px dashed #7C4DFF;background:var(--accent-soft,#EDE7FF);transform:none;box-shadow:none;}
-.anam-card-modeles.dragging{opacity:.35;transform:none;}
-.drag-handle{position:absolute;top:10px;left:10px;cursor:grab;color:var(--muted-ink);font-size:1rem;line-height:1;user-select:none;}
-.drag-handle:active{cursor:grabbing;}
+.anam-card-modeles.dragging{opacity:.35;transform:none;cursor:grabbing;}
+.drag-handle{position:absolute;top:10px;left:10px;color:var(--muted-ink);font-size:1rem;line-height:1;user-select:none;}
 .anam-card-modeles .anam-tag{position:absolute;top:-9px;right:14px;font-size:.66rem;padding:3px 9px;border-radius:2px;letter-spacing:.03em;background:#EDE7FF;color:#4A148C;font-family:'Poppins',sans-serif;}
 .anam-card-modeles h3{font-family:'Poppins',sans-serif;font-weight:400;font-size:1rem;margin:6px 0 8px;}
 .anam-card-modeles p{font-size:.82rem;color:var(--muted-ink);margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;}
@@ -849,7 +849,11 @@ function renderTypeChips(){
 }
 function templateMatchesTypeFilter(t){if(templateTypeFilter==='sms')return t.audience!=='partenaire'&&!!t.smsCompanion;return true;}
 function renderTemplatesGrid(){
-  const grid=document.getElementById('templatesGrid'),term=templateSearch.toLowerCase();
+  const grid=document.getElementById('templatesGrid');
+  // Sauvegarde l'état ouvert/fermé des groupes
+  const openGroups=new Set();
+  grid.querySelectorAll('.template-group.open').forEach(g=>{const h=g.querySelector('[data-toggle-group]');if(h)openGroups.add(h.textContent.trim());});
+  const term=templateSearch.toLowerCase();
   const list=appData.templates.filter(t=>templateMatchesTypeFilter(t)&&(t.title.toLowerCase().indexOf(term)!==-1||(t.category||'').toLowerCase().indexOf(term)!==-1));
   function rc(t){
     const ct=t.audience==='partenaire'?t.partnerCategory:t.patientCategory;
@@ -891,7 +895,9 @@ function renderTemplatesGrid(){
     html+=makeGroup('anamnese','Anamnèses',anamCards,'Aucune anamnèse.');
   }
   grid.innerHTML=html;
+  // Restaure l'état ouvert/fermé
   grid.querySelectorAll('[data-toggle-group]').forEach(header=>{
+    if(openGroups.size===0||openGroups.has(header.textContent.trim()))header.closest('.template-group').classList.add('open');
     header.addEventListener('click',()=>{
       const group=header.closest('.template-group');
       group.classList.toggle('open');
