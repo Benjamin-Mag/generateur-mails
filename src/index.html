@@ -865,7 +865,7 @@ function renderTemplatesGrid(){
     const hsb=t.audience!=='partenaire'&&!!t.smsCompanion;
     const tl=hsb?'Email - SMS':(t.type==='email'?'Email':'SMS');
     const sma=templateTypeFilter==='sms'&&t.smsCompanion;
-    return '<div class="card" draggable="true" data-tpl-id="'+t.id+'" data-tpl-aud="'+t.audience+'"><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(sma?t.smsCompanion:t.body)+'</p>'+(!sma&&t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
+    return '<div class="card" draggable="true" data-tpl-id="'+t.id+'" data-tpl-aud="'+t.audience+'"><span class="drag-handle" title="Déplacer">⠿</span><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(sma?t.smsCompanion:t.body)+'</p>'+(!sma&&t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
   }
   function makeGroup(type,label,cards,emptyMsg){
     const chevron='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
