@@ -137,6 +137,9 @@ input,textarea,select{font-family:inherit;}
 .anam-card-modeles p{font-size:.82rem;color:var(--muted-ink);margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;}
 .anam-card-modeles .card-foot{display:flex;justify-content:flex-end;gap:8px;}
 .group-divider{border:none;border-top:1px solid var(--line);margin:28px 0;}
+.cat-section{margin-bottom:4px;}
+.cat-section-label{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted-ink);margin:0 0 12px;padding:0 2px;}
+.cat-divider{border:none;border-top:1px solid var(--line);margin:20px 0 18px;}
 
 .card{position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:5px;padding:18px 16px 14px;text-align:left;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
 .card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(27,79,155,.15);border-color:var(--accent);}
@@ -867,6 +870,20 @@ function renderTemplatesGrid(){
     const sma=templateTypeFilter==='sms'&&t.smsCompanion;
     return '<div class="card" draggable="true" data-tpl-id="'+t.id+'" data-tpl-aud="'+t.audience+'"><span class="drag-handle" title="Déplacer">⠿</span><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(sma?t.smsCompanion:t.body)+'</p>'+(!sma&&t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
   }
+  function makePatientGroup(templates,isS){
+    const chevron='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+    const label=isS?'SMS patients':'Mails patients';
+    if(!templates.length)return '<div class="template-group patient"><div class="group-header" data-toggle-group><span class="group-count">0</span><span class="model-group-title">'+label+'</span><span class="group-chevron">'+chevron+'</span></div><div class="group-body"><div class="empty-state">Aucun modèle patient.</div></div></div>';
+    const cats=[],bycat={};
+    templates.forEach(t=>{const c=t.patientCategory||'Autre';if(!bycat[c]){bycat[c]=[];cats.push(c);}bycat[c].push(t);});
+    let body='',gi=0;
+    cats.forEach((cat,ci)=>{
+      const sep=ci>0?'<div class="cat-divider"></div>':'';
+      const catCards=bycat[cat].map(t=>rc(t).replace('<div class="card"','<div class="card" style="--i:'+gi++ +'"'));
+      body+=sep+'<div class="cat-section"><span class="cat-section-label">'+escapeHtml(cat)+'</span><div class="grid">'+catCards.join('')+'</div></div>';
+    });
+    return '<div class="template-group patient"><div class="group-header" data-toggle-group><span class="group-count">'+templates.length+'</span><span class="model-group-title">'+label+'</span><span class="group-chevron">'+chevron+'</span></div><div class="group-body">'+body+'</div></div>';
+  }
   function makeGroup(type,label,cards,emptyMsg){
     const chevron='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
     const indexed=cards.map((c,i)=>c.replace(/style="/,'style="--i:'+i+';').replace('<div class="card"','<div class="card" style="--i:'+i+'"').replace('<div class="anam-card-modeles"','<div class="anam-card-modeles" style="--i:'+i+'"'));
@@ -881,8 +898,8 @@ function renderTemplatesGrid(){
       +'</div>';
   }
   const pl=list.filter(t=>t.audience!=='partenaire'),pal=list.filter(t=>t.audience==='partenaire'),isS=templateTypeFilter==='sms';
-  const plCards=pl.map(rc),palCards=pal.map(rc);
-  let html=makeGroup('patient',isS?'SMS patients':'Mails patients',plCards,'Aucun modèle patient.');
+  const palCards=pal.map(rc);
+  let html=makePatientGroup(pl,isS);
   if(!isS){
     html+=makeGroup('partenaire','Mails partenaires',palCards,'Aucun modèle partenaire.');
     const situations=appData.customSituations||[];
