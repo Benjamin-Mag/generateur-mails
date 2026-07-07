@@ -428,15 +428,15 @@ input,textarea,select{font-family:inherit;}
   </div>
 
   <section id="tab-anamnese" class="tab-panel active">
-    <p class="hint">Choisis le genre du patient puis la situation : le texte s'affiche en dessous, modifiable et enregistré automatiquement.</p>
+    <p class="hint">Choisis la situation puis le genre du patient : le texte s'affiche en dessous, modifiable et enregistré automatiquement.</p>
     <div id="anamFormCol">
-      <div class="situation-block">
-        <label class="field-label">Genre du patient</label>
-        <div class="civility-group" id="anamneseGenreRow"></div>
-      </div>
       <div class="situation-block">
         <label class="field-label">Situation</label>
         <div class="civility-group" id="situationRow"></div>
+      </div>
+      <div class="situation-block">
+        <label class="field-label">Genre du patient</label>
+        <div class="civility-group" id="anamneseGenreRow"></div>
       </div>
       <div class="situation-block" id="renouvellementSubBlock" style="display:none;">
         <label class="field-label">Type de renouvellement</label>
@@ -1037,10 +1037,10 @@ function renderAnamSummary(){
   // Si les choix sont incomplets, affichage progressif
   if(!anamneseGenre||!getCurrentAnamneseKey()){
     const blocks=el.querySelectorAll('.situation-block');
-    // Genre toujours visible
+    // Situation toujours visible
     if(blocks[0])blocks[0].style.display='';
-    // Situation visible seulement si genre choisi
-    if(blocks[1])blocks[1].style.display=anamneseGenre?'':'none';
+    // Genre visible seulement si situation choisie
+    if(blocks[1])blocks[1].style.display=getCurrentAnamneseKey()||selectedSituation?'':'none';
     // Renouvellement géré par renderRenouvellementSubRow
     if(blocks[2])blocks[2].style.display='none';
     return;
@@ -1180,18 +1180,17 @@ function renderAnamneseGenreRow(){
     const ta=document.getElementById('anamneseTextarea');
     if(ta&&ta.value)ta.value=resolveGenre(ta.value,anamneseGenre);
     if(selectedSituation&&getCurrentAnamneseKey()){settleAnamPanel();return;}
-    // Mode inline : révéler le bloc Situation
-    if(!_anamFloating){
-      const col=document.getElementById('anamFormCol');
-      if(col){const blocks=col.querySelectorAll('.situation-block');if(blocks[1])blocks[1].style.display='';}
-    }
   }));
 }
 function renderSituationRow(){
   const w=document.getElementById('situationRow');
   const allSituations=appData.customSituations||[];
   w.innerHTML=makeSeg('situation',allSituations,selectedSituation);
-  w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{selectedSituation=e.target.value;renderAnamneseContent();}));
+  w.querySelectorAll('input[name="situation"]').forEach(r=>r.addEventListener('change',e=>{
+    selectedSituation=e.target.value;
+    if(!_anamFloating){const col=document.getElementById('anamFormCol');if(col){const blocks=col.querySelectorAll('.situation-block');if(blocks[1])blocks[1].style.display='';}}
+    renderAnamneseContent();
+  }));
 }
 function renderRenouvellementSubRow(){
   const w=document.getElementById('renouvellementSubRow');
