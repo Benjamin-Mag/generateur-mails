@@ -677,7 +677,7 @@ async function loadData(){
   const bl=appData.templates.length;
   appData.templates=appData.templates.filter(t=>OLD_SEED_IDS.indexOf(t.id)===-1);
   if(appData.templates.length!==bl)changed=true;
-  if(!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
+  if(!parsed.templates&&!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
   const _ct=appData.templates.find(t=>t.id===NEW_TEMPLATE.id);
   if(_ct&&_ct.patientCategory!=='all'){_ct.patientCategory='all';changed=true;}
   const REMOVED_IDS=['tpl-suivi-depistage','tpl-suivi-premier-rdv','tpl-suivi-renouvellement','tpl-suivi-adaptation','tpl-suivi-depistage-orl-patient','tpl-suivi-rdv-orl-patient'];
