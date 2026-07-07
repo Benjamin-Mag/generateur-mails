@@ -1475,7 +1475,7 @@ function wireAnamModal(root,openAnam,idx,drafts){
       const id='custom-'+Date.now();
       appData.customSituations.push({id,label});
       appData.anamnese[id]={text};
-      await persist();renderSituationRow();
+      await persist();renderSituationRow();renderTemplatesGrid();
       const newIdx=appData.customSituations.length-1;
       root.innerHTML=buildAnamModalHTML(newIdx,drafts);
       wireAnamModal(root,openAnam,newIdx,drafts);
