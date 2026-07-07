@@ -847,7 +847,6 @@ function templateMatchesTypeFilter(t){if(templateTypeFilter==='sms')return t.aud
 function renderTemplatesGrid(){
   const grid=document.getElementById('templatesGrid'),term=templateSearch.toLowerCase();
   const list=appData.templates.filter(t=>templateMatchesTypeFilter(t)&&(t.title.toLowerCase().indexOf(term)!==-1||(t.category||'').toLowerCase().indexOf(term)!==-1));
-  if(!list.length){grid.innerHTML='<div class="empty-state">Aucun modèle pour le moment.</div>';return;}
   function rc(t){
     const ct=t.audience==='partenaire'?t.partnerCategory:t.patientCategory;
     const al=(t.audience==='partenaire'?'Partenaire':'Patient')+(ct?' · '+ct:'');
