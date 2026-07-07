@@ -897,7 +897,7 @@ function renderTemplatesGrid(){
   grid.innerHTML=html;
   // Restaure l'état ouvert/fermé
   grid.querySelectorAll('[data-toggle-group]').forEach(header=>{
-    if(openGroups.size===0||openGroups.has(header.textContent.trim()))header.closest('.template-group').classList.add('open');
+    if(openGroups.has(header.textContent.trim()))header.closest('.template-group').classList.add('open');
     header.addEventListener('click',()=>{
       const group=header.closest('.template-group');
       group.classList.toggle('open');
