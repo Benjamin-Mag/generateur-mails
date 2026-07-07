@@ -1691,6 +1691,16 @@ function confirmDeleteAnam(id){
   document.getElementById('searchTemplates').addEventListener('input',e=>{templateSearch=e.target.value;renderTemplatesGrid();});
   document.getElementById('settingsBtn').addEventListener('click',openSettingsForm);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTutorial();}});
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Tab')return;
+    const t=e.target;
+    if(t.tagName!=='TEXTAREA')return;
+    e.preventDefault();
+    const start=t.selectionStart,end=t.selectionEnd,val=t.value,indent='    ';
+    t.value=val.substring(0,start)+indent+val.substring(end);
+    t.selectionStart=t.selectionEnd=start+indent.length;
+    t.dispatchEvent(new Event('input',{bubbles:true}));
+  });
 
   // Ripple effect on .btn-primary
   document.addEventListener('click',e=>{
