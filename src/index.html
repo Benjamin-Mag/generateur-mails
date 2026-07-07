@@ -124,6 +124,10 @@ input,textarea,select{font-family:inherit;}
   transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
 }
 .anam-card-modeles:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(124,77,255,.12);border-color:#7C4DFF;}
+.anam-card-modeles.drag-over{border:2px dashed #7C4DFF;background:var(--accent-soft,#EDE7FF);transform:none;box-shadow:none;}
+.anam-card-modeles.dragging{opacity:.35;transform:none;}
+.drag-handle{position:absolute;top:10px;left:10px;cursor:grab;color:var(--muted-ink);font-size:1rem;line-height:1;user-select:none;}
+.drag-handle:active{cursor:grabbing;}
 .anam-card-modeles .anam-tag{position:absolute;top:-9px;right:14px;font-size:.66rem;padding:3px 9px;border-radius:2px;letter-spacing:.03em;background:#EDE7FF;color:#4A148C;font-family:'Poppins',sans-serif;}
 .anam-card-modeles h3{font-family:'Poppins',sans-serif;font-weight:400;font-size:1rem;margin:6px 0 8px;}
 .anam-card-modeles p{font-size:.82rem;color:var(--muted-ink);margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;}
@@ -876,7 +880,8 @@ function renderTemplatesGrid(){
     const situations=appData.customSituations||[];
     const anamCards=situations.map(s=>{
       const text=(appData.anamnese[s.id]||{text:''}).text||'';
-      return '<div class="anam-card-modeles">'
+      return '<div class="anam-card-modeles" draggable="true" data-anam-id="'+escapeHtml(s.id)+'">'
+        +'<span class="drag-handle" title="Déplacer">⠿</span>'
         +'<span class="anam-tag">Anamnèse</span>'
         +'<h3>'+escapeHtml(s.label)+'</h3>'
         +'<p>'+(text?escapeHtml(text):'<em>Aucun texte saisi</em>')+'</p>'
@@ -890,6 +895,40 @@ function renderTemplatesGrid(){
     header.addEventListener('click',()=>{
       const group=header.closest('.template-group');
       group.classList.toggle('open');
+    });
+  });
+
+  // Drag & drop reorder anamnèses
+  let dragSrcId=null;
+  grid.querySelectorAll('.anam-card-modeles[draggable]').forEach(card=>{
+    card.addEventListener('dragstart',e=>{
+      dragSrcId=card.dataset.anamId;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    card.addEventListener('dragend',()=>{
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.anam-card-modeles').forEach(c=>c.classList.remove('drag-over'));
+    });
+    card.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      grid.querySelectorAll('.anam-card-modeles').forEach(c=>c.classList.remove('drag-over'));
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('drop',async e=>{
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      const targetId=card.dataset.anamId;
+      if(!dragSrcId||dragSrcId===targetId)return;
+      const sits=appData.customSituations;
+      const from=sits.findIndex(s=>s.id===dragSrcId);
+      const to=sits.findIndex(s=>s.id===targetId);
+      if(from===-1||to===-1)return;
+      sits.splice(to,0,sits.splice(from,1)[0]);
+      await persist();
+      renderTemplatesGrid();
     });
   });
 }
