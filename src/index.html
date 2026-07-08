@@ -162,6 +162,7 @@ input,textarea,select{font-family:inherit;}
 @keyframes genPanelIn{from{opacity:0;transform:translate(-50%,-47%) scale(.92);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
 @keyframes genBackdropIn{from{opacity:0;}to{opacity:1;}}
 #genFormCol.is-floating #extraFields{display:none;}
+#genFormCol.is-floating.show-extra #extraFields{display:block;margin-top:12px;}
 #genFormCol.is-floating,#anamFormCol.is-floating{
   position:fixed;top:50%;left:50%;
   transform:translate(-50%,-50%);
@@ -1066,6 +1067,8 @@ function settleGenPanel(){
   const bd=document.getElementById('genBackdrop');
   if(!el||!_genFloating)return;
   _genFloating=false;
+  el.classList.remove('show-extra');
+  const _ew=document.getElementById('extraFields');if(_ew)_ew.style.display='';
   el.querySelectorAll('.gen-panel-header').forEach(b=>b.remove());
   el.querySelectorAll('.panel-close-btn').forEach(b=>b.remove());
   // FLIP — mesure la position flottante actuelle
@@ -1220,6 +1223,7 @@ function teardownGenPanel(){
   }else if(el){el.classList.remove('is-floating');el.style.transform='';el.style.transition='';el.style.transformOrigin='';}
   if(bd)bd.remove();
   _genFloating=false;_genFloatParent=null;_genFloatSibling=null;
+  if(el)el.classList.remove('show-extra');
   resetGenForm();
 }
 
@@ -1280,9 +1284,28 @@ function renderTemplateSelect(){
     selectedTemplateId=btn.dataset.tplId;
     const _nom=manualValues['nom'];manualValues={};if(_nom)manualValues['nom']=_nom;datePickerView={};
     w.querySelectorAll('.tpl-pill').forEach(b=>b.classList.toggle('active',b===btn));
-    settleGenPanel();
     updateExtraFieldsAndPreview();
-    if(!_genFloating)renderGenSummary();
+    if(_genFloating){
+      const ew=document.getElementById('extraFields');
+      const extraInputs=Array.from(ew.querySelectorAll('input[data-extra-var]'));
+      const allFilled=!extraInputs.length||extraInputs.every(i=>(i.value||'').trim());
+      if(!allFilled){
+        ew.style.display='block';
+        setTimeout(()=>{
+          extraInputs.forEach(inp=>{
+            if(!(inp.value||'').trim()){
+              inp.classList.remove('genre-alert');void inp.offsetWidth;inp.classList.add('genre-alert');
+              inp.addEventListener('animationend',()=>inp.classList.remove('genre-alert'),{once:true});
+            }
+          });
+          ew.scrollIntoView({behavior:'smooth',block:'nearest'});
+        },50);
+      } else {
+        settleGenPanel();renderGenSummary();
+      }
+    } else {
+      renderGenSummary();
+    }
   }));
 }
 function updateExtraFieldsAndPreview(){
@@ -1353,6 +1376,14 @@ function renderPreviewOnly(){
   be.innerHTML=previewHtml(template.body,vals,genre);ac.style.display='flex';
   const ss=template.audience==='patient'&&template.type==='email'&&template.smsCompanion;
   if(ss){smsw.style.display='block';document.getElementById('smsCompanionBody').innerHTML=previewHtml(template.smsCompanion,vals,genre);}else smsw.style.display='none';
+  if(_genFloating){
+    const ew=document.getElementById('extraFields');
+    if(ew&&ew.style.display==='block'){
+      const extraInputs=Array.from(ew.querySelectorAll('input[data-extra-var]'));
+      const allFilled=extraInputs.every(i=>(i.value||'').trim());
+      if(allFilled){ew.style.display='';settleGenPanel();renderGenSummary();}
+    }
+  }
 }
 function needsGenreChoice(){return !!document.querySelector('#extraFields input[name="civilite"]');}
 
