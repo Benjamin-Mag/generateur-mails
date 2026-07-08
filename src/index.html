@@ -1246,7 +1246,14 @@ function renderGenreRow(){
   if(nomInput)nomInput.addEventListener('input',e=>{manualValues['nom']=e.target.value;renderPreviewOnly();});
   const pasteBtn=document.getElementById('genrePasteSFBtn');
   if(pasteBtn)pasteBtn.addEventListener('click',async()=>{
-    try{const txt=await navigator.clipboard.readText();if(!txt){showToast('Presse-papier vide.');return;}const inp=document.getElementById('genreNomInput');if(inp){inp.value=txt;manualValues['nom']=txt;renderPreviewOnly();}}catch(e){showToast('Impossible de lire le presse-papier.');}
+    try{
+      const txt=await navigator.clipboard.readText();
+      if(!txt){showToast('Presse-papier vide.');return;}
+      let val=txt;
+      try{const obj=JSON.parse(txt);if(obj&&obj.patient)val=obj.patient;}catch(e){}
+      const inp=document.getElementById('genreNomInput');
+      if(inp){inp.value=val;manualValues['nom']=val;renderPreviewOnly();}
+    }catch(e){showToast('Impossible de lire le presse-papier.');}
   });
 }
 function renderCategoryRow(){
