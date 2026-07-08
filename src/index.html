@@ -1729,8 +1729,10 @@ function openTemplateForm(editing,initialAud,noAnim,anamIdx){
       render(true);
       document.getElementById('f-title').value=ti;
       if(document.getElementById('f-subject'))document.getElementById('f-subject').value=su;
-      if(document.getElementById('f-body'))document.getElementById('f-body').value=bo;
-      if(document.getElementById('f-sms'))document.getElementById('f-sms').value=sm;
+      if(editing){
+        if(document.getElementById('f-body'))document.getElementById('f-body').value=bo;
+        if(document.getElementById('f-sms'))document.getElementById('f-sms').value=sm;
+      }
     }));
     document.getElementById('cancelBtn').addEventListener('click',closeModal);
     document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
