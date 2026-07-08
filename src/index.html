@@ -447,8 +447,8 @@ input,textarea,select{font-family:inherit;}
     </div>
     <div class="tabs" id="tabs">
       <button class="tab active" data-tab="anamnese">Anamnèse</button>
-      <button class="tab" data-tab="generer">Générer</button>
-      <button class="tab" data-tab="modeles">Modèles</button>
+      <button class="tab" data-tab="generer">Templates</button>
+      <button class="tab" data-tab="modeles">Bibliothèque</button>
     </div>
     <div class="topbar-right">
       <button class="btn-outline small" id="anamneseTutorialBtn" type="button">🎓 Tutoriel</button>
@@ -1057,7 +1057,7 @@ function showGenPanel(){
   document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
   const hdr=document.createElement('div');hdr.className='gen-panel-header';
-  hdr.innerHTML='<button type="button" class="panel-close-btn" aria-label="Fermer">×</button><span class="gen-panel-title">Générer</span>';
+  hdr.innerHTML='<button type="button" class="panel-close-btn" aria-label="Fermer">×</button><span class="gen-panel-title">Templates</span>';
   el.insertBefore(hdr,el.firstChild);
   hdr.querySelector('.panel-close-btn').addEventListener('click',settleGenPanel);
 }
@@ -1405,14 +1405,14 @@ const ANAMNESE_TUTORIAL_STEPS=[
   {target:'#copyAnamneseBtn',title:'Copier',text:'Clique ici pour copier le texte complet.',ensure:function(){if(!selectedSituation){selectedSituation='depistage_simple';renderSituationRow();renderAnamneseContent();}}}
 ];
 const GENERER_TUTORIAL_STEPS=[
-  {target:null,title:'Tutoriel — Onglet Générer',text:"Génère rapidement un email prêt à copier-coller. Clique sur « Suivant »."},
+  {target:null,title:'Tutoriel — Onglet Templates',text:"Génère rapidement un email prêt à copier-coller. Clique sur « Suivant »."},
   {target:'#followTypeRow',title:'Type de suivi',text:"Choisis si le mail s'adresse à un patient ou un partenaire."},
   {target:'#templateSelect',title:'Modèle',text:'Sélectionne le modèle correspondant.',ensure:function(){if(!followType){followType='patient';renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();}if(!selectedCategory){selectedCategory='Reconfirmation';renderCategoryRow();renderTemplateSelect();}}},
   {target:'#extraFields',title:'Informations',text:'Renseigne le nom du patient et la date.',ensure:function(){const s=document.getElementById('templateSelect');if(s&&!s.value&&appData.templates.some(t=>t.id==='tpl-confirmation-rdv')){s.value='tpl-confirmation-rdv';updateExtraFieldsAndPreview();}}},
   {target:'.preview-col',title:'Aperçu et copie',text:'Le message apparaît ici. Clique sur « Copier le message ».',tooltipPosition:'left'}
 ];
 const MODELES_TUTORIAL_STEPS=[
-  {target:null,title:'Tutoriel — Onglet Modèles',text:"Gère tous tes modèles d'email et SMS."},
+  {target:null,title:'Tutoriel — Onglet Bibliothèque',text:"Gère tous tes modèles d'email et SMS."},
   {target:'.controls-row',title:'Rechercher ou créer',text:'Barre de recherche ou « + Nouveau modèle ».'},
   {target:'#typeChips',title:'Filtrer',text:"Affiche uniquement Email ou SMS."},
   {target:'#templatesGrid',title:'Mails patients et partenaires',text:"Deux groupes. « Modifier » pour changer, « Supprimer » pour effacer.",tooltipPosition:'above'}
