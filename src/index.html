@@ -399,6 +399,7 @@ input,textarea,select{font-family:inherit;}
 /* ===== Alerte genre ===== */
 @keyframes shakeGenre{0%,100%{transform:translateX(0);}15%{transform:translateX(-7px);}35%{transform:translateX(7px);}55%{transform:translateX(-5px);}75%{transform:translateX(5px);}90%{transform:translateX(-2px);}}
 .genre-alert{animation:shakeGenre .45s ease both;}
+.field-shake{animation:shakeGenre .45s ease both;outline:2px solid var(--danger,#e53935);border-radius:6px;}
 
 /* ===== Animations sur composants ===== */
 #app{animation:fadeInUp .5s ease both;}
@@ -1098,6 +1099,20 @@ function settleGenPanel(){
   },{once:true});
   _genFloatParent=null;_genFloatSibling=null;
 }
+function shakeEmptyFields(){
+  const toShake=[];
+  document.querySelectorAll('#extraFields input[data-extra-var]').forEach(inp=>{
+    if(!(inp.value||'').trim())toShake.push(inp);
+  });
+  const nomInp=document.getElementById('genreNomInput');
+  if(nomInp&&!(nomInp.value||'').trim())toShake.push(nomInp);
+  toShake.forEach(el=>{
+    el.classList.remove('field-shake');
+    void el.offsetWidth;
+    el.classList.add('field-shake');
+    el.addEventListener('animationend',()=>el.classList.remove('field-shake'),{once:true});
+  });
+}
 function renderGenSummary(){
   if(_genFloating)return;
   const el=document.getElementById('genFormCol');
@@ -1278,6 +1293,7 @@ function renderTemplateSelect(){
     settleGenPanel();
     updateExtraFieldsAndPreview();
     if(!_genFloating)renderGenSummary();
+    setTimeout(shakeEmptyFields,50);
   }));
 }
 function updateExtraFieldsAndPreview(){
