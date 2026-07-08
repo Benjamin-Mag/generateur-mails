@@ -315,11 +315,9 @@ input,textarea,select{font-family:inherit;}
 .tpl-pill:nth-child(4){animation-delay:.15s;}
 .tpl-pill:nth-child(5){animation-delay:.19s;}
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
-.sig-details{margin:4px 0 12px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
-.sig-details summary{padding:10px 14px;font-size:.85rem;font-weight:600;cursor:pointer;user-select:none;color:var(--ink);list-style:none;display:flex;align-items:center;gap:6px;}
-.sig-details summary::before{content:'▶';font-size:.7rem;transition:transform .2s;display:inline-block;}
-.sig-details[open] summary::before{transform:rotate(90deg);}
-.sig-group{padding:0 14px 12px;}
+.sig-details{margin:4px 0 12px;border:1px solid var(--line);border-radius:8px;overflow:hidden;padding-bottom:4px;}
+.sig-section-title{margin:0;padding:10px 14px 4px;font-size:.85rem;font-weight:600;color:var(--ink);}
+.sig-group{padding:0 14px 10px;}
 .sig-label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-ink);margin:10px 0 4px;}
 .sig-textarea{width:100%;box-sizing:border-box;font-size:.82rem;font-family:inherit;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--paper);color:var(--ink);}
 .tag-insert-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 4px;}
@@ -1439,11 +1437,12 @@ function openSettingsForm(){
     +genreHtml
     +'<label>Téléphone</label><div class="input-clear-wrap"><input id="f-phone" value="'+escapeHtml(appData.phone||'')+'" placeholder="Ex. 09 74 99 99 99"><button type="button" class="input-clear-btn" id="clearPhoneBtn">×</button></div>'
     +'<p class="hint">Affiché dans la signature.</p>'
-    +'<details class="sig-details" open><summary>Signatures des modèles</summary>'
+    +'<div class="sig-details">'
+    +'<p class="sig-section-title">Signatures des modèles</p>'
     +'<div class="sig-group"><label class="sig-label">Patient · Mail</label><textarea id="f-sig-pm" class="sig-textarea" rows="3">'+escapeHtml(sigPM)+'</textarea></div>'
     +'<div class="sig-group"><label class="sig-label">Patient · SMS</label><textarea id="f-sig-ps" class="sig-textarea" rows="3">'+escapeHtml(sigPS)+'</textarea></div>'
     +'<div class="sig-group"><label class="sig-label">Partenaire · Mail</label><textarea id="f-sig-em" class="sig-textarea" rows="3">'+escapeHtml(sigEM)+'</textarea></div>'
-    +'</details>'
+    +'</div>'
     +'<label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div>'
     +'<p class="hint">Les données sont sauvegardées dans ce dossier.</p>'
     +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div>'
