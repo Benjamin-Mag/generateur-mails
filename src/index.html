@@ -1711,6 +1711,12 @@ function openTemplateForm(editing,initialAud,noAnim,anamIdx){
     const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
     root.innerHTML=buildModalHTML(aud,editing,nl,ni);
     if(skipAnim){const w=root.querySelector('.tpl-modal-wrapper');if(w)w.style.animation='none';const m=root.querySelector('.modal');if(m)m.style.animation='none';}
+    if(!editing){
+      const _b=document.getElementById('f-body');
+      if(_b)_b.value=(aud==='partenaire'?appData.sigPartenaireMail:appData.sigPatientMail)||'';
+      const _s=document.getElementById('f-sms');
+      if(_s)_s.value=appData.sigPatientSMS||'';
+    }
     renderFormCategoryField(aud,ic);
     root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
       if(btn.dataset.aud==='anamnese'){openTemplateForm(editing,'anamnese',true);return;}
