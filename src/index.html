@@ -1280,21 +1280,9 @@ function renderTemplateSelect(){
     selectedTemplateId=btn.dataset.tplId;
     const _nom=manualValues['nom'];manualValues={};if(_nom)manualValues['nom']=_nom;datePickerView={};
     w.querySelectorAll('.tpl-pill').forEach(b=>b.classList.toggle('active',b===btn));
+    settleGenPanel();
     updateExtraFieldsAndPreview();
-    const extraInputs=Array.from(document.querySelectorAll('#extraFields input[data-extra-var]'));
-    if(!_genFloating||!extraInputs.length||extraInputs.every(i=>(i.value||'').trim())){
-      settleGenPanel();
-      if(!_genFloating)renderGenSummary();
-    } else {
-      setTimeout(()=>{
-        document.querySelectorAll('#extraFields input[data-extra-var]').forEach(inp=>{
-          if(!(inp.value||'').trim()){
-            inp.classList.remove('genre-alert');void inp.offsetWidth;inp.classList.add('genre-alert');
-            inp.addEventListener('animationend',()=>inp.classList.remove('genre-alert'),{once:true});
-          }
-        });
-      },50);
-    }
+    if(!_genFloating)renderGenSummary();
   }));
 }
 function updateExtraFieldsAndPreview(){
@@ -1365,13 +1353,6 @@ function renderPreviewOnly(){
   be.innerHTML=previewHtml(template.body,vals,genre);ac.style.display='flex';
   const ss=template.audience==='patient'&&template.type==='email'&&template.smsCompanion;
   if(ss){smsw.style.display='block';document.getElementById('smsCompanionBody').innerHTML=previewHtml(template.smsCompanion,vals,genre);}else smsw.style.display='none';
-  // Ferme le panneau automatiquement quand tous les champs extra sont remplis
-  if(_genFloating){
-    const extraInputs=Array.from(document.querySelectorAll('#extraFields input[data-extra-var]'));
-    if(extraInputs.length&&extraInputs.every(i=>(i.value||'').trim())){
-      settleGenPanel();
-    }
-  }
 }
 function needsGenreChoice(){return !!document.querySelector('#extraFields input[name="civilite"]');}
 
