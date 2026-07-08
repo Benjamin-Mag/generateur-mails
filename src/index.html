@@ -388,8 +388,12 @@ input,textarea,select{font-family:inherit;}
 /* ===== Bouton fermeture panneau flottant ===== */
 .panel-close-btn{position:absolute;top:50%;right:14px;transform:translateY(-50%);background:none;border:none;font-size:1.3rem;color:rgba(255,255,255,.75);cursor:pointer;line-height:1;padding:4px;border-radius:4px;z-index:1;}
 .panel-close-btn:hover{color:#fff;background:rgba(255,255,255,.15);}
-.gen-panel-header{position:relative;background:var(--accent);color:#fff;font-size:1rem;font-weight:700;letter-spacing:.03em;padding:13px 44px 13px 20px;margin:-32px -28px 22px;border-radius:20px 20px 0 0;}
-.gen-panel-header span{display:block;}
+.gen-panel-header{position:relative;background:var(--accent);color:#fff;padding:10px 14px 10px 20px;margin:-32px -28px 22px;border-radius:20px 20px 0 0;display:flex;align-items:center;gap:10px;}
+.gen-panel-title{flex:1;text-align:center;font-size:1rem;font-weight:700;letter-spacing:.03em;}
+.gen-panel-btns{display:flex;gap:8px;align-items:center;}
+.gen-panel-btns .btn-primary{padding:7px 12px;font-size:.8rem;}
+.panel-close-btn{position:static;transform:none;background:none;border:none;font-size:1.3rem;color:rgba(255,255,255,.75);cursor:pointer;line-height:1;padding:4px;border-radius:4px;flex-shrink:0;}
+.panel-close-btn:hover{color:#fff;background:rgba(255,255,255,.15);}
 /* ===== Alerte genre ===== */
 @keyframes shakeGenre{0%,100%{transform:translateX(0);}15%{transform:translateX(-7px);}35%{transform:translateX(7px);}55%{transform:translateX(-5px);}75%{transform:translateX(5px);}90%{transform:translateX(-2px);}}
 .genre-alert{animation:shakeGenre .45s ease both;}
@@ -1044,14 +1048,27 @@ function showGenPanel(){
   bd.addEventListener('click',settleGenPanel);
   document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
-  const hdr=document.createElement('div');hdr.className='gen-panel-header';hdr.innerHTML='<span>Générer</span>';el.insertBefore(hdr,el.firstChild);
-  const cb=document.createElement('button');cb.type='button';cb.className='panel-close-btn';cb.setAttribute('aria-label','Fermer');cb.textContent='×';cb.addEventListener('click',settleGenPanel);hdr.appendChild(cb);
+  const hdr=document.createElement('div');hdr.className='gen-panel-header';
+  hdr.innerHTML='<button type="button" class="panel-close-btn" aria-label="Fermer">×</button><span class="gen-panel-title">Générer</span><div class="gen-panel-btns"></div>';
+  el.insertBefore(hdr,el.firstChild);
+  hdr.querySelector('.panel-close-btn').addEventListener('click',settleGenPanel);
+  // Déplace physiquement les boutons dans le header
+  const _ca=document.getElementById('copyActions'),_sw=document.getElementById('smsCompanionWrap');
+  const _cpb=document.getElementById('copyBodyBtn'),_csb=document.getElementById('copySmsBtn');
+  const pb=hdr.querySelector('.gen-panel-btns');
+  if(_cpb)pb.appendChild(_cpb);
+  if(_csb)pb.appendChild(_csb);
 }
 function settleGenPanel(){
   const el=document.getElementById('genFormCol');
   const bd=document.getElementById('genBackdrop');
   if(!el||!_genFloating)return;
   _genFloating=false;
+  // Remet les boutons à leur place avant de supprimer le header
+  const _ca=document.getElementById('copyActions'),_sw=document.getElementById('smsCompanionWrap');
+  const _cpb=document.getElementById('copyBodyBtn'),_csb=document.getElementById('copySmsBtn');
+  if(_ca&&_cpb)_ca.appendChild(_cpb);
+  if(_sw&&_csb)_sw.querySelector('.actions-row').appendChild(_csb);
   el.querySelectorAll('.gen-panel-header').forEach(b=>b.remove());
   el.querySelectorAll('.panel-close-btn').forEach(b=>b.remove());
   // FLIP — mesure la position flottante actuelle
