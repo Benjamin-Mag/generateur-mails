@@ -1243,7 +1243,7 @@ function renderGenreRow(){
   w.innerHTML='<div class="genre-row-line">'+makeSeg('gen-civilite',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],civilite)+nomHtml+'</div>';
   w.querySelectorAll('input[name="gen-civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
   const nomInput=document.getElementById('genreNomInput');
-  if(nomInput)nomInput.addEventListener('input',e=>{manualValues['nom']=e.target.value;renderPreviewOnly();});
+  if(nomInput)nomInput.addEventListener('input',e=>{manualValues['nom']=e.target.value;updateExtraFieldsAndPreview();});
   const pasteBtn=document.getElementById('genrePasteSFBtn');
   if(pasteBtn)pasteBtn.addEventListener('click',async()=>{
     try{
@@ -1294,7 +1294,7 @@ function updateExtraFieldsAndPreview(){
   if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
-    if(v==='nom')return '';
+    if(v==='nom'&&(manualValues['nom']||'').trim())return '';
     if(v==='nom partenaire')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom-partenaire">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-nom-partenaire" data-extra-var="nom partenaire" value="'+escapeHtml(manualValues['nom partenaire']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFPartBtn" title="Coller depuis Salesforce">📋</button></div></div>';
     if(v==='adresse')return '<div class="extra-field"><div class="field-row-header"><label for="extra-adresse">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-adresse" data-extra-var="adresse" value="'+escapeHtml(manualValues['adresse']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFAddrBtn" title="Coller depuis Salesforce">📋</button></div></div>';
     if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
