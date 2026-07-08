@@ -686,9 +686,10 @@ async function loadData(){
   appData.advisorGenre=(parsed.advisorGenre==='F')?'F':'M';
   appData.onboardingDone=parsed.onboardingDone===true;
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
-  appData.sigPatientMail=(typeof parsed.sigPatientMail==='string')?parsed.sigPatientMail:'';
-  appData.sigPatientSMS=(typeof parsed.sigPatientSMS==='string')?parsed.sigPatientSMS:'';
-  appData.sigPartenaireMail=(typeof parsed.sigPartenaireMail==='string')?parsed.sigPartenaireMail:'';
+  const _defSig='\n\nBien cordialement,\n'+appData.signatureName+'\n'+(appData.advisorGenre==='F'?'Conseillère':'Conseiller')+' audibene\n'+(appData.phone||'');
+  appData.sigPatientMail=(typeof parsed.sigPatientMail==='string'&&parsed.sigPatientMail)?parsed.sigPatientMail:_defSig;
+  appData.sigPatientSMS=(typeof parsed.sigPatientSMS==='string'&&parsed.sigPatientSMS)?parsed.sigPatientSMS:_defSig;
+  appData.sigPartenaireMail=(typeof parsed.sigPartenaireMail==='string'&&parsed.sigPartenaireMail)?parsed.sigPartenaireMail:_defSig;
 
   let changed=false;
   OLD_FOOTERS.forEach(old=>{
@@ -1676,13 +1677,13 @@ function buildModalHTML(aud,editing,nl,ni){
     +'<div id="emailFields" style="'+(aud==='patient'&&editing&&editing.type==='sms'?'display:none':'')+'">'
     +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button>'+(aud==='partenaire'?'<button type="button" class="tag-chip" data-tag="{{telephone}}">{{telephone}}</button>':'')+'</div>'
-    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml((aud==='partenaire'?appData.sigPartenaireMail:appData.sigPatientMail)||'\n\nBien cordialement,\n'+appData.signatureName+'\n'+advisorTitle()+'\n'+(appData.phone||'')))+'</textarea>'
+    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml(aud==='partenaire'?appData.sigPartenaireMail:appData.sigPatientMail))+'</textarea>'
     +'</div>'
     +'<div id="smsOnlyField" style="'+(aud!=='patient'||!editing||editing.type!=='sms'?'display:none':'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button><button type="button" class="tag-chip" data-tag="{{telephone}}">{{telephone}}</button></div>'
     +'<label>SMS'+req+'</label><textarea id="f-sms-only" placeholder="Texte du SMS…">'+(editing&&editing.type==='sms'?escapeHtml(editing.body):'')+'</textarea>'
     +'</div>'
-    +(aud==='patient'?'<div id="smsCompanionField" style="'+(editing&&editing.type==='sms'?'display:none':'')+'"><label>SMS accompagnateur</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):escapeHtml(appData.sigPatientSMS||'\n\nBien cordialement,\n'+appData.signatureName+'\n'+advisorTitle()+'\n'+(appData.phone||'')))+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS</label><textarea id="f-sms"></textarea></div>')
+    +(aud==='patient'?'<div id="smsCompanionField" style="'+(editing&&editing.type==='sms'?'display:none':'')+'"><label>SMS accompagnateur</label><textarea id="f-sms" placeholder="Version courte pour SMS…">'+(editing?escapeHtml(editing.smsCompanion||''):escapeHtml(appData.sigPatientSMS))+'</textarea></div>':'<div id="smsCompanionField" style="display:none;"><label>SMS</label><textarea id="f-sms"></textarea></div>')
     +'<div class="err-msg" id="f-err">Le titre et le corps du mail sont obligatoires.</div>'
     +navRow
     +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveBtn">'+(editing?'Enregistrer':'Ajouter')+'</button></div>'
