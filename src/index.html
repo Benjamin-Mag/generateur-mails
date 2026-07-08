@@ -1241,9 +1241,7 @@ function renderGenreRow(){
   if(!followType){block.style.display='none';return;}
   block.style.display='block';
   const nomVal=escapeHtml(manualValues['nom']||'');
-  const nomHtml=followType==='partenaire'
-    ?'<div class="genre-nom-wrap"><input id="genreNomInput" class="genre-nom-input" placeholder="Nom du patient" value="'+nomVal+'"><button type="button" class="paste-sf-btn" id="genrePasteSFBtn" title="Coller depuis Salesforce">📋</button></div>'
-    :'';
+  const nomHtml='<div class="genre-nom-wrap"><input id="genreNomInput" class="genre-nom-input" placeholder="Nom du patient" value="'+nomVal+'"><button type="button" class="paste-sf-btn" id="genrePasteSFBtn" title="Coller depuis Salesforce">📋</button></div>';
   w.innerHTML='<div class="genre-row-line">'+makeSeg('gen-civilite',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],civilite)+nomHtml+'</div>';
   w.querySelectorAll('input[name="gen-civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
   const nomInput=document.getElementById('genreNomInput');
