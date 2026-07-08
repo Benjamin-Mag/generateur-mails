@@ -1438,7 +1438,7 @@ function openSettingsForm(){
     +genreHtml
     +'<label>Téléphone</label><div class="input-clear-wrap"><input id="f-phone" value="'+escapeHtml(appData.phone||'')+'" placeholder="Ex. 09 74 99 99 99"><button type="button" class="input-clear-btn" id="clearPhoneBtn">×</button></div>'
     +'<p class="hint">Affiché dans la signature.</p>'
-    +'<details class="sig-details"><summary>Signatures des modèles</summary>'
+    +'<details class="sig-details" open><summary>Signatures des modèles</summary>'
     +'<div class="sig-group"><label class="sig-label">Patient · Mail</label><textarea id="f-sig-pm" class="sig-textarea" rows="3">'+escapeHtml(sigPM)+'</textarea></div>'
     +'<div class="sig-group"><label class="sig-label">Patient · SMS</label><textarea id="f-sig-ps" class="sig-textarea" rows="3">'+escapeHtml(sigPS)+'</textarea></div>'
     +'<div class="sig-group"><label class="sig-label">Partenaire · Mail</label><textarea id="f-sig-em" class="sig-textarea" rows="3">'+escapeHtml(sigEM)+'</textarea></div>'
@@ -1457,6 +1457,9 @@ function openSettingsForm(){
   document.getElementById('overlay').addEventListener('mousedown',e=>{e.currentTarget._mdOnOverlay=(e.target.id==='overlay');});document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay'&&e.currentTarget._mdOnOverlay)closeModal();});
   document.getElementById('f-signature').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save();}});
   document.getElementById('f-phone').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save();}});
+  document.getElementById('f-sig-pm').addEventListener('input',e=>{appData.sigPatientMail=e.target.value;});
+  document.getElementById('f-sig-ps').addEventListener('input',e=>{appData.sigPatientSMS=e.target.value;});
+  document.getElementById('f-sig-em').addEventListener('input',e=>{appData.sigPartenaireMail=e.target.value;});
   async function save(){
     const nn=document.getElementById('f-signature').value.trim();
     if(!nn)return;
