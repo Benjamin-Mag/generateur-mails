@@ -1210,7 +1210,7 @@ function renderGenreRow(){
   if(!followType){block.style.display='none';return;}
   block.style.display='block';
   const nomVal=escapeHtml(manualValues['nom']||'');
-  const nomHtml=followType!=='partenaire'
+  const nomHtml=followType==='partenaire'
     ?'<div class="genre-nom-wrap"><input id="genreNomInput" class="genre-nom-input" placeholder="Nom du patient" value="'+nomVal+'"><button type="button" class="paste-sf-btn" id="genrePasteSFBtn" title="Coller depuis Salesforce">📋</button></div>'
     :'';
   w.innerHTML='<div class="genre-row-line">'+makeSeg('gen-civilite',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],civilite)+nomHtml+'</div>';
@@ -1260,7 +1260,7 @@ function updateExtraFieldsAndPreview(){
   if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
-    if(v==='nom'){if(followType!=='partenaire')return '';return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFBtn" title="Coller depuis Salesforce">📋</button></div></div>';}
+    if(v==='nom'){if(followType==='partenaire')return '';return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFBtn" title="Coller depuis Salesforce">📋</button></div></div>';}
     if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
     if(isDateVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'" readonly><button type="button" class="date-icon-btn" data-date-toggle="'+escapeHtml(v)+'" aria-label="Choisir une date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div></div>';
     return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><input id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'"></div>';
