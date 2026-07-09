@@ -251,7 +251,8 @@ input,textarea,select{font-family:inherit;}
 .time-confirm-btn:hover{background:#154080;}
 
 .preview-subject{background:var(--card-bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:.88rem;font-weight:600;margin-bottom:10px;}
-.preview-body{background:var(--card-bg);border:1px solid var(--line);border-radius:6px;padding:14px;font-size:.88rem;line-height:1.55;white-space:pre-wrap;min-height:160px;color:var(--muted-ink);}
+.preview-body{background:var(--card-bg);border:1px solid var(--line);border-radius:6px;padding:14px;font-size:.88rem;line-height:1.55;white-space:pre-wrap;min-height:160px;color:var(--muted-ink);cursor:text;}
+.preview-body:focus,.preview-subject:focus{outline:2px solid var(--accent);outline-offset:-1px;}
 .preview-body mark.ph-empty{background:var(--accent-soft);color:#1A3D7A;border-radius:3px;padding:0 2px;}
 .actions-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
 .btn-outline{background:none;border:1px solid var(--line);border-radius:6px;padding:9px 15px;font-size:.85rem;color:var(--ink);}
@@ -514,9 +515,9 @@ input,textarea,select{font-family:inherit;}
           </div>
         </div>
         <div id="previewSubjectWrap" style="display:none;">
-          <div class="preview-subject" id="previewSubject"></div>
+          <div class="preview-subject" id="previewSubject" contenteditable="true" spellcheck="false"></div>
         </div>
-        <div class="preview-body" id="previewBody">Choisis un type de suivi puis un modèle pour commencer.</div>
+        <div class="preview-body" id="previewBody" contenteditable="true" spellcheck="false">Choisis un type de suivi puis un modèle pour commencer.</div>
         <div class="sms-companion" id="smsCompanionWrap" style="display:none;">
           <div class="apercu-header">
             <label class="field-label">SMS</label>
@@ -524,7 +525,7 @@ input,textarea,select{font-family:inherit;}
               <button class="btn-primary" id="copySmsBtn">Copier le SMS</button>
             </div>
           </div>
-          <div class="preview-body" id="smsCompanionBody"></div>
+          <div class="preview-body" id="smsCompanionBody" contenteditable="true" spellcheck="false"></div>
         </div>
       </div>
     </div>
@@ -1906,18 +1907,18 @@ function confirmDeleteAnam(id){
   document.getElementById('copyBodyBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
-    const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''});
-    const genre=getEffectiveGenre();
-    const subject=t.subject?resolveGenre(buildFilledText(t.subject,vals),genre):'';
-    const body=resolveGenre(buildFilledText(t.body,vals),genre);
+    const se=document.getElementById('previewSubject');
+    const be=document.getElementById('previewBody');
+    const subject=(se&&se.offsetParent!==null?se.innerText:'').trim();
+    const body=(be?be.innerText:'').trim();
     const toCopy=subject?subject+'\n'+body:body;
     showToast(await copyText(toCopy)?'Message copié ✓':"Impossible de copier.");
   });
   document.getElementById('copySmsBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t||!t.smsCompanion)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
-    const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''});
-    showToast(await copyText(resolveGenre(buildFilledText(t.smsCompanion,vals),getEffectiveGenre()))?'SMS copié ✓':"Impossible de copier.");
+    const sb=document.getElementById('smsCompanionBody');
+    showToast(await copyText((sb?sb.innerText:'').trim())?'SMS copié ✓':"Impossible de copier.");
   });
   document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}showToast(await copyText(resolveGenre(document.getElementById('anamneseTextarea').value,anamneseGenre))?'Texte copié ✓':"Impossible de copier.");});
   document.getElementById('anamneseTutorialBtn').addEventListener('click',startAnamneseTutorial);
