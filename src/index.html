@@ -1337,6 +1337,8 @@ function updateExtraFieldsAndPreview(){
     vars.splice(di+1,0,'heure');
   }
   if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
+  const SYSTEM_VARS=['nom_conseiller','tel_conseiller','titre_conseiller'];
+  vars=vars.filter(v=>!SYSTEM_VARS.includes(v));
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
     if(v==='nom'&&(manualValues['nom']||'').trim()&&!_genFloating)return '';
