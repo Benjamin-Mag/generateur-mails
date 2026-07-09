@@ -2119,7 +2119,7 @@ function confirmDeleteAnam(id){
     const sb=document.getElementById('smsCompanionBody');
     showToast(await copyText((sb?sb.innerText:'').trim())?'SMS copié ✓':"Impossible de copier.");
   });
-  document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}showToast(await copyText(resolveGenre(document.getElementById('anamneseTextarea').value,anamneseGenre))?'Texte copié ✓':"Impossible de copier.");});
+  document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}const raw=document.getElementById('anamneseTextarea').value;const resolved=resolveGenre(buildFilledText(raw,getSystemValues()),anamneseGenre);showToast(await copyText(resolved)?'Texte copié ✓':"Impossible de copier.");});
   document.getElementById('anamneseTutorialBtn').addEventListener('click',startMainTutorial);
   document.getElementById('genererTutorialBtn').addEventListener('click',startMainTutorial);
   document.getElementById('modelesTutorialBtn').addEventListener('click',startMainTutorial);
