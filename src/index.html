@@ -69,7 +69,6 @@ input,textarea,select{font-family:inherit;}
 .tab-panel.active{display:block;}
 
 .controls-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
-#searchTemplates{border:1px solid var(--line);background:var(--card-bg);border-radius:20px;padding:9px 16px;font-size:.9rem;width:220px;color:var(--ink);flex:1;min-width:160px;}
 .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:10px 16px;font-size:.88rem;font-weight:600;white-space:nowrap;position:relative;overflow:hidden;transition:background .2s ease,transform .1s ease,box-shadow .2s ease;}
 .btn-primary:hover{background:var(--accent-hover);box-shadow:0 4px 14px rgba(27,79,155,.35);transform:translateY(-1px);}
 .btn-primary:active{transform:translateY(0);}
@@ -438,7 +437,7 @@ input,textarea,select{font-family:inherit;}
 #permBanner{animation:slideDown .3s ease both;}
 
 @media(max-width:760px){.gen-layout{grid-template-columns:1fr;}}
-@media(max-width:600px){.topbar{flex-direction:column;align-items:stretch;}.tabs{width:100%;justify-content:space-between;}#searchTemplates{width:auto;}}
+@media(max-width:600px){.topbar{flex-direction:column;align-items:stretch;}.tabs{width:100%;justify-content:space-between;}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 </style>
 </head>
@@ -571,10 +570,8 @@ input,textarea,select{font-family:inherit;}
 
   <section id="tab-modeles" class="tab-panel">
     <div class="controls-row">
-      <input id="searchTemplates" type="text" placeholder="Rechercher un modèle…">
       <button class="btn-primary" id="addTemplateBtn">+ Nouveau modèle</button>
     </div>
-    <div class="chips" id="typeChips"></div>
     <div id="templatesGrid"></div>
   </section>
 </div>
@@ -698,7 +695,7 @@ const DEFAULT_EMAIL_FOOTER = "_________________________________________________\
 
 /* ========== App state ========== */
 let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'',phone:'',advisorGenre:'M',onboardingDone:false,tutorialDone:false,emailFooter:DEFAULT_EMAIL_FOOTER,sigPatientMail:'',sigPatientSMS:'',sigPartenaireMail:''};
-let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
+let activeTab='anamnese';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
 let timePickerOpenVar=null, timePickerState={};
@@ -869,7 +866,7 @@ async function initStorageAndLoad(){
 }
 
 function renderAll(){
-  renderTypeChips();renderTemplatesGrid();renderTemplateSelect();
+  renderTemplatesGrid();renderTemplateSelect();
   renderAnamneseGenreRow();renderSituationRow();
   renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();
 }
@@ -951,34 +948,26 @@ function resetTabState(name){
   teardownAnamPanel();
   if(name==='generer'){manualValues={};civilite=null;followType=(tutorialStepIndex>=0?null:'patient');selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();showGenPanel();}
   else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderAnamneseGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();showAnamPanel();}
-  else if(name==='modeles'){templateSearch='';templateTypeFilter='all';const s=document.getElementById('searchTemplates');if(s)s.value='';renderTypeChips();renderTemplatesGrid();}
+  else if(name==='modeles'){renderTemplatesGrid();}
 }
 
 /* ========== Templates grid ========== */
-function renderTypeChips(){
-  const wrap=document.getElementById('typeChips');
-  wrap.innerHTML=[['all','Tous'],['email','Email'],['sms','SMS']].map(o=>'<button class="chip '+(templateTypeFilter===o[0]?'active':'')+'" data-val="'+o[0]+'">'+o[1]+'</button>').join('');
-  wrap.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{templateTypeFilter=c.dataset.val;renderTypeChips();renderTemplatesGrid();}));
-}
-function templateMatchesTypeFilter(t){if(templateTypeFilter==='sms')return t.audience!=='partenaire'&&!!t.smsCompanion;return true;}
 function renderTemplatesGrid(){
   const grid=document.getElementById('templatesGrid');
   // Sauvegarde l'état ouvert/fermé des groupes (clé = titre seul, pas le compteur)
   const openGroups=new Set();
   grid.querySelectorAll('.template-group.open').forEach(g=>{const t=g.querySelector('.model-group-title');if(t)openGroups.add(t.textContent.trim());});
-  const term=templateSearch.toLowerCase();
-  const list=appData.templates.filter(t=>templateMatchesTypeFilter(t)&&(t.title.toLowerCase().indexOf(term)!==-1||(t.category||'').toLowerCase().indexOf(term)!==-1));
+  const list=appData.templates.slice();
   function rc(t){
     const ct=t.audience==='partenaire'?t.partnerCategory:t.patientCategory;
     const al=(t.audience==='partenaire'?'Partenaire':'Patient')+(ct?' · '+ct:'');
     const hsb=t.audience!=='partenaire'&&!!t.smsCompanion;
     const tl=hsb?'Email - SMS':(t.type==='email'?'Email':'SMS');
-    const sma=templateTypeFilter==='sms'&&t.smsCompanion;
-    return '<div class="card" draggable="true" data-tpl-id="'+t.id+'" data-tpl-aud="'+t.audience+'"><span class="drag-handle" title="Déplacer">⠿</span><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(sma?t.smsCompanion:t.body)+'</p>'+(!sma&&t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
+    return '<div class="card" draggable="true" data-tpl-id="'+t.id+'" data-tpl-aud="'+t.audience+'"><span class="drag-handle" title="Déplacer">⠿</span><span class="card-tag '+t.type+'">'+tl+'</span><h3>'+escapeHtml(t.title)+'</h3><p class="cat">'+al+(t.category?' · '+escapeHtml(t.category):'')+'</p><p>'+escapeHtml(t.body)+'</p>'+(t.smsCompanion?'<p class="sms-preview"><strong>SMS :</strong> '+escapeHtml(t.smsCompanion)+'</p>':'')+'<div class="card-foot"><button class="copy-mini" data-edit-template="'+t.id+'">Modifier</button><button class="copy-mini danger" data-del-template="'+t.id+'">Supprimer</button></div></div>';
   }
-  function makePatientGroup(templates,isS){
+  function makePatientGroup(templates){
     const chevron='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
-    const label=isS?'SMS patients':'Mails patients';
+    const label='Mails patients';
     if(!templates.length)return '<div class="template-group patient"><div class="group-header" data-toggle-group><span class="group-count">0</span><span class="model-group-title">'+label+'</span><span class="group-chevron">'+chevron+'</span></div><div class="group-body"><div class="empty-state">Aucun modèle patient.</div></div></div>';
     const cats=[],bycat={};
     templates.forEach(t=>{const c=t.patientCategory||'Autre';if(!bycat[c]){bycat[c]=[];cats.push(c);}bycat[c].push(t);});
@@ -1003,10 +992,10 @@ function renderTemplatesGrid(){
       +'<div class="group-body">'+body+'</div>'
       +'</div>';
   }
-  const pl=list.filter(t=>t.audience!=='partenaire'),pal=list.filter(t=>t.audience==='partenaire'),isS=templateTypeFilter==='sms';
+  const pl=list.filter(t=>t.audience!=='partenaire'),pal=list.filter(t=>t.audience==='partenaire');
   const palCards=pal.map(rc);
-  let html=makePatientGroup(pl,isS);
-  if(!isS){
+  let html=makePatientGroup(pl,false);
+  {
     html+=makeGroup('partenaire','Mails partenaires',palCards,'Aucun modèle partenaire.');
     const situations=appData.customSituations||[];
     const anamCards=situations.map(s=>{
@@ -1103,8 +1092,7 @@ function renderTemplatesGrid(){
   });
 }
 function getFilteredTemplateList(){
-  const term=templateSearch.toLowerCase();
-  const l=appData.templates.filter(t=>templateMatchesTypeFilter(t)&&(t.title.toLowerCase().indexOf(term)!==-1||(t.category||'').toLowerCase().indexOf(term)!==-1));
+  const l=appData.templates.slice();
   return l.filter(t=>t.audience!=='partenaire').concat(l.filter(t=>t.audience==='partenaire'));
 }
 
@@ -2137,7 +2125,7 @@ function confirmDeleteAnam(id){
     if(da)confirmDeleteAnam(da.dataset.delAnam);
   });
   document.getElementById('addTemplateBtn').addEventListener('click',()=>{tutorialOnAction('addTemplateClicked');openTemplateForm(null);});
-  document.getElementById('searchTemplates').addEventListener('input',e=>{templateSearch=e.target.value;renderTemplatesGrid();});
+
   document.getElementById('settingsBtn').addEventListener('click',openSettingsForm);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTutorial();}});
   document.addEventListener('keydown',e=>{
