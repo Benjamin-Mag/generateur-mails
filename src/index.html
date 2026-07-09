@@ -1309,23 +1309,8 @@ function renderGenreRow(){
   const w=document.getElementById('genreRow');
   if(!followType){block.style.display='none';return;}
   block.style.display='block';
-  const nomVal=escapeHtml(manualValues['nom']||'');
-  const nomHtml='<div class="genre-nom-wrap"><input id="genreNomInput" class="genre-nom-input" placeholder="Nom du patient" value="'+nomVal+'"><button type="button" class="paste-sf-btn" id="genrePasteSFBtn" title="Coller depuis Salesforce">📋</button></div>';
-  w.innerHTML='<div class="genre-row-line">'+makeSeg('gen-civilite',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],civilite)+nomHtml+'</div>';
+  w.innerHTML='<div class="genre-row-line">'+makeSeg('gen-civilite',[{id:'Monsieur',label:'M.'},{id:'Madame',label:'Mme'}],civilite)+'</div>';
   w.querySelectorAll('input[name="gen-civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
-  const nomInput=document.getElementById('genreNomInput');
-  if(nomInput)nomInput.addEventListener('input',e=>{manualValues['nom']=e.target.value;updateExtraFieldsAndPreview();});
-  const pasteBtn=document.getElementById('genrePasteSFBtn');
-  if(pasteBtn)pasteBtn.addEventListener('click',async()=>{
-    try{
-      const txt=await navigator.clipboard.readText();
-      if(!txt){showToast('Presse-papier vide.');return;}
-      let val=txt;
-      try{const obj=JSON.parse(txt);if(obj&&obj.patient)val=obj.patient;}catch(e){}
-      const inp=document.getElementById('genreNomInput');
-      if(inp){inp.value=val;manualValues['nom']=val;renderPreviewOnly();}
-    }catch(e){showToast('Impossible de lire le presse-papier.');}
-  });
 }
 function renderCategoryRow(){
   const w=document.getElementById('categoryRow'),l=getCurrentCategoryList();
@@ -1393,7 +1378,7 @@ function updateExtraFieldsAndPreview(){
   if(!_genFloating)vars=vars.filter(v=>!(manualValues[v]||'').trim());
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
-    if(v==='nom')return '';
+    if(v==='nom')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFBtn" title="Coller depuis Salesforce">📋</button></div></div>';
     if(v==='nom partenaire')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom-partenaire">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-nom-partenaire" data-extra-var="nom partenaire" value="'+escapeHtml(manualValues['nom partenaire']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFPartBtn" title="Coller depuis Salesforce">📋</button></div></div>';
     if(v==='adresse')return '<div class="extra-field"><div class="field-row-header"><label for="extra-adresse">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-adresse" data-extra-var="adresse" value="'+escapeHtml(manualValues['adresse']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFAddrBtn" title="Coller depuis Salesforce">📋</button></div></div>';
     if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
