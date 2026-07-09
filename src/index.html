@@ -341,15 +341,17 @@ input,textarea,select{font-family:inherit;}
 
 .tutorial-overlay{position:fixed;inset:0;z-index:200;pointer-events:none;}
 .tutorial-backdrop-full{position:fixed;inset:0;background:rgba(43,42,40,.65);pointer-events:auto;}
-.tutorial-highlight{position:fixed;border-radius:8px;box-shadow:0 0 0 9999px rgba(43,42,40,.65);pointer-events:auto;z-index:201;}
-.tutorial-tooltip{position:fixed;z-index:202;background:var(--card-bg);border:1px solid var(--line);border-radius:8px;padding:18px 20px;width:300px;max-width:calc(100vw - 32px);box-shadow:0 10px 30px rgba(0,0,0,.3);pointer-events:auto;}
-.tutorial-tooltip h3{font-family:'Poppins',sans-serif;font-weight:400;font-size:1rem;margin:0 14px 8px 0;}
-.tutorial-tooltip p{font-size:.85rem;color:var(--muted-ink);line-height:1.5;margin:0 0 16px;}
-.tutorial-close{position:absolute;top:8px;right:10px;background:none;border:none;font-size:1.1rem;color:var(--muted-ink);cursor:pointer;line-height:1;padding:4px;}
+.tutorial-highlight{position:fixed;border-radius:8px;box-shadow:0 0 0 9999px rgba(43,42,40,.65);pointer-events:none;z-index:201;}
+@keyframes tut-pulse{0%,100%{box-shadow:0 0 0 9999px rgba(43,42,40,.65);}50%{box-shadow:0 0 0 9999px rgba(43,42,40,.65),0 0 0 8px rgba(27,79,155,.5),0 0 0 18px rgba(27,79,155,.15);}}
+.tutorial-highlight.tutorial-pulse{animation:tut-pulse 2s ease-in-out infinite;}
+.tutorial-tooltip{position:fixed;z-index:202;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;padding:20px 22px 16px;width:310px;max-width:calc(100vw - 32px);box-shadow:0 12px 36px rgba(0,0,0,.25);pointer-events:auto;}
+.tutorial-tooltip h3{font-family:'Poppins',sans-serif;font-weight:600;font-size:1rem;margin:0 24px 8px 0;color:var(--ink);}
+.tutorial-tooltip p{font-size:.85rem;color:var(--muted-ink);line-height:1.55;margin:0;}
+.tutorial-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;color:var(--muted-ink);cursor:pointer;line-height:1;padding:4px;}
 .tutorial-close:hover{color:var(--accent);}
-.tutorial-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.tutorial-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
 .tutorial-step-count{font-size:.74rem;color:var(--muted-ink);white-space:nowrap;}
-.tutorial-nav{display:flex;gap:8px;}
+.tutorial-action-hint{font-size:.8rem;color:var(--accent);font-weight:600;display:flex;align-items:center;gap:5px;}
 
 /* ===== Modal Anamnèse ===== */
 /* ===== Barre résumé anamnèse ===== */
@@ -427,12 +429,31 @@ input,textarea,select{font-family:inherit;}
 
 <!-- Écran de premier lancement -->
 <div id="setupScreen" style="display:none;">
-  <div class="setup-card">
-    <div class="setup-icon">📁</div>
-    <h2>Choisir un dossier de sauvegarde</h2>
-    <p>Tes données (modèles, anamnèses) seront sauvegardées dans un fichier <strong>data.json</strong> sur ton ordinateur.<br><br>
-    Choisis le dossier où tu veux stocker ce fichier — par exemple ton bureau ou un dossier réseau partagé.</p>
-    <button class="btn-primary" id="pickFolderBtn" style="font-size:1rem;padding:12px 24px;">Choisir un dossier…</button>
+  <div class="setup-card" style="max-width:440px;">
+    <div class="setup-icon">👋</div>
+    <h2 style="margin-bottom:6px;">Bienvenue !</h2>
+    <p style="margin-bottom:20px;font-size:.9rem;">Quelques infos pour personnaliser tes mails, puis on choisit où sauvegarder tes données.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;text-align:left;margin-bottom:20px;">
+      <div>
+        <label style="font-size:.8rem;font-weight:600;color:var(--muted-ink);display:block;margin-bottom:4px;">Ton prénom &amp; nom</label>
+        <input id="setupName" type="text" placeholder="Ex : Marie Dupont" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;background:var(--input-bg);color:var(--ink);">
+      </div>
+      <div>
+        <label style="font-size:.8rem;font-weight:600;color:var(--muted-ink);display:block;margin-bottom:4px;">Genre (pour la signature)</label>
+        <div style="display:flex;gap:10px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem;"><input type="radio" name="setupGenre" value="M" checked> Conseiller</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem;"><input type="radio" name="setupGenre" value="F"> Conseillère</label>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:.8rem;font-weight:600;color:var(--muted-ink);display:block;margin-bottom:4px;">Ton téléphone</label>
+        <input id="setupPhone" type="tel" placeholder="Ex : 06 12 34 56 78" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;background:var(--input-bg);color:var(--ink);">
+      </div>
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:20px;font-size:.85rem;color:var(--muted-ink);">
+      📁 <strong style="color:var(--ink);">Dossier de sauvegarde</strong><br>Tes modèles et anamnèses seront stockés dans un fichier <strong>data.json</strong> sur ton ordinateur.
+    </div>
+    <button class="btn-primary" id="pickFolderBtn" style="font-size:1rem;padding:12px 24px;width:100%;">Choisir un dossier &amp; commencer →</button>
   </div>
 </div>
 
@@ -659,7 +680,7 @@ const OLD_FOOTERS = [
 const DEFAULT_EMAIL_FOOTER = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
 
 /* ========== App state ========== */
-let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'Benjamin Magnier',phone:'',advisorGenre:'M',onboardingDone:false,emailFooter:DEFAULT_EMAIL_FOOTER,sigPatientMail:'',sigPatientSMS:'',sigPartenaireMail:''};
+let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'',phone:'',advisorGenre:'M',onboardingDone:false,tutorialDone:false,emailFooter:DEFAULT_EMAIL_FOOTER,sigPatientMail:'',sigPatientSMS:'',sigPartenaireMail:''};
 let activeTab='anamnese', templateTypeFilter='all', templateSearch='';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
@@ -696,10 +717,11 @@ async function loadData(){
   appData.templates=parsed.templates||[];
   appData.anamnese=parsed.anamnese||{};
   appData.customSituations=Array.isArray(parsed.customSituations)&&parsed.customSituations.length?parsed.customSituations:DEFAULT_SITUATIONS.map(s=>({...s}));
-  appData.signatureName=(typeof parsed.signatureName==='string'&&parsed.signatureName)?parsed.signatureName:'Benjamin Magnier';
+  appData.signatureName=(typeof parsed.signatureName==='string')?parsed.signatureName:'';
   appData.phone=(typeof parsed.phone==='string')?parsed.phone:'';
   appData.advisorGenre=(parsed.advisorGenre==='F')?'F':'M';
   appData.onboardingDone=parsed.onboardingDone===true;
+  appData.tutorialDone=parsed.tutorialDone===true;
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
   const _defSig='\n\nBien cordialement,\n{{nom_conseiller}}\n{{titre_conseiller}}\n{{tel_conseiller}}';
   appData.sigPatientMail=(typeof parsed.sigPatientMail==='string'&&parsed.sigPatientMail)?parsed.sigPatientMail:_defSig;
@@ -716,7 +738,7 @@ async function loadData(){
   const bl=appData.templates.length;
   appData.templates=appData.templates.filter(t=>OLD_SEED_IDS.indexOf(t.id)===-1);
   if(appData.templates.length!==bl)changed=true;
-  if(!parsed.templates&&!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
+  if(parsed.onboardingDone&&!parsed.templates&&!appData.templates.some(t=>t.id===NEW_TEMPLATE.id)){appData.templates.push(Object.assign({},NEW_TEMPLATE,{createdAt:Date.now()}));changed=true;}
   const _ct=appData.templates.find(t=>t.id===NEW_TEMPLATE.id);
   if(_ct&&_ct.patientCategory!=='all'){_ct.patientCategory='all';changed=true;}
   const REMOVED_IDS=['tpl-suivi-depistage','tpl-suivi-premier-rdv','tpl-suivi-renouvellement','tpl-suivi-adaptation','tpl-suivi-depistage-orl-patient','tpl-suivi-rdv-orl-patient'];
@@ -756,9 +778,11 @@ async function loadData(){
     const e=appData.anamnese[id];
     if(e&&typeof e.text!=='string'&&(e.intro||e.conclusion)){appData.anamnese[id]={text:[e.intro||'',e.conclusion||''].filter(Boolean).join('\n\n')};changed=true;}
   });
-  ['depistage_simple','depistage_orl','premier_rdv','renouvellement_avec_ordonnance','renouvellement_sans_ordonnance'].forEach(id=>{
-    if(!appData.anamnese[id]){appData.anamnese[id]=Object.assign({},DEFAULT_ANAMNESE[id]);changed=true;}
-  });
+  if(parsed.onboardingDone){
+    ['depistage_simple','depistage_orl','premier_rdv','renouvellement_avec_ordonnance','renouvellement_sans_ordonnance'].forEach(id=>{
+      if(!appData.anamnese[id]){appData.anamnese[id]=Object.assign({},DEFAULT_ANAMNESE[id]);changed=true;}
+    });
+  }
   if(changed)await persist();
 }
 
@@ -779,7 +803,8 @@ async function initStorageAndLoad(){
         dirHandle=handle;
         await loadData();
         renderAll();
-        if(!appData.onboardingDone)showOnboardingModal();
+        if(!appData.onboardingDone){showOnboardingModal();}
+        else if(!appData.tutorialDone){startMainTutorial();}
         return;
       }
     } catch(e){}
@@ -806,8 +831,23 @@ async function initStorageAndLoad(){
   // First launch
   setup.style.display='flex';
   document.getElementById('pickFolderBtn').onclick=async()=>{
+    const nameVal=document.getElementById('setupName').value.trim();
+    if(!nameVal){document.getElementById('setupName').focus();document.getElementById('setupName').style.borderColor='var(--accent)';return;}
     const ok=await pickFolder();
-    if(ok){setup.style.display='none';await loadData();renderAll();if(!appData.onboardingDone)showOnboardingModal();}
+    if(ok){
+      setup.style.display='none';
+      await loadData();
+      const phoneVal=document.getElementById('setupPhone').value.trim();
+      const genreVal=document.querySelector('input[name="setupGenre"]:checked').value;
+      appData.signatureName=nameVal;
+      appData.phone=phoneVal;
+      appData.advisorGenre=genreVal;
+      appData.onboardingDone=true;
+      await persist();
+      renderAll();
+      showToast('Bienvenue '+nameVal+' !');
+      setTimeout(()=>startMainTutorial(),600);
+    }
   };
 }
 
@@ -886,6 +926,7 @@ function switchTab(name){
   document.getElementById('genererTutorialBtn').style.display=name==='generer'?'inline-flex':'none';
   document.getElementById('modelesTutorialBtn').style.display=name==='modeles'?'inline-flex':'none';
   resetTabState(name);
+  tutorialOnAction('tab_'+name);
 }
 function resetTabState(name){
   closeDatePicker();
@@ -1256,7 +1297,7 @@ function makeSeg(name,options,checkedVal){
 function renderFollowTypeRow(){
   const w=document.getElementById('followTypeRow');
   w.innerHTML=makeSeg('follow-type',FOLLOW_TYPES,followType);
-  w.querySelectorAll('input[name="follow-type"]').forEach(r=>r.addEventListener('change',e=>{followType=e.target.value;selectedCategory=null;manualValues={};civilite=null;datePickerView={};renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();}));
+  w.querySelectorAll('input[name="follow-type"]').forEach(r=>r.addEventListener('change',e=>{followType=e.target.value;selectedCategory=null;manualValues={};civilite=null;datePickerView={};renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();tutorialOnAction('followTypeChanged');}));
 }
 function renderGenreRow(){
   const block=document.getElementById('genreBlock');
@@ -1306,6 +1347,7 @@ function renderTemplateSelect(){
     const _nom=manualValues['nom'];manualValues={};if(_nom)manualValues['nom']=_nom;datePickerView={};
     w.querySelectorAll('.tpl-pill').forEach(b=>b.classList.toggle('active',b===btn));
     updateExtraFieldsAndPreview();
+    tutorialOnAction('templateSelected');
     if(_genFloating){
       const ew=document.getElementById('extraFields');
       const extraInputs=Array.from(ew.querySelectorAll('input[data-extra-var]'));
@@ -1455,58 +1497,118 @@ function showCenterAlert(msg){
 }
 
 /* ========== Tutoriels ========== */
-const ANAMNESE_TUTORIAL_STEPS=[
-  {target:null,title:'Bienvenue sur le générateur',text:"Ce tutoriel te montre comment utiliser l'onglet Anamnèse. Clique sur « Suivant » pour commencer."},
-  {target:'#anamneseGenreRow',title:'Genre du patient',text:'Commence par choisir M. ou Mme. Ce choix adapte automatiquement les accords dans le texte généré.'},
-  {target:'#situationRow',title:'Situation',text:'Choisis la situation : Dépistage, Dépistage avec ORL, 1er RDV ou Renouvellement.'},
-  {target:'#anamneseContent',title:'Le texte',text:"L'introduction et la conclusion s'affichent ici, modifiables. Tes modifications sont enregistrées automatiquement.",tooltipPosition:'above',ensure:function(){if(!selectedSituation){selectedSituation='depistage_simple';renderSituationRow();renderAnamneseContent();}}},
-  {target:'#copyAnamneseBtn',title:'Copier',text:'Clique ici pour copier le texte complet.',ensure:function(){if(!selectedSituation){selectedSituation='depistage_simple';renderSituationRow();renderAnamneseContent();}}}
+/* ========== Tutoriel interactif principal ========== */
+const MAIN_TUTORIAL_STEPS=[
+  {target:null,advance:'button',
+   title:'Bienvenue ! 🎉',
+   text:'Je vais te guider pas à pas pour prendre en main ton générateur de mails. On va créer ensemble un modèle, une anamnèse, puis générer ton premier mail. Clique sur <strong>Suivant</strong> pour commencer.'},
+  {target:'[data-tab="modeles"]',advance:'action',actionKey:'tab_modeles',pulse:true,
+   title:'La Bibliothèque',
+   text:'C\'est ici que sont rangés tous tes modèles d\'email et SMS.',
+   hint:'👆 Clique sur l\'onglet « Bibliothèque »'},
+  {target:'#addTemplateBtn',advance:'action',actionKey:'addTemplateClicked',pulse:true,
+   title:'Crée ton premier modèle',
+   text:'Un modèle, c\'est un mail pré-rédigé avec des variables comme <code>{{nom_patient}}</code> qui se remplissent automatiquement.',
+   hint:'👆 Clique sur « + Nouveau modèle »'},
+  {target:'#modalRoot',advance:'action',actionKey:'templateSaved',pulse:false,
+   title:'Rédige le modèle',
+   text:'Donne un <strong>titre</strong> et rédige ton <strong>message</strong>. Tu peux insérer des variables entre <code>{{}}</code>. Quand c\'est prêt, clique sur <strong>Ajouter</strong>.',
+   hint:'✅ Clique sur Ajouter quand tu as terminé',
+   tooltipPosition:'left'},
+  {target:null,advance:'button',
+   title:'Modèle créé ! 🥳',
+   text:'Parfait. Maintenant on crée une <strong>anamnèse</strong> — un texte d\'introduction pour tes comptes-rendus patients. Je vais ouvrir le formulaire pour toi.'},
+  {target:'#modalRoot',advance:'action',actionKey:'anamneseSaved',pulse:false,
+   title:'Crée une anamnèse',
+   text:'Donne un <strong>titre</strong> à cette situation et écris le <strong>texte</strong> de l\'anamnèse. Clique sur <strong>Ajouter</strong> quand c\'est prêt.',
+   hint:'✅ Clique sur Ajouter quand tu as terminé',
+   tooltipPosition:'left',
+   ensure:()=>{if(!document.getElementById('overlay'))openTemplateForm(null,'anamnese',true);}},
+  {target:'[data-tab="generer"]',advance:'action',actionKey:'tab_generer',pulse:true,
+   title:'Générer un mail',
+   text:'Maintenant voyons comment générer un mail à partir de tes modèles !',
+   hint:'👆 Clique sur l\'onglet « Générer »'},
+  {target:'#followTypeRow',advance:'action',actionKey:'followTypeChanged',pulse:false,
+   title:'Type de suivi',
+   text:'Choisis d\'abord si le mail s\'adresse à un <strong>patient</strong> ou un <strong>partenaire</strong>.',
+   hint:'👆 Clique sur Patient ou Partenaire'},
+  {target:'#templateSelect',advance:'action',actionKey:'templateSelected',pulse:false,
+   title:'Sélectionne un modèle',
+   text:'Clique sur le modèle que tu veux utiliser dans la liste.',
+   hint:'👆 Clique sur un modèle',
+   ensure:()=>{if(!followType){followType='patient';renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();}}},
+  {target:'#copyBodyBtn',advance:'action',actionKey:'copied',pulse:true,
+   title:'Copie le message',
+   text:'Le mail est généré ! Remplis les champs si besoin, puis clique sur <strong>Copier le message</strong> pour copier le tout dans ton presse-papiers.',
+   hint:'👆 Clique pour copier'},
+  {target:null,advance:'button',
+   title:'C\'est parti ! 🚀',
+   text:'Tu maîtrises l\'essentiel. Tu retrouveras ce tutoriel dans les <strong>Réglages</strong> à tout moment. Bonne génération !'}
 ];
-const GENERER_TUTORIAL_STEPS=[
-  {target:null,title:'Tutoriel — Onglet Templates',text:"Génère rapidement un email prêt à copier-coller. Clique sur « Suivant »."},
-  {target:'#followTypeRow',title:'Type de suivi',text:"Choisis si le mail s'adresse à un patient ou un partenaire."},
-  {target:'#templateSelect',title:'Modèle',text:'Sélectionne le modèle correspondant.',ensure:function(){if(!followType){followType='patient';renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();}if(!selectedCategory){selectedCategory='Reconfirmation';renderCategoryRow();renderTemplateSelect();}}},
-  {target:'#extraFields',title:'Informations',text:'Renseigne le nom du patient et la date.',ensure:function(){const s=document.getElementById('templateSelect');if(s&&!s.value&&appData.templates.some(t=>t.id==='tpl-confirmation-rdv')){s.value='tpl-confirmation-rdv';updateExtraFieldsAndPreview();}}},
-  {target:'.preview-col',title:'Aperçu et copie',text:'Le message apparaît ici. Clique sur « Copier le message ».',tooltipPosition:'left'}
-];
-const MODELES_TUTORIAL_STEPS=[
-  {target:null,title:'Tutoriel — Onglet Bibliothèque',text:"Gère tous tes modèles d'email et SMS."},
-  {target:'.controls-row',title:'Rechercher ou créer',text:'Barre de recherche ou « + Nouveau modèle ».'},
-  {target:'#typeChips',title:'Filtrer',text:"Affiche uniquement Email ou SMS."},
-  {target:'#templatesGrid',title:'Mails patients et partenaires',text:"Deux groupes. « Modifier » pour changer, « Supprimer » pour effacer.",tooltipPosition:'above'}
-];
-function startTutorial(steps){teardownGenPanel();teardownAnamPanel();activeTutorialSteps=steps;tutorialStepIndex=0;renderTutorialStep();}
-function startAnamneseTutorial(){startTutorial(ANAMNESE_TUTORIAL_STEPS);}
-function startGenererTutorial(){startTutorial(GENERER_TUTORIAL_STEPS);}
-function startModelesTutorial(){startTutorial(MODELES_TUTORIAL_STEPS);}
-function closeTutorial(){tutorialStepIndex=-1;activeTutorialSteps=null;const o=document.getElementById('tutorialOverlay');if(o)o.remove();}
+function tutorialOnAction(key){
+  if(tutorialStepIndex<0||!activeTutorialSteps)return;
+  const step=activeTutorialSteps[tutorialStepIndex];
+  if(step.advance==='action'&&step.actionKey===key){tutorialStepIndex++;renderTutorialStep();}
+}
+function startMainTutorial(){
+  teardownGenPanel();teardownAnamPanel();
+  activeTutorialSteps=MAIN_TUTORIAL_STEPS;
+  tutorialStepIndex=0;
+  switchTab('modeles');
+  renderTutorialStep();
+}
+function closeTutorial(){
+  tutorialStepIndex=-1;activeTutorialSteps=null;
+  const o=document.getElementById('tutorialOverlay');if(o)o.remove();
+}
+async function finishTutorial(){
+  closeTutorial();
+  appData.tutorialDone=true;
+  await persist();
+  showToast('Tutoriel terminé 🎉');
+}
 function renderTutorialStep(){
   if(tutorialStepIndex<0||!activeTutorialSteps)return;
   const steps=activeTutorialSteps,step=steps[tutorialStepIndex];
   if(step.ensure)step.ensure();
   let ov=document.getElementById('tutorialOverlay');
   if(!ov){ov=document.createElement('div');ov.id='tutorialOverlay';ov.className='tutorial-overlay';document.body.appendChild(ov);}
-  // Scroll l'élément cible dans la zone visible avant de calculer sa position
   if(step.target){
     const el=document.querySelector(step.target);
     if(el)el.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
   }
-  // Attend la fin du scroll avant de calculer la bounding box
   setTimeout(()=>_renderTutorialStepPositioned(step,steps,ov),350);
 }
 function _renderTutorialStepPositioned(step,steps,ov){
-  let tr=null;if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
+  let tr=null;
+  if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
+  const pad=10;
   let box='',ts;
   if(tr&&tr.width>0){
-    box='<div class="tutorial-highlight" style="top:'+(tr.top-8)+'px;left:'+(tr.left-8)+'px;width:'+(tr.width+16)+'px;height:'+(tr.height+16)+'px;"></div>';
-    if(step.tooltipPosition==='above'){const tl=Math.max(16,Math.min(tr.left,window.innerWidth-316));ts='bottom:'+(window.innerHeight-tr.top+14)+'px;left:'+tl+'px;';}
-    else if(step.tooltipPosition==='left'){ts='right:'+Math.min(window.innerWidth-tr.left+14,window.innerWidth-316)+'px;top:'+Math.max(16,Math.min(tr.top,window.innerHeight-260))+'px;';}
-    else ts='top:'+(tr.bottom+14)+'px;left:'+Math.max(16,Math.min(tr.left,window.innerWidth-316))+'px;';
-  }else ts='top:50%;left:50%;transform:translate(-50%,-50%);';
-  ov.innerHTML=(tr&&tr.width>0?'':'<div class="tutorial-backdrop-full"></div>')+box+'<div class="tutorial-tooltip" style="'+ts+'"><button type="button" class="tutorial-close" id="tutorialCloseBtn">×</button><h3>'+escapeHtml(step.title)+'</h3><p>'+step.text+'</p><div class="tutorial-foot"><span class="tutorial-step-count">'+(tutorialStepIndex+1)+' / '+steps.length+'</span><div class="tutorial-nav"><button type="button" class="btn-outline small" id="tutorialPrevBtn" '+(tutorialStepIndex===0?'disabled':'')+'>Précédent</button><button type="button" class="btn-primary" id="tutorialNextBtn">'+(tutorialStepIndex===steps.length-1?'Terminer':'Suivant')+'</button></div></div></div>';
+    box='<div class="tutorial-highlight'+(step.pulse?' tutorial-pulse':'')+'" style="top:'+(tr.top-pad)+'px;left:'+(tr.left-pad)+'px;width:'+(tr.width+pad*2)+'px;height:'+(tr.height+pad*2)+'px;"></div>';
+    if(step.tooltipPosition==='above'){const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));ts='bottom:'+(window.innerHeight-tr.top+16)+'px;left:'+tl+'px;';}
+    else if(step.tooltipPosition==='left'){const tw=Math.min(326,tr.left-32);ts='top:'+Math.max(16,Math.min(tr.top,window.innerHeight-320))+'px;right:'+(window.innerWidth-tr.left+16)+'px;width:'+tw+'px;';}
+    else{const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));ts='top:'+(tr.bottom+16)+'px;left:'+tl+'px;';}
+  }else{ts='top:50%;left:50%;transform:translate(-50%,-50%);';}
+  const isLast=tutorialStepIndex===steps.length-1;
+  const isBtn=step.advance==='button';
+  const btnHtml=isBtn?'<button type="button" class="btn-primary" id="tutorialNextBtn">'+(isLast?'Terminer 🎉':'Suivant →')+'</button>':'';
+  const hintHtml=(!isBtn&&step.hint)?'<p class="tutorial-action-hint">'+step.hint+'</p>':'';
+  ov.innerHTML=(tr&&tr.width>0?'':'<div class="tutorial-backdrop-full"></div>')+box
+    +'<div class="tutorial-tooltip" style="'+ts+'">'
+    +'<button type="button" class="tutorial-close" id="tutorialCloseBtn">×</button>'
+    +'<h3>'+escapeHtml(step.title)+'</h3>'
+    +'<p>'+step.text+'</p>'
+    +hintHtml
+    +'<div class="tutorial-foot"><span class="tutorial-step-count">'+(tutorialStepIndex+1)+' / '+steps.length+'</span>'
+    +btnHtml+'</div>'
+    +'</div>';
   document.getElementById('tutorialCloseBtn').addEventListener('click',closeTutorial);
-  document.getElementById('tutorialPrevBtn').addEventListener('click',()=>{if(tutorialStepIndex>0){tutorialStepIndex--;renderTutorialStep();}});
-  document.getElementById('tutorialNextBtn').addEventListener('click',()=>{if(tutorialStepIndex<steps.length-1){tutorialStepIndex++;renderTutorialStep();}else closeTutorial();});
+  if(isBtn){
+    document.getElementById('tutorialNextBtn').addEventListener('click',()=>{
+      if(isLast)finishTutorial();else{tutorialStepIndex++;renderTutorialStep();}
+    });
+  }
   const bdf=ov.querySelector('.tutorial-backdrop-full');if(bdf)bdf.addEventListener('click',closeTutorial);
 }
 
@@ -1651,6 +1753,7 @@ function wireNewAnamModal(root){
     appData.anamnese[id]={text};
     await persist();renderSituationRow();renderTemplatesGrid();
     closeModal();showToast('Situation ajoutée ✓');
+    tutorialOnAction('anamneseSaved');
   });
   root.querySelectorAll('.tpl-modal-tab').forEach(btn=>btn.addEventListener('click',()=>{
     if(btn.dataset.aud!=='anamnese')openTemplateForm(null,btn.dataset.aud,true);
@@ -1877,7 +1980,7 @@ function openTemplateForm(editing,initialAud,noAnim,anamIdx){
       else{appData.templates.push({id:'user-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),title:ti,type:ty,audience:aud,partnerCategory:aud==='partenaire'?cv:undefined,patientCategory:aud==='patient'?cv:undefined,smsCompanion:aud==='patient'&&!isSmsOnly?(sm||undefined):undefined,subject:isSmsOnly?undefined:su,body:bo,createdAt:Date.now()});}
       await persist();renderTemplatesGrid();renderTemplateSelect();return true;
     }
-    document.getElementById('saveBtn').addEventListener('click',async()=>{const ok=await saveForm();if(ok){closeModal();showToast(editing?'Modèle mis à jour ✓':'Modèle ajouté ✓');}});
+    document.getElementById('saveBtn').addEventListener('click',async()=>{const ok=await saveForm();if(ok){closeModal();showToast(editing?'Modèle mis à jour ✓':'Modèle ajouté ✓');if(!editing)tutorialOnAction('templateSaved');}});
     if(editing){
       document.getElementById('prevTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i>0)openTemplateForm(l[i-1]);});
       document.getElementById('nextTplBtn').addEventListener('click',async()=>{const ok=await saveForm();if(!ok)return;const l=getFilteredTemplateList(),i=l.findIndex(t=>t.id===editing.id);if(i<l.length-1)openTemplateForm(l[i+1]);});
@@ -1918,7 +2021,7 @@ function confirmDeleteAnam(id){
     const subject=(se&&se.offsetParent!==null?se.innerText:'').trim();
     const body=(be?be.innerText:'').trim();
     const toCopy=subject?subject+'\n'+body:body;
-    showToast(await copyText(toCopy)?'Message copié ✓':"Impossible de copier.");
+    const copied=await copyText(toCopy);showToast(copied?'Message copié ✓':"Impossible de copier.");if(copied)tutorialOnAction('copied');
   });
   document.getElementById('copySmsBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t||!t.smsCompanion)return;
@@ -1927,9 +2030,9 @@ function confirmDeleteAnam(id){
     showToast(await copyText((sb?sb.innerText:'').trim())?'SMS copié ✓':"Impossible de copier.");
   });
   document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}showToast(await copyText(resolveGenre(document.getElementById('anamneseTextarea').value,anamneseGenre))?'Texte copié ✓':"Impossible de copier.");});
-  document.getElementById('anamneseTutorialBtn').addEventListener('click',startAnamneseTutorial);
-  document.getElementById('genererTutorialBtn').addEventListener('click',startGenererTutorial);
-  document.getElementById('modelesTutorialBtn').addEventListener('click',startModelesTutorial);
+  document.getElementById('anamneseTutorialBtn').addEventListener('click',startMainTutorial);
+  document.getElementById('genererTutorialBtn').addEventListener('click',startMainTutorial);
+  document.getElementById('modelesTutorialBtn').addEventListener('click',startMainTutorial);
   document.getElementById('templatesGrid').addEventListener('click',e=>{
     const ed=e.target.closest('[data-edit-template]'),dl=e.target.closest('[data-del-template]');
     const ea=e.target.closest('[data-edit-anam]'),da=e.target.closest('[data-del-anam]');
@@ -1938,7 +2041,7 @@ function confirmDeleteAnam(id){
     if(ea){const anamIdx=(appData.customSituations||[]).findIndex(s=>s.id===ea.dataset.editAnam);openTemplateForm(null,'anamnese',true,anamIdx>=0?anamIdx:0);}
     if(da)confirmDeleteAnam(da.dataset.delAnam);
   });
-  document.getElementById('addTemplateBtn').addEventListener('click',()=>openTemplateForm(null));
+  document.getElementById('addTemplateBtn').addEventListener('click',()=>{tutorialOnAction('addTemplateClicked');openTemplateForm(null);});
   document.getElementById('searchTemplates').addEventListener('input',e=>{templateSearch=e.target.value;renderTemplatesGrid();});
   document.getElementById('settingsBtn').addEventListener('click',openSettingsForm);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTutorial();}});
