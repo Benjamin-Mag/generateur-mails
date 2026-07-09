@@ -2042,6 +2042,8 @@ function openTemplateForm(editing,initialAud,noAnim,anamIdx){
     }
     // Insertion de tags au curseur
     let _lastField=null;
+    function autoResize(el){if(!el)return;el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+    ['f-body','f-sms','f-sms-only'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.style.resize='none';el.style.overflow='hidden';autoResize(el);el.addEventListener('input',()=>autoResize(el));});
     ['f-subject','f-body','f-sms','f-sms-only'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('focus',()=>_lastField=el);});
     root.querySelectorAll('.tag-chip').forEach(btn=>btn.addEventListener('click',()=>{
       const tag=btn.dataset.tag;
