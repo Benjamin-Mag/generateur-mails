@@ -1623,19 +1623,19 @@ function renderTutorialStep(){
 function _renderTutorialStepPositioned(step,steps,ov){
   let tr=null;
   if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
-  // Pour noBackdrop (modal), trou autour de .modal
-  let holeRect=tr;
-  if(!holeRect&&step.noBackdrop){const m=document.querySelector('.modal');if(m)holeRect=m.getBoundingClientRect();}
   const pad=10;
-  // Blocker avec trou clip-path si on a une cible
-  let blockerStyle='';
-  if(holeRect&&holeRect.width>0){
-    const t=Math.max(0,holeRect.top-pad),l=Math.max(0,holeRect.left-pad);
-    const r=Math.min(window.innerWidth,holeRect.right+pad),b=Math.min(window.innerHeight,holeRect.bottom+pad);
-    const W=window.innerWidth,H=window.innerHeight;
-    blockerStyle=`clip-path:polygon(0px 0px,0px ${H}px,${l}px ${H}px,${l}px ${t}px,${r}px ${t}px,${r}px ${b}px,${l}px ${b}px,${l}px ${H}px,${W}px ${H}px,${W}px 0px);`;
+  // Blocker avec trou clip-path sur la cible — absent pour les étapes modal (noBackdrop)
+  let blockerHtml='';
+  if(!step.noBackdrop){
+    let blockerStyle='';
+    if(tr&&tr.width>0){
+      const t=Math.max(0,tr.top-pad),l=Math.max(0,tr.left-pad);
+      const r=Math.min(window.innerWidth,tr.right+pad),b=Math.min(window.innerHeight,tr.bottom+pad);
+      const W=window.innerWidth,H=window.innerHeight;
+      blockerStyle=`clip-path:polygon(0px 0px,0px ${H}px,${l}px ${H}px,${l}px ${t}px,${r}px ${t}px,${r}px ${b}px,${l}px ${b}px,${l}px ${H}px,${W}px ${H}px,${W}px 0px);`;
+    }
+    blockerHtml='<div class="tutorial-blocker" style="'+blockerStyle+'"></div>';
   }
-  const blockerHtml='<div class="tutorial-blocker" style="'+blockerStyle+'"></div>';
   // Highlight (juste l'anneau pulse, pas de box-shadow overlay)
   let box='',ts;
   if(tr&&tr.width>0){
