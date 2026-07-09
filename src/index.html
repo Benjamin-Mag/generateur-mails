@@ -1524,11 +1524,11 @@ const MAIN_TUTORIAL_STEPS=[
   {target:null,advance:'button',
    title:'Modèle créé ! 🥳',
    text:'Parfait. Maintenant on crée une <strong>anamnèse</strong> — un texte d\'introduction pour tes comptes-rendus patients. Je vais ouvrir le formulaire pour toi.'},
-  {target:null,advance:'action',actionKey:'anamneseSaved',noBackdrop:true,
+  {target:null,advance:'action',actionKey:'anamneseSaved',noBackdrop:true,tooltipPosition:'corner',
    title:'Crée une anamnèse',
-   text:'Donne un <strong>titre</strong> à cette situation et écris le <strong>texte</strong> de l\'anamnèse. Clique sur <strong>Ajouter</strong> quand c\'est prêt.',
-   hint:'✅ Clique sur Ajouter quand tu as terminé',
-   tooltipPosition:'corner',
+   text:'Remplis les champs, puis clique sur <strong>Ajouter</strong>.',
+   checklist:['Remplis le titre de la situation','Rédige le texte de l\'anamnèse'],
+   checklistType:'anam',
    ensure:()=>{if(!document.getElementById('overlay'))openTemplateForm(null,'anamnese',true);}},
   {target:'[data-tab="generer"]',advance:'action',actionKey:'tab_generer',pulse:true,
    title:'Générer un mail',
@@ -1570,36 +1570,43 @@ function closeTutorial(){
   _tutCheckState=[];
   const o=document.getElementById('tutorialOverlay');if(o)o.remove();
 }
-function _startChecklistWatcher(items){
+function _startChecklistWatcher(items,type){
   _tutCheckState=items.map(()=>false);
-  _tutCheckState[0]=true; // catégorie toujours pré-sélectionnée
-  _renderChecklistUI();
+  if(type!=='anam')_tutCheckState[0]=true; // catégorie toujours pré-sélectionnée pour modèle
+  _renderChecklistUI(items);
   if(_tutCheckInterval)clearInterval(_tutCheckInterval);
   _tutCheckInterval=setInterval(()=>{
     if(!activeTutorialSteps){clearInterval(_tutCheckInterval);return;}
     let changed=false;
-    // 1 titre (après catégorie)
-    if(_tutCheckState[0]&&!_tutCheckState[1]){const el=document.getElementById('f-title');if(el&&el.value.trim()){_tutCheckState[1]=true;changed=true;}}
-    // 2 objet (après titre)
-    if(_tutCheckState[1]&&!_tutCheckState[2]){const el=document.getElementById('f-subject');if(el&&el.value.trim()){_tutCheckState[2]=true;changed=true;}}
-    // 3 corps (après objet)
-    if(_tutCheckState[2]&&!_tutCheckState[3]){const el=document.getElementById('f-body');if(el&&el.value.trim().replace(/Bien cordialement[\s\S]*/,'').trim().length>2){_tutCheckState[3]=true;changed=true;}}
-    // 4 SMS (optionnel, après corps)
-    if(_tutCheckState[3]&&!_tutCheckState[4]){const el=document.getElementById('f-sms');if(el&&el.value.trim().replace(/Bien cordialement[\s\S]*/,'').trim().length>2){_tutCheckState[4]=true;changed=true;}}
-    if(changed)_renderChecklistUI();
+    if(type==='anam'){
+      // 0 titre
+      if(!_tutCheckState[0]){const el=document.getElementById('anam-label');if(el&&el.value.trim()){_tutCheckState[0]=true;changed=true;}}
+      // 1 texte (après titre)
+      if(_tutCheckState[0]&&!_tutCheckState[1]){const el=document.getElementById('anam-text');if(el&&el.value.trim().length>2){_tutCheckState[1]=true;changed=true;}}
+    }else{
+      // 1 titre (après catégorie)
+      if(_tutCheckState[0]&&!_tutCheckState[1]){const el=document.getElementById('f-title');if(el&&el.value.trim()){_tutCheckState[1]=true;changed=true;}}
+      // 2 objet (après titre)
+      if(_tutCheckState[1]&&!_tutCheckState[2]){const el=document.getElementById('f-subject');if(el&&el.value.trim()){_tutCheckState[2]=true;changed=true;}}
+      // 3 corps (après objet)
+      if(_tutCheckState[2]&&!_tutCheckState[3]){const el=document.getElementById('f-body');if(el&&el.value.trim().replace(/Bien cordialement[\s\S]*/,'').trim().length>2){_tutCheckState[3]=true;changed=true;}}
+      // 4 SMS (optionnel, après corps)
+      if(_tutCheckState[3]&&!_tutCheckState[4]){const el=document.getElementById('f-sms');if(el&&el.value.trim().replace(/Bien cordialement[\s\S]*/,'').trim().length>2){_tutCheckState[4]=true;changed=true;}}
+    }
+    if(changed)_renderChecklistUI(items);
   },300);
-  // catégorie: écouter changement pour cocher immédiatement si l'utilisateur change
-  document.addEventListener('change',_onCategoryChange);
+  if(type!=='anam')document.addEventListener('change',_onCategoryChange);
 }
 function _onCategoryChange(e){
   if(e.target&&e.target.name==='f-category'&&!_tutCheckState[0]){_tutCheckState[0]=true;_renderChecklistUI();}
 }
-function _renderChecklistUI(){
+function _renderChecklistUI(items){
   const cl=document.getElementById('tutCheckList');
   if(!cl)return;
+  const _items=items||_tutCheckState.map((_,i)=>i);
   cl.innerHTML=_tutCheckState.map((done,i)=>{
     const locked=i>0&&!_tutCheckState[i-1];
-    return '<li class="tut-check-item'+(done?' done':'')+(locked?' locked':'')+'"><span class="tut-check-box">'+(done?'✓':'')+'</span><span>'+['Choisis une catégorie','Remplis le titre','Remplis l\'objet du mail','Rédige le corps du mail','Ajoute la version SMS (optionnel)'][i]+'</span></li>';
+    return '<li class="tut-check-item'+(done?' done':'')+(locked?' locked':'')+'"><span class="tut-check-box">'+(done?'✓':'')+'</span><span>'+_items[i]+'</span></li>';
   }).join('');
 }
 async function finishTutorial(){
@@ -1672,7 +1679,7 @@ function _renderTutorialStepPositioned(step,steps,ov){
   }
   if(step.checklist){
     if(_tutCheckInterval){clearInterval(_tutCheckInterval);_tutCheckInterval=null;document.removeEventListener('change',_onCategoryChange);}
-    _startChecklistWatcher(step.checklist);
+    _startChecklistWatcher(step.checklist,step.checklistType);
   }
 }
 
