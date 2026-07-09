@@ -1510,19 +1510,19 @@ const MAIN_TUTORIAL_STEPS=[
    title:'Crée ton premier modèle',
    text:'Un modèle, c\'est un mail pré-rédigé avec des variables comme <code>{{nom_patient}}</code> qui se remplissent automatiquement.',
    hint:'👆 Clique sur « + Nouveau modèle »'},
-  {target:'.modal',advance:'action',actionKey:'templateSaved',pulse:false,
+  {target:null,advance:'action',actionKey:'templateSaved',noBackdrop:true,
    title:'Rédige le modèle',
    text:'Donne un <strong>titre</strong> et rédige ton <strong>message</strong>. Tu peux insérer des variables entre <code>{{}}</code>. Quand c\'est prêt, clique sur <strong>Ajouter</strong>.',
    hint:'✅ Clique sur Ajouter quand tu as terminé',
-   tooltipPosition:'above'},
+   tooltipPosition:'corner'},
   {target:null,advance:'button',
    title:'Modèle créé ! 🥳',
    text:'Parfait. Maintenant on crée une <strong>anamnèse</strong> — un texte d\'introduction pour tes comptes-rendus patients. Je vais ouvrir le formulaire pour toi.'},
-  {target:'.modal',advance:'action',actionKey:'anamneseSaved',pulse:false,
+  {target:null,advance:'action',actionKey:'anamneseSaved',noBackdrop:true,
    title:'Crée une anamnèse',
    text:'Donne un <strong>titre</strong> à cette situation et écris le <strong>texte</strong> de l\'anamnèse. Clique sur <strong>Ajouter</strong> quand c\'est prêt.',
    hint:'✅ Clique sur Ajouter quand tu as terminé',
-   tooltipPosition:'above',
+   tooltipPosition:'corner',
    ensure:()=>{if(!document.getElementById('overlay'))openTemplateForm(null,'anamnese',true);}},
   {target:'[data-tab="generer"]',advance:'action',actionKey:'tab_generer',pulse:true,
    title:'Générer un mail',
@@ -1584,17 +1584,20 @@ function _renderTutorialStepPositioned(step,steps,ov){
   if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
   const pad=10;
   let box='',ts;
-  if(tr&&tr.width>0){
+  if(step.tooltipPosition==='corner'){
+    ts='top:16px;right:16px;';
+  }else if(tr&&tr.width>0){
     box='<div class="tutorial-highlight'+(step.pulse?' tutorial-pulse':'')+'" style="top:'+(tr.top-pad)+'px;left:'+(tr.left-pad)+'px;width:'+(tr.width+pad*2)+'px;height:'+(tr.height+pad*2)+'px;"></div>';
-    if(step.tooltipPosition==='above'){const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));ts='bottom:'+(window.innerHeight-tr.top+16)+'px;left:'+tl+'px;';}
+    if(step.tooltipPosition==='above'){const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));const topY=tr.top-16-200;ts=topY>16?'bottom:'+(window.innerHeight-tr.top+16)+'px;left:'+tl+'px;':'top:16px;left:'+tl+'px;';}
     else if(step.tooltipPosition==='left'){const tw=Math.min(326,tr.left-32);ts='top:'+Math.max(16,Math.min(tr.top,window.innerHeight-320))+'px;right:'+(window.innerWidth-tr.left+16)+'px;width:'+tw+'px;';}
-    else{const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));ts='top:'+(tr.bottom+16)+'px;left:'+tl+'px;';}
+    else{const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));ts='top:'+Math.min(tr.bottom+16,window.innerHeight-220)+'px;left:'+tl+'px;';}
   }else{ts='top:50%;left:50%;transform:translate(-50%,-50%);';}
   const isLast=tutorialStepIndex===steps.length-1;
   const isBtn=step.advance==='button';
   const btnHtml=isBtn?'<button type="button" class="btn-primary" id="tutorialNextBtn">'+(isLast?'Terminer 🎉':'Suivant →')+'</button>':'';
   const hintHtml=(!isBtn&&step.hint)?'<p class="tutorial-action-hint">'+step.hint+'</p>':'';
-  ov.innerHTML=(tr&&tr.width>0?'':'<div class="tutorial-backdrop-full"></div>')+box
+  const showBackdrop=!step.noBackdrop&&!(tr&&tr.width>0)&&step.tooltipPosition!=='corner';
+  ov.innerHTML=(showBackdrop?'<div class="tutorial-backdrop-full"></div>':'')+box
     +'<div class="tutorial-tooltip" style="'+ts+'">'
     +'<button type="button" class="tutorial-close" id="tutorialCloseBtn">×</button>'
     +'<h3>'+escapeHtml(step.title)+'</h3>'
