@@ -1970,7 +1970,7 @@ function buildModalHTML(aud,editing,nl,ni){
     +'<div id="emailFields" style="'+(aud==='patient'&&editing&&editing.type==='sms'?'display:none':'')+'">'
     +'<label>Objet</label><input id="f-subject" value="'+(editing?escapeHtml(editing.subject||''):'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button>'+(aud==='patient'?'<button type="button" class="tag-chip" data-tag="{{nom partenaire}}">{{nom partenaire}}</button><button type="button" class="tag-chip" data-tag="{{adresse}}">{{adresse}}</button>':'')+'</div>'
-    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml(aud==='partenaire'?appData.sigPartenaireMail:appData.sigPatientMail))+'</textarea>'
+    +'<label>Mail'+req+'</label><textarea id="f-body">'+(editing&&editing.type!=='sms'?escapeHtml(editing.body):escapeHtml('\n'+(aud==='partenaire'?appData.sigPartenaireMail:appData.sigPatientMail)))+'</textarea>'
     +'</div>'
     +'<div id="smsOnlyField" style="'+(aud!=='patient'||!editing||editing.type!=='sms'?'display:none':'')+'">'
     +'<div class="tag-insert-bar"><span class="tag-insert-label">Insérer :</span><button type="button" class="tag-chip" data-tag="{{nom}}">{{nom}}</button><button type="button" class="tag-chip" data-tag="{{date}}">{{date}}</button><button type="button" class="tag-chip" data-tag="{{heure}}">{{heure}}</button><button type="button" class="tag-chip" data-tag="{{telephone}}">{{telephone}}</button></div>'
