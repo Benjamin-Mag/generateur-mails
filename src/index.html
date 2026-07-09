@@ -628,7 +628,7 @@ const NEW_TEMPLATE = {
   id:'tpl-confirmation-rdv', title:"Confirmation de votre rendez-vous", category:"Rendez-vous",
   audience:"patient", patientCategory:"all", type:"email",
   subject:"Confirmation de votre rendez-vous du {{date}}",
-  body:"Bonjour {{nom}},\n\nJe me permets de vous rappeler votre rendez-vous chez notre partenaire audioprothésiste, prévu le {{date}}.\n\nPourriez-vous me confirmer votre présence par retour d'e-mail ou par téléphone au {{telephone}} ?\n\nJe vous remercie par avance pour votre réactivité et reste à votre disposition pour toute question.\n\nBien cordialement,\nBenjamin Magnier\nVotre conseill(ère) Audibene\n{{telephone}}",
+  body:"Bonjour {{nom}},\n\nJe me permets de vous rappeler votre rendez-vous chez notre partenaire audioprothésiste, prévu le {{date}}.\n\nPourriez-vous me confirmer votre présence par retour d'e-mail ou par téléphone au {{telephone}} ?\n\nJe vous remercie par avance pour votre réactivité et reste à votre disposition pour toute question.\n\nBien cordialement,\n{{nom_conseiller}}\nVotre conseill(ère) Audibene\n{{tel_conseiller}}",
   smsCompanion:"Petit rappel de votre rendez-vous avec notre partenaire audioprothésiste prévu le {{date}} à {{heure}}.\n\nJe vous remercie par avance de me confirmer que ce RDV vous convient toujours en me répondant OK.\nNotre partenaire audioprothésiste se réjouit déjà de vous accueillir !\nBien cordialement,\nBenjamin Magnier\nVotre conseill(ère) Audibene\n{{telephone}}"
 };
 const SUIVI_TEMPLATES = [];
@@ -643,11 +643,11 @@ const WEEKDAYS_FR = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.'];
 const DEFAULT_SITUATIONS = [{id:'depistage_simple',label:'Dépistage'},{id:'depistage_orl',label:'Dépistage avec ORL'},{id:'premier_rdv',label:'1er RDV'},{id:'renouvellement_avec_ordonnance',label:'Renouvellement – Avec ordonnance'},{id:'renouvellement_sans_ordonnance',label:'Renouvellement – Sans ordonnance'}];
 const RENOUVELLEMENT_OPTIONS = [{id:'avec_ordonnance',label:'Avec ordonnance'},{id:'sans_ordonnance',label:'Sans ordonnance'}];
 const DEFAULT_ANAMNESE = {
-  depistage_simple:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
-  depistage_orl:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif, avec orientation vers un ORL de votre réseau. Je vous remercie par avance pour votre prise en charge.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
-  premier_rdv:{text:"Cher partenaire, je vous confie notre patient(e) muni(e) d'une ordonnance ORL pour un premier rendez-vous.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
-  renouvellement_avec_ordonnance:{text:"Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage avec ordonnance de renouvellement.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"},
-  renouvellement_sans_ordonnance:{text:"Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\nBenjamin Magnier"}
+  depistage_simple:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\n{{nom_conseiller}}"},
+  depistage_orl:{text:"Cher partenaire, je vous confie notre patient(e) pour un dépistage auditif, avec orientation vers un ORL de votre réseau. Je vous remercie par avance pour votre prise en charge.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\n{{nom_conseiller}}"},
+  premier_rdv:{text:"Cher partenaire, je vous confie notre patient(e) muni(e) d'une ordonnance ORL pour un premier rendez-vous.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\n{{nom_conseiller}}"},
+  renouvellement_avec_ordonnance:{text:"Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage avec ordonnance de renouvellement.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\n{{nom_conseiller}}"},
+  renouvellement_sans_ordonnance:{text:"Cher partenaire, je vous confie notre patient(e) pour un renouvellement d'appareillage.\n\nJe vous souhaite une excellente consultation.\nBien à vous,\n{{nom_conseiller}}"}
 };
 const OLD_FOOTERS = [
   "audibene — pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\naudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann",
@@ -668,6 +668,7 @@ let tutorialStepIndex=-1, activeTutorialSteps=null;
 
 /* ========== Helpers ========== */
 function advisorTitle(){return appData.advisorGenre==='F'?'Votre conseillère Audibene':'Votre conseiller Audibene';}
+function getSystemValues(){return {nom_conseiller:appData.signatureName||'',tel_conseiller:appData.phone||'',titre_conseiller:(appData.advisorGenre==='F'?'Conseillère':'Conseiller')+' audibene'};}
 function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
 function fieldLabel(v){if(FIELD_LABELS[v])return FIELD_LABELS[v];const c=v.replace(/_/g,' ');return c.charAt(0).toUpperCase()+c.slice(1);}
 function isDateVar(v){return /date/i.test(v);}
@@ -699,7 +700,7 @@ async function loadData(){
   appData.advisorGenre=(parsed.advisorGenre==='F')?'F':'M';
   appData.onboardingDone=parsed.onboardingDone===true;
   appData.emailFooter=(typeof parsed.emailFooter==='string'&&parsed.emailFooter)?parsed.emailFooter:DEFAULT_EMAIL_FOOTER;
-  const _defSig='\n\nBien cordialement,\n'+appData.signatureName+'\n'+(appData.advisorGenre==='F'?'Conseillère':'Conseiller')+' audibene\n'+(appData.phone||'');
+  const _defSig='\n\nBien cordialement,\n{{nom_conseiller}}\n{{titre_conseiller}}\n{{tel_conseiller}}';
   appData.sigPatientMail=(typeof parsed.sigPatientMail==='string'&&parsed.sigPatientMail)?parsed.sigPatientMail:_defSig;
   appData.sigPatientSMS=(typeof parsed.sigPatientSMS==='string'&&parsed.sigPatientSMS)?parsed.sigPatientSMS:_defSig;
   appData.sigPartenaireMail=(typeof parsed.sigPartenaireMail==='string'&&parsed.sigPartenaireMail)?parsed.sigPartenaireMail:_defSig;
@@ -721,7 +722,25 @@ async function loadData(){
   const before=appData.templates.length;
   appData.templates=appData.templates.filter(t=>!REMOVED_IDS.includes(t.id));
   if(appData.templates.length!==before)changed=true;
-  if(appData.phone){appData.templates.forEach(t=>{if(t.body&&t.body.includes('{{telephone}}')){t.body=t.body.split('{{telephone}}').join(appData.phone);changed=true;}if(t.smsCompanion&&t.smsCompanion.includes('{{telephone}}')){t.smsCompanion=t.smsCompanion.split('{{telephone}}').join(appData.phone);changed=true;}});}
+  const _sn=appData.signatureName;
+  appData.templates.forEach(t=>{
+    ['body','smsCompanion','subject'].forEach(k=>{
+      if(typeof t[k]==='string'){
+        let v=t[k];
+        if(_sn&&v.includes(_sn)){v=v.split(_sn).join('{{nom_conseiller}}');changed=true;}
+        if(v.includes('{{telephone}}')){v=v.split('{{telephone}}').join('{{tel_conseiller}}');changed=true;}
+        if(v!==t[k])t[k]=v;
+      }
+    });
+  });
+  Object.keys(appData.anamnese).forEach(id=>{
+    if(appData.anamnese[id]&&typeof appData.anamnese[id].text==='string'&&_sn&&appData.anamnese[id].text.includes(_sn)){
+      appData.anamnese[id]={text:appData.anamnese[id].text.split(_sn).join('{{nom_conseiller}}')};changed=true;
+    }
+  });
+  ['sigPatientMail','sigPatientSMS','sigPartenaireMail'].forEach(k=>{
+    if(typeof appData[k]==='string'&&_sn&&appData[k].includes(_sn)){appData[k]=appData[k].split(_sn).join('{{nom_conseiller}}');changed=true;}
+  });
   appData.templates.forEach(t=>{
     if(!t.audience){t.audience=(t.id===NEW_TEMPLATE.id)?'patient':(SUIVI_TEMPLATES.some(s=>s.id===t.id)?'partenaire':'patient');changed=true;}
     if(t.audience==='partenaire'&&!t.partnerCategory){const s=SUIVI_TEMPLATES.find(s=>s.id===t.id);t.partnerCategory=s?s.partnerCategory:'CC1';changed=true;}
@@ -1369,7 +1388,7 @@ function renderPreviewOnly(){
   const template=appData.templates.find(t=>t.id===selectedTemplateId);
   if(!template)return;
   const sw=document.getElementById('previewSubjectWrap'),se=document.getElementById('previewSubject'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
-  const vals=Object.assign({},manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''}),genre=getEffectiveGenre();
+  const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''}),genre=getEffectiveGenre();
   if(template.type==='email'&&template.subject){sw.style.display='block';se.innerHTML=previewHtml(template.subject,vals,genre);}else sw.style.display='none';
   be.innerHTML=previewHtml(template.body,vals,genre);ac.style.display='flex';
   const ss=template.audience==='patient'&&template.type==='email'&&template.smsCompanion;
@@ -1489,11 +1508,6 @@ function _renderTutorialStepPositioned(step,steps,ov){
 /* ========== Réglages ========== */
 async function renameSignature(oldName,newName){
   if(!newName)return;
-  const ot=(oldName||'').trim();
-  if(ot&&ot!==newName){
-    appData.templates.forEach(t=>{t.body=t.body.split(ot).join(newName);if(t.subject)t.subject=t.subject.split(ot).join(newName);if(t.smsCompanion)t.smsCompanion=t.smsCompanion.split(ot).join(newName);});
-    Object.keys(appData.anamnese).forEach(id=>{if(appData.anamnese[id]&&typeof appData.anamnese[id].text==='string')appData.anamnese[id].text=appData.anamnese[id].text.split(ot).join(newName);});
-  }
   appData.signatureName=newName;
   await persist();
 }
@@ -1511,7 +1525,7 @@ function openSettingsForm(){
     '<input type="radio" name="s-genre" value="F"'+(isFemme?' checked':'')+'> Conseillère</label>',
     '</div>'
   ].join('');
-  const defSig='\n\nBien cordialement,\n'+appData.signatureName+'\n'+advisorTitle()+'\n'+(appData.phone||'');
+  const defSig='\n\nBien cordialement,\n{{nom_conseiller}}\n{{titre_conseiller}}\n{{tel_conseiller}}';
   const sigPM=appData.sigPatientMail||defSig;
   const sigPS=appData.sigPatientSMS||defSig;
   const sigEM=appData.sigPartenaireMail||defSig;
@@ -1894,7 +1908,7 @@ function confirmDeleteAnam(id){
   document.getElementById('copyBodyBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
-    const vals=Object.assign({},manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''});
+    const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''});
     const genre=getEffectiveGenre();
     const subject=t.subject?resolveGenre(buildFilledText(t.subject,vals),genre):'';
     const body=resolveGenre(buildFilledText(t.body,vals),genre);
@@ -1904,7 +1918,7 @@ function confirmDeleteAnam(id){
   document.getElementById('copySmsBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t||!t.smsCompanion)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
-    const vals=Object.assign({},manualValues,{nom:getRecipientNomValue(),telephone:appData.phone||'','nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''});
+    const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''});
     showToast(await copyText(resolveGenre(buildFilledText(t.smsCompanion,vals),getEffectiveGenre()))?'SMS copié ✓':"Impossible de copier.");
   });
   document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}showToast(await copyText(resolveGenre(document.getElementById('anamneseTextarea').value,anamneseGenre))?'Texte copié ✓':"Impossible de copier.");});
