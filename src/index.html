@@ -1340,6 +1340,7 @@ function updateExtraFieldsAndPreview(){
   if(vars.indexOf('nom')!==-1)vars=['nom'].concat(vars.filter(v=>v!=='nom'));
   const SYSTEM_VARS=['nom_conseiller','tel_conseiller','titre_conseiller'];
   vars=vars.filter(v=>!SYSTEM_VARS.includes(v));
+  if(!_genFloating)vars=vars.filter(v=>!(manualValues[v]||'').trim());
   ew.innerHTML=vars.map(v=>{
     const lbl=escapeHtml(fieldLabel(v));
     if(v==='nom')return '';
