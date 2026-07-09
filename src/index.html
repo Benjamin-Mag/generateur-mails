@@ -1474,7 +1474,7 @@ function renderAnamneseGenreRow(){
     anamneseGenre=e.target.value;
     const ta=document.getElementById('anamneseTextarea');
     const key=getCurrentAnamneseKey();
-    if(ta&&key){const raw=(appData.anamnese[key]||{text:''}).text||'';ta.value=resolveGenre(raw,anamneseGenre);}
+    if(ta&&key){const raw=(appData.anamnese[key]||{text:''}).text||'';ta.value=resolveGenre(buildFilledText(raw,getSystemValues()),anamneseGenre);}
     if(selectedSituation&&key){settleAnamPanel();return;}
   }));
 }
