@@ -1497,7 +1497,8 @@ function renderAnamneseContent(){
   const cw=document.getElementById('anamneseContent'),key=getCurrentAnamneseKey();
   if(!key){cw.style.display='none';return;}
   cw.style.display='block';
-  document.getElementById('anamneseTextarea').value=(appData.anamnese[key]||{text:''}).text||'';
+  const rawAnam=(appData.anamnese[key]||{text:''}).text||'';
+  document.getElementById('anamneseTextarea').value=buildFilledText(rawAnam,getSystemValues());
   if(anamneseGenre){settleAnamPanel();}else{const gr=document.getElementById('anamneseGenreRow').querySelector('.seg-group');gr.classList.remove('genre-alert');void gr.offsetWidth;gr.classList.add('genre-alert');gr.addEventListener('animationend',()=>gr.classList.remove('genre-alert'),{once:true});}
 }
 
@@ -2119,7 +2120,7 @@ function confirmDeleteAnam(id){
     const sb=document.getElementById('smsCompanionBody');
     showToast(await copyText((sb?sb.innerText:'').trim())?'SMS copié ✓':"Impossible de copier.");
   });
-  document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}const raw=document.getElementById('anamneseTextarea').value;const resolved=resolveGenre(buildFilledText(raw,getSystemValues()),anamneseGenre);showToast(await copyText(resolved)?'Texte copié ✓':"Impossible de copier.");});
+  document.getElementById('copyAnamneseBtn').addEventListener('click',async()=>{if(!anamneseGenre){showCenterAlert('Sélectionne le genre avant de copier.');return;}const raw=document.getElementById('anamneseTextarea').value;const resolved=resolveGenre(raw,anamneseGenre);showToast(await copyText(resolved)?'Texte copié ✓':"Impossible de copier.");});
   document.getElementById('anamneseTutorialBtn').addEventListener('click',startMainTutorial);
   document.getElementById('genererTutorialBtn').addEventListener('click',startMainTutorial);
   document.getElementById('modelesTutorialBtn').addEventListener('click',startMainTutorial);
