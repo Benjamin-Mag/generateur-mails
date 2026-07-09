@@ -1123,7 +1123,7 @@ function showGenPanel(){
   // Backdrop
   const bd=document.createElement('div');
   bd.className='gen-backdrop';bd.id='genBackdrop';
-  bd.addEventListener('click',settleGenPanel);
+  bd.addEventListener('click',()=>{if(tutorialStepIndex>=0)return;settleGenPanel();});
   document.body.insertBefore(bd,el);
   el.classList.add('is-floating');
   const hdr=document.createElement('div');hdr.className='gen-panel-header';
