@@ -319,8 +319,13 @@ input,textarea,select{font-family:inherit;}
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
 .sig-details{margin:4px 0 12px;border:1px solid var(--line);border-radius:8px;overflow:hidden;padding-bottom:4px;}
 .sig-section-title{margin:0;padding:10px 14px 4px;font-size:.85rem;font-weight:600;color:var(--ink);}
-.sig-group{padding:0 14px 10px;}
-.sig-label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-ink);margin:10px 0 4px;}
+.sig-group{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.sig-label{display:flex;align-items:center;justify-content:space-between;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-ink);padding:9px 12px;cursor:pointer;user-select:none;margin:0;}
+.sig-label:hover{background:var(--bg);}
+.sig-label .sig-chevron{transition:transform .2s;font-style:normal;font-size:.7rem;}
+.sig-group.open .sig-label .sig-chevron{transform:rotate(180deg);}
+.sig-body{display:none;padding:0 10px 10px;}
+.sig-group.open .sig-body{display:block;}
 .sig-textarea{width:100%;box-sizing:border-box;font-size:.82rem;font-family:inherit;resize:vertical;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--paper);color:var(--ink);}
 .tag-insert-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0 4px;}
 .tag-insert-label{font-size:.72rem;font-weight:600;color:var(--muted-ink);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
@@ -1722,14 +1727,15 @@ function openSettingsForm(){
     +'<p class="hint">Affiché dans la signature.</p>'
     +'<div class="sig-details">'
     +'<p class="sig-section-title">Signatures des modèles</p>'
-    +'<div class="sig-group"><label class="sig-label">Patient · Mail</label><textarea id="f-sig-pm" class="sig-textarea" rows="3">'+escapeHtml(sigPM)+'</textarea></div>'
-    +'<div class="sig-group"><label class="sig-label">Patient · SMS</label><textarea id="f-sig-ps" class="sig-textarea" rows="3">'+escapeHtml(sigPS)+'</textarea></div>'
-    +'<div class="sig-group"><label class="sig-label">Partenaire · Mail</label><textarea id="f-sig-em" class="sig-textarea" rows="3">'+escapeHtml(sigEM)+'</textarea></div>'
+    +'<div class="sig-group"><label class="sig-label" data-sig-toggle>Patient · Mail<i class="sig-chevron">▾</i></label><div class="sig-body"><textarea id="f-sig-pm" class="sig-textarea" rows="3">'+escapeHtml(sigPM)+'</textarea></div></div>'
+    +'<div class="sig-group"><label class="sig-label" data-sig-toggle>Patient · SMS<i class="sig-chevron">▾</i></label><div class="sig-body"><textarea id="f-sig-ps" class="sig-textarea" rows="3">'+escapeHtml(sigPS)+'</textarea></div></div>'
+    +'<div class="sig-group"><label class="sig-label" data-sig-toggle>Partenaire · Mail<i class="sig-chevron">▾</i></label><div class="sig-body"><textarea id="f-sig-em" class="sig-textarea" rows="3">'+escapeHtml(sigEM)+'</textarea></div></div>'
     +'</div>'
     +'<label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div>'
     +'<p class="hint">Les données sont sauvegardées dans ce dossier.</p>'
     +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div>'
     +'</div></div>';
+  document.querySelectorAll('[data-sig-toggle]').forEach(lbl=>lbl.addEventListener('click',()=>lbl.closest('.sig-group').classList.toggle('open')));
   document.getElementById('clearSignatureBtn').addEventListener('click',()=>{const i=document.getElementById('f-signature');i.value='';i.focus();});
   document.getElementById('clearPhoneBtn').addEventListener('click',()=>{const i=document.getElementById('f-phone');i.value='';i.focus();});
   document.getElementById('changeFolderBtn').addEventListener('click',async()=>{
