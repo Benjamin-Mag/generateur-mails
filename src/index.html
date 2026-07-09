@@ -953,9 +953,9 @@ function renderTypeChips(){
 function templateMatchesTypeFilter(t){if(templateTypeFilter==='sms')return t.audience!=='partenaire'&&!!t.smsCompanion;return true;}
 function renderTemplatesGrid(){
   const grid=document.getElementById('templatesGrid');
-  // Sauvegarde l'état ouvert/fermé des groupes
+  // Sauvegarde l'état ouvert/fermé des groupes (clé = titre seul, pas le compteur)
   const openGroups=new Set();
-  grid.querySelectorAll('.template-group.open').forEach(g=>{const h=g.querySelector('[data-toggle-group]');if(h)openGroups.add(h.textContent.trim());});
+  grid.querySelectorAll('.template-group.open').forEach(g=>{const t=g.querySelector('.model-group-title');if(t)openGroups.add(t.textContent.trim());});
   const term=templateSearch.toLowerCase();
   const list=appData.templates.filter(t=>templateMatchesTypeFilter(t)&&(t.title.toLowerCase().indexOf(term)!==-1||(t.category||'').toLowerCase().indexOf(term)!==-1));
   function rc(t){
@@ -1014,7 +1014,7 @@ function renderTemplatesGrid(){
   grid.innerHTML=html;
   // Restaure l'état ouvert/fermé
   grid.querySelectorAll('[data-toggle-group]').forEach(header=>{
-    if(openGroups.has(header.textContent.trim()))header.closest('.template-group').classList.add('open');
+    const titleEl=header.querySelector('.model-group-title');if(titleEl&&openGroups.has(titleEl.textContent.trim()))header.closest('.template-group').classList.add('open');
     header.addEventListener('click',()=>{
       const group=header.closest('.template-group');
       group.classList.toggle('open');
