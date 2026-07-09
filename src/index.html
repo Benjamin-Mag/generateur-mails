@@ -834,6 +834,7 @@ function renderDatePopover(v,anchorEl){
   pop.innerHTML='<div class="dp-header"><button type="button" class="dp-nav" data-dp-prev>‹</button><span class="dp-month">'+MONTHS_FR[view.month]+'</span><button type="button" class="dp-nav" data-dp-next>›</button><input type="number" class="dp-year" value="'+view.year+'"></div><div class="dp-weekdays">'+WEEKDAYS_FR.map(w=>'<span>'+w+'</span>').join('')+'</div><div class="dp-grid">'+cells.map(c=>'<button type="button" class="dp-day '+(c.muted?'muted':'')+' '+(isSameDate(c.date,selected)?'selected':'')+' '+(isSameDate(c.date,today)&&!c.muted?'today':'')+'" data-dp-day="'+c.date.toISOString()+'">'+c.day+'</button>').join('')+'</div><div class="dp-footer"><button type="button" class="dp-today-link" data-dp-today>Aujourd\'hui</button></div>';
   pop.addEventListener('click',e=>e.stopPropagation());
   anchorEl.closest('.date-field-wrap').appendChild(pop);
+  setTimeout(()=>pop.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
   pop.querySelector('[data-dp-prev]').addEventListener('click',()=>{view.month--;if(view.month<0){view.month=11;view.year--;}renderDatePopover(v,anchorEl);});
   pop.querySelector('[data-dp-next]').addEventListener('click',()=>{view.month++;if(view.month>11){view.month=0;view.year++;}renderDatePopover(v,anchorEl);});
   pop.querySelector('.dp-year').addEventListener('change',e=>{view.year=parseInt(e.target.value)||view.year;renderDatePopover(v,anchorEl);});
@@ -858,6 +859,7 @@ function renderTimePopover(v,anchorEl){
     +'<button type="button" class="time-confirm-btn" id="tp-confirm">Confirmer</button>';
   pop.addEventListener('click',e=>e.stopPropagation());
   anchorEl.closest('.date-field-wrap').appendChild(pop);
+  setTimeout(()=>pop.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
   function upd(){pop.querySelector('#tp-h').textContent=String(st.h).padStart(2,'0');pop.querySelector('#tp-m').textContent=String(st.m).padStart(2,'0');}
   pop.querySelector('[data-tp-up-h]').addEventListener('click',()=>{st.h=(st.h+1)%24;upd();});
   pop.querySelector('[data-tp-dn-h]').addEventListener('click',()=>{st.h=(st.h+23)%24;upd();});
