@@ -1540,8 +1540,9 @@ const MAIN_TUTORIAL_STEPS=[
    hint:'👆 Clique sur Patient ou Partenaire'},
   {target:'#templateSelect',advance:'action',actionKey:'templateSelected',pulse:false,
    title:'Sélectionne un modèle',
-   text:'Clique sur le modèle que tu veux utiliser dans la liste.',
-   hint:'👆 Clique sur un modèle',
+   text:'Suis les étapes dans l\'ordre.',
+   checklist:['Choisis le genre du patient','Choisis une catégorie','Clique sur un modèle'],
+   checklistType:'select',
    ensure:()=>{if(!followType){followType='patient';renderFollowTypeRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();}}},
   {target:'#copyBodyBtn',advance:'action',actionKey:'copied',pulse:true,
    title:'Copie le message',
@@ -1583,6 +1584,12 @@ function _startChecklistWatcher(items,type){
       if(!_tutCheckState[0]){const el=document.getElementById('anam-label');if(el&&el.value.trim()){_tutCheckState[0]=true;changed=true;}}
       // 1 texte (après titre)
       if(_tutCheckState[0]&&!_tutCheckState[1]){const el=document.getElementById('anam-text');if(el&&el.value.trim().length>2){_tutCheckState[1]=true;changed=true;}}
+    }else if(type==='select'){
+      // 0 genre (gen-civilite)
+      if(!_tutCheckState[0]){if(document.querySelector('input[name="gen-civilite"]:checked')){_tutCheckState[0]=true;changed=true;}}
+      // 1 catégorie (après genre)
+      if(_tutCheckState[0]&&!_tutCheckState[1]){if(selectedCategory){_tutCheckState[1]=true;changed=true;}}
+      // 2 modèle : avancé par tutorialOnAction('templateSelected'), pas besoin de poll
     }else{
       // 1 titre (après catégorie)
       if(_tutCheckState[0]&&!_tutCheckState[1]){const el=document.getElementById('f-title');if(el&&el.value.trim()){_tutCheckState[1]=true;changed=true;}}
