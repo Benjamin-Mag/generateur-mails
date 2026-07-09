@@ -1088,6 +1088,7 @@ function settleGenPanel(){
   _genFloating=false;
   el.classList.remove('show-extra');
   const _ew=document.getElementById('extraFields');if(_ew)_ew.style.display='';
+  const _gvb=document.getElementById('genValiderBtn');if(_gvb)_gvb.remove();
   el.querySelectorAll('.gen-panel-header').forEach(b=>b.remove());
   el.querySelectorAll('.panel-close-btn').forEach(b=>b.remove());
   // FLIP — mesure la position flottante actuelle
