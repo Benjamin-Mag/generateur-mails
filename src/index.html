@@ -838,8 +838,8 @@ function renderDatePopover(v,anchorEl){
   pop.querySelector('[data-dp-prev]').addEventListener('click',()=>{view.month--;if(view.month<0){view.month=11;view.year--;}renderDatePopover(v,anchorEl);});
   pop.querySelector('[data-dp-next]').addEventListener('click',()=>{view.month++;if(view.month>11){view.month=0;view.year++;}renderDatePopover(v,anchorEl);});
   pop.querySelector('.dp-year').addEventListener('change',e=>{view.year=parseInt(e.target.value)||view.year;renderDatePopover(v,anchorEl);});
-  pop.querySelectorAll('[data-dp-day]').forEach(btn=>btn.addEventListener('click',()=>{const d=new Date(btn.dataset.dpDay);manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();}));
-  pop.querySelector('[data-dp-today]').addEventListener('click',()=>{const d=new Date();manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();});
+  pop.querySelectorAll('[data-dp-day]').forEach(btn=>btn.addEventListener('click',()=>{const d=new Date(btn.dataset.dpDay);manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();if(!_genFloating)updateExtraFieldsAndPreview();}));
+  pop.querySelector('[data-dp-today]').addEventListener('click',()=>{const d=new Date();manualValues[v]=formatFrDate(d);const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];closeDatePicker();renderPreviewOnly();if(!_genFloating)updateExtraFieldsAndPreview();});
 }
 document.addEventListener('click',()=>{closeDatePicker();closeTimePicker();});
 
@@ -868,7 +868,7 @@ function renderTimePopover(v,anchorEl){
   pop.querySelector('#tp-confirm').addEventListener('click',()=>{
     manualValues[v]=formatHeureFr(st.h,st.m);
     const inp=document.getElementById('extra-'+v);if(inp)inp.value=manualValues[v];
-    closeTimePicker();renderPreviewOnly();
+    closeTimePicker();renderPreviewOnly();if(!_genFloating)updateExtraFieldsAndPreview();
   });
 }
 
