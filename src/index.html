@@ -352,6 +352,12 @@ input,textarea,select{font-family:inherit;}
 .tutorial-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
 .tutorial-step-count{font-size:.74rem;color:var(--muted-ink);white-space:nowrap;}
 .tutorial-action-hint{font-size:.8rem;color:var(--accent);font-weight:600;display:flex;align-items:center;gap:5px;}
+.tut-checklist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;}
+.tut-check-item{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted-ink);transition:color .2s;}
+.tut-check-item.done{color:var(--ink);}
+.tut-check-item.locked{opacity:.4;}
+.tut-check-box{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;transition:all .2s;}
+.tut-check-item.done .tut-check-box{background:#22c55e;border-color:#22c55e;color:#fff;}
 
 /* ===== Modal Anamnèse ===== */
 /* ===== Barre résumé anamnèse ===== */
@@ -686,7 +692,7 @@ let manualValues={}, civilite=null, followType=null, selectedCategory=null, sele
 let datePickerOpenVar=null, datePickerView={};
 let timePickerOpenVar=null, timePickerState={};
 let selectedSituation=null, anamneseGenre=null, renouvellementType=null;
-let tutorialStepIndex=-1, activeTutorialSteps=null;
+let tutorialStepIndex=-1, activeTutorialSteps=null, _tutCheckInterval=null, _tutCheckState=[];
 
 /* ========== Helpers ========== */
 function advisorTitle(){return appData.advisorGenre==='F'?'Votre conseillère Audibene':'Votre conseiller Audibene';}
@@ -1510,11 +1516,10 @@ const MAIN_TUTORIAL_STEPS=[
    title:'Crée ton premier modèle',
    text:'Un modèle, c\'est un mail pré-rédigé avec des variables comme <code>{{nom_patient}}</code> qui se remplissent automatiquement.',
    hint:'👆 Clique sur « + Nouveau modèle »'},
-  {target:null,advance:'action',actionKey:'templateSaved',noBackdrop:true,
+  {target:null,advance:'action',actionKey:'templateSaved',noBackdrop:true,tooltipPosition:'corner',
    title:'Rédige le modèle',
-   text:'Donne un <strong>titre</strong> et rédige ton <strong>message</strong>. Tu peux insérer des variables entre <code>{{}}</code>. Quand c\'est prêt, clique sur <strong>Ajouter</strong>.',
-   hint:'✅ Clique sur Ajouter quand tu as terminé',
-   tooltipPosition:'corner'},
+   text:'Remplis les champs dans l\'ordre, puis clique sur <strong>Ajouter</strong>.',
+   checklist:['Choisis une catégorie','Remplis le titre','Remplis l\'objet du mail','Rédige le corps du mail','Ajoute la version SMS (optionnel)']},
   {target:null,advance:'button',
    title:'Modèle créé ! 🥳',
    text:'Parfait. Maintenant on crée une <strong>anamnèse</strong> — un texte d\'introduction pour tes comptes-rendus patients. Je vais ouvrir le formulaire pour toi.'},
@@ -1559,7 +1564,42 @@ function startMainTutorial(){
 }
 function closeTutorial(){
   tutorialStepIndex=-1;activeTutorialSteps=null;
+  if(_tutCheckInterval){clearInterval(_tutCheckInterval);_tutCheckInterval=null;}
+  document.removeEventListener('change',_onCategoryChange);
+  _tutCheckState=[];
   const o=document.getElementById('tutorialOverlay');if(o)o.remove();
+}
+function _startChecklistWatcher(items){
+  _tutCheckState=items.map(()=>false);
+  _tutCheckState[0]=true; // catégorie toujours pré-sélectionnée
+  _renderChecklistUI();
+  if(_tutCheckInterval)clearInterval(_tutCheckInterval);
+  _tutCheckInterval=setInterval(()=>{
+    if(!activeTutorialSteps){clearInterval(_tutCheckInterval);return;}
+    let changed=false;
+    // 1 titre (après catégorie)
+    if(_tutCheckState[0]&&!_tutCheckState[1]){const el=document.getElementById('f-title');if(el&&el.value.trim()){_tutCheckState[1]=true;changed=true;}}
+    // 2 objet (après titre)
+    if(_tutCheckState[1]&&!_tutCheckState[2]){const el=document.getElementById('f-subject');if(el&&el.value.trim()){_tutCheckState[2]=true;changed=true;}}
+    // 3 corps (après objet)
+    if(_tutCheckState[2]&&!_tutCheckState[3]){const el=document.getElementById('f-body');if(el&&el.value.trim().replace(/Bien cordialement[\s\S]*/,'').trim().length>2){_tutCheckState[3]=true;changed=true;}}
+    // 4 SMS (optionnel, après corps)
+    if(_tutCheckState[3]&&!_tutCheckState[4]){const el=document.getElementById('f-sms');if(el&&el.value.trim().replace(/Bien cordialement[\s\S]*/,'').trim().length>2){_tutCheckState[4]=true;changed=true;}}
+    if(changed)_renderChecklistUI();
+  },300);
+  // catégorie: écouter changement pour cocher immédiatement si l'utilisateur change
+  document.addEventListener('change',_onCategoryChange);
+}
+function _onCategoryChange(e){
+  if(e.target&&e.target.name==='f-category'&&!_tutCheckState[0]){_tutCheckState[0]=true;_renderChecklistUI();}
+}
+function _renderChecklistUI(){
+  const cl=document.getElementById('tutCheckList');
+  if(!cl)return;
+  cl.innerHTML=_tutCheckState.map((done,i)=>{
+    const locked=i>0&&!_tutCheckState[i-1];
+    return '<li class="tut-check-item'+(done?' done':'')+(locked?' locked':'')+'"><span class="tut-check-box">'+(done?'✓':'')+'</span><span>'+['Choisis une catégorie','Remplis le titre','Remplis l\'objet du mail','Rédige le corps du mail','Ajoute la version SMS (optionnel)'][i]+'</span></li>';
+  }).join('');
 }
 async function finishTutorial(){
   closeTutorial();
@@ -1595,7 +1635,8 @@ function _renderTutorialStepPositioned(step,steps,ov){
   const isLast=tutorialStepIndex===steps.length-1;
   const isBtn=step.advance==='button';
   const btnHtml=isBtn?'<button type="button" class="btn-primary" id="tutorialNextBtn">'+(isLast?'Terminer 🎉':'Suivant →')+'</button>':'';
-  const hintHtml=(!isBtn&&step.hint)?'<p class="tutorial-action-hint">'+step.hint+'</p>':'';
+  const hintHtml=(!isBtn&&step.hint&&!step.checklist)?'<p class="tutorial-action-hint">'+step.hint+'</p>':'';
+  const checklistHtml=step.checklist?'<ul class="tut-checklist" id="tutCheckList"></ul>':'';
   const showBackdrop=!step.noBackdrop&&!(tr&&tr.width>0)&&step.tooltipPosition!=='corner';
   ov.innerHTML=(showBackdrop?'<div class="tutorial-backdrop-full"></div>':'')+box
     +'<div class="tutorial-tooltip" style="'+ts+'">'
@@ -1603,6 +1644,7 @@ function _renderTutorialStepPositioned(step,steps,ov){
     +'<h3>'+escapeHtml(step.title)+'</h3>'
     +'<p>'+step.text+'</p>'
     +hintHtml
+    +checklistHtml
     +'<div class="tutorial-foot"><span class="tutorial-step-count">'+(tutorialStepIndex+1)+' / '+steps.length+'</span>'
     +btnHtml+'</div>'
     +'</div>';
@@ -1611,6 +1653,10 @@ function _renderTutorialStepPositioned(step,steps,ov){
     document.getElementById('tutorialNextBtn').addEventListener('click',()=>{
       if(isLast)finishTutorial();else{tutorialStepIndex++;renderTutorialStep();}
     });
+  }
+  if(step.checklist){
+    if(_tutCheckInterval){clearInterval(_tutCheckInterval);_tutCheckInterval=null;document.removeEventListener('change',_onCategoryChange);}
+    _startChecklistWatcher(step.checklist);
   }
   const bdf=ov.querySelector('.tutorial-backdrop-full');if(bdf)bdf.addEventListener('click',closeTutorial);
 }
