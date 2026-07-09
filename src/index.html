@@ -1538,7 +1538,7 @@ const MAIN_TUTORIAL_STEPS=[
    title:'Type de suivi',
    text:'Choisis d\'abord si le mail s\'adresse à un <strong>patient</strong> ou un <strong>partenaire</strong>.',
    hint:'👆 Clique sur Patient ou Partenaire'},
-  {target:'#templateSelect',advance:'action',actionKey:'templateSelected',pulse:false,
+  {target:'#genFormCol',advance:'action',actionKey:'templateSelected',pulse:false,
    title:'Sélectionne un modèle',
    text:'Suis les étapes dans l\'ordre.',
    checklist:['Choisis le genre du patient','Choisis une catégorie','Clique sur un modèle'],
@@ -1573,7 +1573,7 @@ function closeTutorial(){
 }
 function _startChecklistWatcher(items,type){
   _tutCheckState=items.map(()=>false);
-  if(type!=='anam')_tutCheckState[0]=true; // catégorie toujours pré-sélectionnée pour modèle
+  if(!type)_tutCheckState[0]=true; // catégorie toujours pré-sélectionnée pour modèle email
   _renderChecklistUI(items);
   if(_tutCheckInterval)clearInterval(_tutCheckInterval);
   _tutCheckInterval=setInterval(()=>{
