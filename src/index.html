@@ -1433,7 +1433,7 @@ function renderPreviewOnly(){
   const template=appData.templates.find(t=>t.id===selectedTemplateId);
   if(!template)return;
   const sw=document.getElementById('previewSubjectWrap'),se=document.getElementById('previewSubject'),be=document.getElementById('previewBody'),ac=document.getElementById('copyActions'),smsw=document.getElementById('smsCompanionWrap');
-  const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']||''}),genre=getEffectiveGenre();
+  const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']?'\n'+manualValues['adresse']+'\n':''}),genre=getEffectiveGenre();
   if(template.type==='email'&&template.subject){sw.style.display='block';se.innerHTML=previewHtml(template.subject,vals,genre);}else sw.style.display='none';
   be.innerHTML=previewHtml(template.body,vals,genre);ac.style.display='flex';
   const ss=template.audience==='patient'&&template.type==='email'&&template.smsCompanion;
