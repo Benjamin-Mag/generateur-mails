@@ -1117,7 +1117,7 @@ function settleGenPanel(){
   if(bd){bd.style.transition='opacity .32s ease';bd.style.opacity='0';setTimeout(()=>bd.remove(),340);}
   el.addEventListener('transitionend',()=>{
     el.style.transform='';el.style.transition='';el.style.transformOrigin='';
-    if(!_genFloating)renderGenSummary();
+    if(!_genFloating){updateExtraFieldsAndPreview();renderGenSummary();}
   },{once:true});
   _genFloatParent=null;_genFloatSibling=null;
 }
