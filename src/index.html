@@ -340,9 +340,10 @@ input,textarea,select{font-family:inherit;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 .tutorial-overlay{position:fixed;inset:0;z-index:200;pointer-events:none;}
+.tutorial-blocker{position:fixed;inset:0;z-index:200;pointer-events:auto;background:rgba(43,42,40,.65);}
 .tutorial-backdrop-full{position:fixed;inset:0;background:rgba(43,42,40,.65);pointer-events:auto;}
-.tutorial-highlight{position:fixed;border-radius:8px;box-shadow:0 0 0 9999px rgba(43,42,40,.65);pointer-events:none;z-index:201;}
-@keyframes tut-pulse{0%,100%{box-shadow:0 0 0 9999px rgba(43,42,40,.65);}50%{box-shadow:0 0 0 9999px rgba(43,42,40,.65),0 0 0 8px rgba(27,79,155,.5),0 0 0 18px rgba(27,79,155,.15);}}
+.tutorial-highlight{position:fixed;border-radius:8px;pointer-events:none;z-index:201;}
+@keyframes tut-pulse{0%,100%{box-shadow:0 0 0 4px rgba(27,79,155,.25);}50%{box-shadow:0 0 0 8px rgba(27,79,155,.55);}}
 .tutorial-highlight.tutorial-pulse{animation:tut-pulse 2s ease-in-out infinite;}
 .tutorial-tooltip{position:fixed;z-index:202;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;padding:20px 22px 16px;width:310px;max-width:calc(100vw - 32px);box-shadow:0 12px 36px rgba(0,0,0,.25);pointer-events:auto;}
 .tutorial-tooltip h3{font-family:'Poppins',sans-serif;font-weight:600;font-size:1rem;margin:0 24px 8px 0;color:var(--ink);}
@@ -1622,23 +1623,38 @@ function renderTutorialStep(){
 function _renderTutorialStepPositioned(step,steps,ov){
   let tr=null;
   if(step.target){const el=document.querySelector(step.target);if(el)tr=el.getBoundingClientRect();}
+  // Pour noBackdrop (modal), trou autour de .modal
+  let holeRect=tr;
+  if(!holeRect&&step.noBackdrop){const m=document.querySelector('.modal');if(m)holeRect=m.getBoundingClientRect();}
   const pad=10;
+  // Blocker avec trou clip-path si on a une cible
+  let blockerStyle='';
+  if(holeRect&&holeRect.width>0){
+    const t=Math.max(0,holeRect.top-pad),l=Math.max(0,holeRect.left-pad);
+    const r=Math.min(window.innerWidth,holeRect.right+pad),b=Math.min(window.innerHeight,holeRect.bottom+pad);
+    const W=window.innerWidth,H=window.innerHeight;
+    blockerStyle=`clip-path:polygon(0px 0px,0px ${H}px,${l}px ${H}px,${l}px ${t}px,${r}px ${t}px,${r}px ${b}px,${l}px ${b}px,${l}px ${H}px,${W}px ${H}px,${W}px 0px);`;
+  }
+  const blockerHtml='<div class="tutorial-blocker" style="'+blockerStyle+'"></div>';
+  // Highlight (juste l'anneau pulse, pas de box-shadow overlay)
   let box='',ts;
+  if(tr&&tr.width>0){
+    box='<div class="tutorial-highlight'+(step.pulse?' tutorial-pulse':'')+'" style="top:'+(tr.top-pad)+'px;left:'+(tr.left-pad)+'px;width:'+(tr.width+pad*2)+'px;height:'+(tr.height+pad*2)+'px;border-radius:10px;"></div>';
+  }
+  // Position tooltip
   if(step.tooltipPosition==='corner'){
     ts='top:16px;right:16px;';
   }else if(tr&&tr.width>0){
-    box='<div class="tutorial-highlight'+(step.pulse?' tutorial-pulse':'')+'" style="top:'+(tr.top-pad)+'px;left:'+(tr.left-pad)+'px;width:'+(tr.width+pad*2)+'px;height:'+(tr.height+pad*2)+'px;"></div>';
-    if(step.tooltipPosition==='above'){const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));const topY=tr.top-16-200;ts=topY>16?'bottom:'+(window.innerHeight-tr.top+16)+'px;left:'+tl+'px;':'top:16px;left:'+tl+'px;';}
-    else if(step.tooltipPosition==='left'){const tw=Math.min(326,tr.left-32);ts='top:'+Math.max(16,Math.min(tr.top,window.innerHeight-320))+'px;right:'+(window.innerWidth-tr.left+16)+'px;width:'+tw+'px;';}
-    else{const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));ts='top:'+Math.min(tr.bottom+16,window.innerHeight-220)+'px;left:'+tl+'px;';}
+    if(step.tooltipPosition==='above'){const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));const spaceAbove=tr.top-pad-16;ts=spaceAbove>180?'bottom:'+(window.innerHeight-tr.top+pad+8)+'px;left:'+tl+'px;':'top:16px;left:'+tl+'px;';}
+    else if(step.tooltipPosition==='left'){const tw=Math.min(310,tr.left-32);ts='top:'+Math.max(16,Math.min(tr.top,window.innerHeight-320))+'px;right:'+(window.innerWidth-tr.left+pad+8)+'px;width:'+tw+'px;';}
+    else{const tl=Math.max(16,Math.min(tr.left,window.innerWidth-326));ts='top:'+Math.min(tr.bottom+pad+8,window.innerHeight-220)+'px;left:'+tl+'px;';}
   }else{ts='top:50%;left:50%;transform:translate(-50%,-50%);';}
   const isLast=tutorialStepIndex===steps.length-1;
   const isBtn=step.advance==='button';
   const btnHtml=isBtn?'<button type="button" class="btn-primary" id="tutorialNextBtn">'+(isLast?'Terminer 🎉':'Suivant →')+'</button>':'';
   const hintHtml=(!isBtn&&step.hint&&!step.checklist)?'<p class="tutorial-action-hint">'+step.hint+'</p>':'';
   const checklistHtml=step.checklist?'<ul class="tut-checklist" id="tutCheckList"></ul>':'';
-  const showBackdrop=!step.noBackdrop&&!(tr&&tr.width>0)&&step.tooltipPosition!=='corner';
-  ov.innerHTML=(showBackdrop?'<div class="tutorial-backdrop-full"></div>':'')+box
+  ov.innerHTML=blockerHtml+box
     +'<div class="tutorial-tooltip" style="'+ts+'">'
     +'<button type="button" class="tutorial-close" id="tutorialCloseBtn">×</button>'
     +'<h3>'+escapeHtml(step.title)+'</h3>'
@@ -1658,7 +1674,6 @@ function _renderTutorialStepPositioned(step,steps,ov){
     if(_tutCheckInterval){clearInterval(_tutCheckInterval);_tutCheckInterval=null;document.removeEventListener('change',_onCategoryChange);}
     _startChecklistWatcher(step.checklist);
   }
-  const bdf=ov.querySelector('.tutorial-backdrop-full');if(bdf)bdf.addEventListener('click',closeTutorial);
 }
 
 /* ========== Réglages ========== */
