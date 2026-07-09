@@ -1347,8 +1347,10 @@ function updateExtraFieldsAndPreview(){
     if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
     if(isDateVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'" readonly><button type="button" class="date-icon-btn" data-date-toggle="'+escapeHtml(v)+'" aria-label="Choisir une date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div></div>';
     return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><input id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'"></div>';
-  }).join('');
+  }).join('')+(vars.length&&_genFloating?'<button type="button" class="btn-primary" id="genValiderBtn" style="width:100%;margin-top:14px;">Générer →</button>':'');
   ew.querySelectorAll('input[data-extra-var]:not(.date-display-input)').forEach(i=>i.addEventListener('input',e=>{manualValues[e.target.dataset.extraVar]=e.target.value;renderPreviewOnly();}));
+  const _gvb=document.getElementById('genValiderBtn');
+  if(_gvb)_gvb.addEventListener('click',()=>{settleGenPanel();renderGenSummary();});
   ew.querySelectorAll('input[name="civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
   async function parseSFClip(key){
     try{
@@ -1395,14 +1397,6 @@ function renderPreviewOnly(){
   be.innerHTML=previewHtml(template.body,vals,genre);ac.style.display='flex';
   const ss=template.audience==='patient'&&template.type==='email'&&template.smsCompanion;
   if(ss){smsw.style.display='block';document.getElementById('smsCompanionBody').innerHTML=previewHtml(template.smsCompanion,vals,genre);}else smsw.style.display='none';
-  if(_genFloating){
-    const ew=document.getElementById('extraFields');
-    if(ew&&ew.style.display==='block'){
-      const extraInputs=Array.from(ew.querySelectorAll('input[data-extra-var]'));
-      const allFilled=extraInputs.every(i=>(i.value||'').trim());
-      if(allFilled){ew.style.display='';settleGenPanel();renderGenSummary();}
-    }
-  }
 }
 function needsGenreChoice(){return !!document.querySelector('#extraFields input[name="civilite"]');}
 
