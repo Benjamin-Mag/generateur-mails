@@ -317,6 +317,9 @@ input,textarea,select{font-family:inherit;}
 .tpl-pill:nth-child(4){animation-delay:.15s;}
 .tpl-pill:nth-child(5){animation-delay:.19s;}
 .folder-row{display:flex;align-items:center;gap:10px;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;}
+.extension-download-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:10px 12px;background:var(--paper);border:1px solid var(--line);border-radius:6px;}
+.extension-download-label{font-size:.85rem;color:var(--muted-ink);}
+.extension-download-row a.btn-outline{text-decoration:none;}
 .sig-details{margin:4px 0 12px;border:1px solid var(--line);border-radius:8px;overflow:hidden;padding-bottom:4px;}
 .sig-section-title{margin:0;padding:10px 14px 4px;font-size:.85rem;font-weight:600;color:var(--ink);}
 .sig-group{padding:0 0 10px;}
@@ -1738,6 +1741,7 @@ function openSettingsForm(){
     +'</div>'
     +'<label>Dossier de sauvegarde</label><div class="folder-row"><span>📁 '+escapeHtml(folderName)+'</span><button type="button" class="btn-outline small" id="changeFolderBtn">Changer…</button></div>'
     +'<p class="hint">Les données sont sauvegardées dans ce dossier.</p>'
+    +'<div class="extension-download-row"><span class="extension-download-label">Extension navigateur</span><a href="public/ColleurMailSF.zip" download class="btn-outline small">⬇ Télécharger l\'extension</a></div>'
     +'<div class="modal-foot"><button class="btn-outline" id="cancelBtn">Annuler</button><button class="btn-primary" id="saveSettingsBtn">Enregistrer</button></div>'
     +'</div></div>';
   document.getElementById('sigToggle').addEventListener('click',()=>document.getElementById('sigDetails').classList.toggle('open'));
