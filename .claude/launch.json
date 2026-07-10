@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "generateur-mails",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "src", "-p", "5500", "--no-clipboard"],
+      "port": 5500
+    }
+  ]
+}
