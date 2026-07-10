@@ -1465,7 +1465,7 @@ function updateExtraFieldsAndPreview(){
     if(v==='nom')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-nom" data-extra-var="nom" value="'+escapeHtml(manualValues['nom']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFBtn" title="Coller depuis Salesforce">📋</button></div></div>';
     if(v==='nom partenaire')return '<div class="extra-field"><div class="field-row-header"><label for="extra-nom-partenaire">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-nom-partenaire" data-extra-var="nom partenaire" value="'+escapeHtml(manualValues['nom partenaire']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFPartBtn" title="Coller depuis Salesforce">📋</button></div></div>';
     if(v==='adresse')return '<div class="extra-field"><div class="field-row-header"><label for="extra-adresse">'+lbl+'</label></div><div class="input-paste-wrap"><input id="extra-adresse" data-extra-var="adresse" value="'+escapeHtml(manualValues['adresse']||'')+'" placeholder="'+lbl+'"><button type="button" class="paste-sf-btn" id="pasteSFAddrBtn" title="Coller depuis Salesforce">📋</button></div></div>';
-    if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
+    if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" data-time-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="14h00 ou 1400"><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
     if(isDateVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'" readonly><button type="button" class="date-icon-btn" data-date-toggle="'+escapeHtml(v)+'" aria-label="Choisir une date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div></div>';
     return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><input id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'"></div>';
   }).join('');
@@ -1509,6 +1509,26 @@ function updateExtraFieldsAndPreview(){
   });
   ew.querySelectorAll('.date-display-input[data-extra-var],[data-date-toggle]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const v=el.dataset.extraVar||el.dataset.dateToggle;if(!isHeureVar(v)){if(datePickerOpenVar===v)closeDatePicker();else openDatePicker(v,el);}}));
   ew.querySelectorAll('[data-time-toggle],.date-display-input[data-extra-var]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const v=el.dataset.extraVar||el.dataset.timeToggle;if(isHeureVar(v)){if(timePickerOpenVar===v)closeTimePicker();else openTimePicker(v,el);}}));
+  ew.querySelectorAll('input[data-time-var]').forEach(inp=>{
+    inp.removeAttribute('readonly');
+    inp.addEventListener('blur',()=>{
+      const raw=inp.value.replace(/\s/g,'');
+      if(!raw){manualValues[inp.dataset.timeVar]='';renderPreviewOnly();return;}
+      let h,m;
+      const mFmt=raw.match(/^(\d{1,2})[hH:](\d{2})$/);
+      const mNum=raw.match(/^(\d{3,4})$/);
+      if(mFmt){h=parseInt(mFmt[1]);m=parseInt(mFmt[2]);}
+      else if(mNum){const s=mNum[1].padStart(4,'0');h=parseInt(s.slice(0,2));m=parseInt(s.slice(2));}
+      else return;
+      if(h>23||m>59)return;
+      const formatted=formatHeureFr(h,m);
+      inp.value=formatted;
+      manualValues[inp.dataset.timeVar]=formatted;
+      const st=timePickerState[inp.dataset.timeVar]||{};st.h=h;st.m=m;timePickerState[inp.dataset.timeVar]=st;
+      renderPreviewOnly();
+    });
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}});
+  });
   renderPreviewOnly();
 }
 function renderPreviewOnly(){
