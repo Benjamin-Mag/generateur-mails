@@ -2203,12 +2203,13 @@ function confirmDeleteAnam(id){
   document.querySelectorAll('.nav-item[data-tab]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
   document.getElementById('burgerBtn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('collapsed'));
   document.getElementById('copyBodyBtn').addEventListener('click',async()=>{
-    const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t)return;
+    if(!selectedTemplateId)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
-    const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']?'\n'+manualValues['adresse']+'\n':''});
-    const genre=getEffectiveGenre();
-    const subject=t.subject?resolveGenre(buildFilledText(t.subject,vals),genre):'';
-    const body=resolveGenre(buildFilledText(t.body,vals),genre);
+    const subjectEl=document.getElementById('previewSubject');
+    const bodyEl=document.getElementById('previewBody');
+    const subjectWrap=document.getElementById('previewSubjectWrap');
+    const subject=(subjectWrap&&subjectWrap.style.display!=='none'&&subjectEl)?subjectEl.innerText.trim():'';
+    const body=bodyEl?bodyEl.innerText:'';
     const toCopy=subject?subject+'\n'+body:body;
     const copied=await copyText(toCopy);showToast(copied?'Message copié ✓':"Impossible de copier.");if(copied)tutorialOnAction('copied');
   });
