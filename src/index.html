@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -194,7 +194,20 @@ html,body{height:100%;}
 .copy-mini.danger:hover{border-color:var(--accent);background:var(--accent);color:#fff;}
 .empty-state{color:var(--muted-ink);font-size:.88rem;padding:30px 0;text-align:center;}
 
-.gen-layout{display:flex;flex-direction:column;gap:20px;max-width:720px;margin:0 auto;}
+.gen-page-body{display:flex;flex-direction:column;flex:1;min-height:0;}
+.gen-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;color:var(--muted-ink);padding:40px 20px;}
+.gen-empty-state i{font-size:52px;opacity:.25;}
+.gen-empty-state p{text-align:center;font-size:15px;line-height:1.7;}
+.gen-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+.gen-drawer-overlay.open{opacity:1;pointer-events:auto;}
+.gen-drawer{position:fixed;top:0;right:0;width:380px;max-width:100vw;height:100vh;background:var(--card-bg);border-left:1px solid var(--line);display:flex;flex-direction:column;z-index:200;transform:translateX(100%);transition:transform .25s ease;box-shadow:-4px 0 20px rgba(0,0,0,.12);}
+.gen-drawer.open{transform:translateX(0);}
+.gen-drawer-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.gen-drawer-title{font-size:15px;font-weight:600;color:var(--ink);}
+.gen-drawer-close{background:none;border:none;cursor:pointer;color:var(--muted-ink);font-size:20px;display:flex;align-items:center;padding:4px;border-radius:4px;line-height:1;}
+.gen-drawer-close:hover{background:var(--hover);}
+.gen-drawer-body{flex:1;overflow-y:auto;padding:20px;}
+.gen-drawer-footer{padding:16px 20px;border-top:1px solid var(--line);flex-shrink:0;}
 /* ===== Panneau flottant ===== */
 @keyframes genPanelIn{from{opacity:0;transform:translate(-50%,-47%) scale(.92);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
 @keyframes genBackdropIn{from{opacity:0;}to{opacity:1;}}
@@ -610,32 +623,17 @@ html,body{height:100%;}
     <div class="page-topbar">
       <h2>Templates</h2>
       <div class="tb-right">
+        <button class="btn-outline small" id="modifierTemplateBtn" type="button" style="display:none;"><i class="ti ti-edit"></i> Modifier</button>
+        <button class="btn-primary" id="nouveauTemplateBtn" type="button"><i class="ti ti-plus"></i> Nouveau template</button>
         <button class="btn-outline small" id="genererTutorialBtn" type="button">🎓 Tutoriel</button>
       </div>
     </div>
-    <div class="page-body">
-    <div id="genSummaryContainer" style="display:flex;justify-content:center;margin-bottom:12px;"></div>
-    <div class="gen-layout">
-      <div class="gen-col" id="genFormCol">
-        <div id="genFormInner">
-          <label class="field-label">Envoyer mail à :</label>
-          <div class="civility-group" id="followTypeRow"></div>
-          <div class="situation-block" id="genreBlock" style="display:none;margin-top:18px;">
-            <label class="field-label">Genre du patient</label>
-            <div class="civility-group" id="genreRow"></div>
-          </div>
-          <div class="situation-block" id="categoryBlock" style="display:none;margin-top:18px;">
-            <label class="field-label">Catégorie</label>
-            <div class="civility-group" id="categoryRow"></div>
-          </div>
-          <div id="modeleBlock" style="display:none;">
-            <label class="field-label" style="margin-top:18px;">Modèle</label>
-            <div id="templateSelect" class="template-pill-grid"></div>
-          </div>
-        </div>
-        <div id="extraFields" class="extra-fields"></div>
+    <div class="page-body gen-page-body">
+      <div id="genEmptyState" class="gen-empty-state">
+        <i class="ti ti-layout-cards"></i>
+        <p>Clique sur <strong>Nouveau template</strong><br>pour générer un aperçu.</p>
       </div>
-      <div class="gen-col preview-col" id="apercuBlock" style="display:none;">
+      <div id="apercuBlock" style="display:none;padding:20px;flex:1;">
         <div class="apercu-header">
           <label class="field-label">Aperçu</label>
           <div class="apercu-actions">
@@ -647,7 +645,7 @@ html,body{height:100%;}
         <div id="previewSubjectWrap" style="display:none;">
           <div class="preview-subject" id="previewSubject" contenteditable="true" spellcheck="false"></div>
         </div>
-        <div class="preview-body" id="previewBody" contenteditable="true" spellcheck="false">Choisis un type de suivi puis un modèle pour commencer.</div>
+        <div class="preview-body" id="previewBody" contenteditable="true" spellcheck="false"></div>
         <div class="sms-companion" id="smsCompanionWrap" style="display:none;">
           <div class="apercu-header">
             <label class="field-label">SMS</label>
@@ -659,6 +657,36 @@ html,body{height:100%;}
         </div>
       </div>
     </div>
+    <div id="genDrawerOverlay" class="gen-drawer-overlay"></div>
+    <div id="genDrawer" class="gen-drawer">
+      <div class="gen-drawer-header">
+        <span class="gen-drawer-title" id="genDrawerTitle">Nouveau template</span>
+        <button class="gen-drawer-close" id="genDrawerClose" type="button"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="gen-drawer-body">
+        <div id="genFormCol">
+          <div id="genFormInner">
+            <label class="field-label">Type</label>
+            <div class="civility-group" id="followTypeRow"></div>
+            <div class="situation-block" id="genreBlock" style="display:none;margin-top:18px;">
+              <label class="field-label">Genre du patient</label>
+              <div class="civility-group" id="genreRow"></div>
+            </div>
+            <div class="situation-block" id="categoryBlock" style="display:none;margin-top:18px;">
+              <label class="field-label">Catégorie</label>
+              <div class="civility-group" id="categoryRow"></div>
+            </div>
+            <div id="modeleBlock" style="display:none;margin-top:18px;">
+              <label class="field-label">Modèle</label>
+              <div id="templateSelect" class="template-pill-grid"></div>
+            </div>
+          </div>
+          <div id="extraFields" class="extra-fields" style="margin-top:18px;"></div>
+        </div>
+      </div>
+      <div class="gen-drawer-footer">
+        <button class="btn-primary" id="genererApercuBtn" type="button" style="width:100%;">Générer l'aperçu</button>
+      </div>
     </div>
   </section>
 
@@ -1055,7 +1083,7 @@ function resetTabState(name){
   closeDatePicker();
   teardownGenPanel();
   teardownAnamPanel();
-  if(name==='generer'){manualValues={};civilite=null;followType=(tutorialStepIndex>=0?null:'patient');selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();showGenPanel();}
+  if(name==='generer'){manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();updateModifierBtn();openGenDrawer(false);}
   else if(name==='anamnese'){selectedSituation=null;anamneseGenre=null;renouvellementType=null;renderAnamneseGenreRow();renderSituationRow();renderRenouvellementSubRow();renderAnamneseContent();showAnamPanel();}
   else if(name==='modeles'){renderTemplatesGrid();}
 }
@@ -1210,94 +1238,33 @@ function updateCategoryBlockVisibility(){
   document.getElementById('categoryBlock').style.display=followType?'block':'none';
   if(!selectedCategory){document.getElementById('modeleBlock').style.display='none';document.getElementById('apercuBlock').style.display='none';}
 }
+let _drawerOpen=false;
+function openGenDrawer(isModifier){
+  document.getElementById('genDrawerTitle').textContent=isModifier?'Modifier':'Nouveau template';
+  document.getElementById('genDrawer').classList.add('open');
+  document.getElementById('genDrawerOverlay').classList.add('open');
+  _genFloating=true;
+}
+function closeGenDrawer(){
+  document.getElementById('genDrawer').classList.remove('open');
+  document.getElementById('genDrawerOverlay').classList.remove('open');
+  _genFloating=false;
+  updateExtraFieldsAndPreview();
+  updateModifierBtn();
+}
+function updateModifierBtn(){
+  const btn=document.getElementById('modifierTemplateBtn');
+  if(btn)btn.style.display=selectedTemplateId?'':'none';
+}
 function resetGenForm(){
-  const container=document.getElementById('genSummaryContainer');if(container)container.innerHTML='';
-  const inner=document.getElementById('genFormInner');if(inner)inner.style.display='';
   updateCategoryBlockVisibility();
   if(selectedCategory)document.getElementById('modeleBlock').style.display='block';
 }
 /* ===== Panneau flottant ===== */
 let _genFloating=false,_genFloatParent=null,_genFloatSibling=null;
-function showGenPanel(){
-  const el=document.getElementById('genFormCol');
-  if(!el||_genFloating)return;
-  resetGenForm();
-  _genFloating=true;
-  // Mémorise la place d'origine
-  _genFloatParent=el.parentNode;
-  _genFloatSibling=el.nextSibling;
-  // Déplace physiquement dans body pour éviter les stacking contexts
-  document.body.appendChild(el);
-  // Backdrop
-  const bd=document.createElement('div');
-  bd.className='gen-backdrop';bd.id='genBackdrop';
-  bd.addEventListener('click',()=>{if(tutorialStepIndex>=0)return;settleGenPanel();});
-  document.body.insertBefore(bd,el);
-  el.classList.add('is-floating');
-  const hdr=document.createElement('div');hdr.className='gen-panel-header';
-  hdr.innerHTML='<button type="button" class="panel-close-btn" aria-label="Fermer">×</button><span class="gen-panel-title">Templates</span>';
-  el.insertBefore(hdr,el.firstChild);
-  hdr.querySelector('.panel-close-btn').addEventListener('click',settleGenPanel);
-}
-function settleGenPanel(){
-  const el=document.getElementById('genFormCol');
-  const bd=document.getElementById('genBackdrop');
-  if(!el||!_genFloating)return;
-  _genFloating=false;
-  el.classList.remove('show-extra');
-  const _ew=document.getElementById('extraFields');if(_ew)_ew.style.display='';
-  const _gvb=document.getElementById('genValiderBtn');if(_gvb)_gvb.remove();
-  el.querySelectorAll('.gen-panel-header').forEach(b=>b.remove());
-  el.querySelectorAll('.panel-close-btn').forEach(b=>b.remove());
-  // FLIP — mesure la position flottante actuelle
-  const startRect=el.getBoundingClientRect();
-  // Remet dans le flux d'origine pour mesurer la position finale
-  el.classList.remove('is-floating');
-  if(_genFloatSibling)_genFloatParent.insertBefore(el,_genFloatSibling);
-  else _genFloatParent.appendChild(el);
-  el.style.visibility='hidden';
-  const endRect=el.getBoundingClientRect();
-  el.style.visibility='';
-  // Calcule le delta
-  const dx=startRect.left-endRect.left;
-  const dy=startRect.top-endRect.top;
-  const sx=startRect.width/endRect.width;
-  const sy=Math.min(startRect.height/endRect.height,3); // clamp pour éviter distorsion
-  // Applique le transform inversé (remet visuellement au point de départ)
-  el.style.transformOrigin='top left';
-  el.style.transition='none';
-  el.style.transform=`translate(${dx}px,${dy}px) scale(${sx},${sy})`;
-  el.getBoundingClientRect();
-  // Anime vers la position finale
-  el.style.transition='transform .5s cubic-bezier(.22,1,.36,1)';
-  el.style.transform='none';
-  // Backdrop disparaît
-  if(bd){bd.style.transition='opacity .32s ease';bd.style.opacity='0';setTimeout(()=>bd.remove(),340);}
-  el.addEventListener('transitionend',()=>{
-    el.style.transform='';el.style.transition='';el.style.transformOrigin='';
-    if(!_genFloating){updateExtraFieldsAndPreview();renderGenSummary();}
-  },{once:true});
-  _genFloatParent=null;_genFloatSibling=null;
-}
-function renderGenSummary(){
-  if(_genFloating)return;
-  const el=document.getElementById('genFormCol');
-  if(!el)return;
-  if(!selectedTemplateId){resetGenForm();return;}
-  const template=appData.templates.find(t=>t.id===selectedTemplateId);
-  const typeLabel=followType==='partenaire'?'Partenaire':'Patient';
-  const catLabel=selectedCategory||'';
-  const tplLabel=template?template.title:'';
-  const inner=document.getElementById('genFormInner');
-  if(inner)inner.style.display='none';
-  const container=document.getElementById('genSummaryContainer');
-  if(container)container.innerHTML='';
-  const bar=document.createElement('div');
-  bar.className='anam-summary-bar';bar.id='genSummaryBar';
-  bar.innerHTML=`<span class="anam-summary-chip genre">${escapeHtml(typeLabel)}</span><span class="anam-summary-sep">›</span><span class="anam-summary-chip sit">${escapeHtml(catLabel)}</span><span class="anam-summary-sep">›</span><span class="anam-summary-chip sit">${escapeHtml(tplLabel)}</span><span class="anam-summary-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifier</span>`;
-  bar.addEventListener('click',()=>{if(container)container.innerHTML='';resetGenForm();showGenPanel();});
-  if(container)container.appendChild(bar);
-}
+function showGenPanel(){openGenDrawer(false);}
+function settleGenPanel(){closeGenDrawer();}
+function renderGenSummary(){updateModifierBtn();}
 /* ===== Panneau flottant Anamnèse ===== */
 let _anamFloating=false,_anamFloatParent=null,_anamFloatSibling=null;
 function showAnamPanel(){
@@ -1391,17 +1358,11 @@ function teardownAnamPanel(){
 }
 
 function teardownGenPanel(){
-  const el=document.getElementById('genFormCol');
-  const bd=document.getElementById('genBackdrop');
-  if(el&&_genFloating&&_genFloatParent){
-    el.classList.remove('is-floating');
-    el.style.transform='';el.style.transition='';el.style.transformOrigin='';
-    if(_genFloatSibling)_genFloatParent.insertBefore(el,_genFloatSibling);
-    else _genFloatParent.appendChild(el);
-  }else if(el){el.classList.remove('is-floating');el.style.transform='';el.style.transition='';el.style.transformOrigin='';}
-  if(bd)bd.remove();
-  _genFloating=false;_genFloatParent=null;_genFloatSibling=null;
-  if(el)el.classList.remove('show-extra');
+  const d=document.getElementById('genDrawer');
+  const o=document.getElementById('genDrawerOverlay');
+  if(d)d.classList.remove('open');
+  if(o)o.classList.remove('open');
+  _genFloating=false;
   resetGenForm();
 }
 
@@ -1493,14 +1454,12 @@ function updateExtraFieldsAndPreview(){
     if(isHeureVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="ex. 14h00" readonly><button type="button" class="date-icon-btn" data-time-toggle="'+escapeHtml(v)+'" aria-label="Choisir une heure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button></div></div>';
     if(isDateVar(v))return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><div class="date-field-wrap"><input type="text" class="date-display-input" id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'" readonly><button type="button" class="date-icon-btn" data-date-toggle="'+escapeHtml(v)+'" aria-label="Choisir une date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div></div>';
     return '<div class="extra-field"><label for="extra-'+v+'">'+lbl+'</label><input id="extra-'+v+'" data-extra-var="'+escapeHtml(v)+'" value="'+escapeHtml(manualValues[v]||'')+'" placeholder="'+lbl+'"></div>';
-  }).join('')+(vars.length&&_genFloating?'<button type="button" class="btn-primary" id="genValiderBtn" style="width:100%;margin-top:14px;">Générer →</button>':'');
+  }).join('');
   ew.querySelectorAll('input[data-extra-var]:not(.date-display-input)').forEach(i=>{
     i.addEventListener('input',e=>{manualValues[e.target.dataset.extraVar]=e.target.value;renderPreviewOnly();});
     i.addEventListener('blur',e=>{if(!_genFloating&&(e.target.value||'').trim())updateExtraFieldsAndPreview();});
     i.addEventListener('keydown',e=>{if(e.key==='Enter'&&!_genFloating&&(e.target.value||'').trim()){e.preventDefault();updateExtraFieldsAndPreview();}});
   });
-  const _gvb=document.getElementById('genValiderBtn');
-  if(_gvb)_gvb.addEventListener('click',()=>{settleGenPanel();renderGenSummary();});
   ew.querySelectorAll('input[name="civilite"]').forEach(r=>r.addEventListener('change',e=>{civilite=e.target.value;renderPreviewOnly();}));
   async function parseSFClip(key){
     try{
@@ -2220,6 +2179,11 @@ function confirmDeleteAnam(id){
     if(da)confirmDeleteAnam(da.dataset.delAnam);
   });
   document.getElementById('addTemplateBtn').addEventListener('click',()=>{tutorialOnAction('addTemplateClicked');openTemplateForm(null);});
+  document.getElementById('nouveauTemplateBtn').addEventListener('click',()=>openGenDrawer(false));
+  document.getElementById('modifierTemplateBtn').addEventListener('click',()=>openGenDrawer(true));
+  document.getElementById('genDrawerClose').addEventListener('click',closeGenDrawer);
+  document.getElementById('genDrawerOverlay').addEventListener('click',closeGenDrawer);
+  document.getElementById('genererApercuBtn').addEventListener('click',closeGenDrawer);
 
   document.getElementById('settingsBtn').addEventListener('click',openSettingsForm);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeTutorial();}});
