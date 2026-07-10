@@ -2205,24 +2205,11 @@ function confirmDeleteAnam(id){
   document.getElementById('copyBodyBtn').addEventListener('click',async()=>{
     if(!selectedTemplateId)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
-    function extractText(el){
-      let t='';
-      el.childNodes.forEach(n=>{
-        if(n.nodeType===Node.TEXT_NODE){t+=n.textContent;}
-        else if(n.nodeName==='BR'){t+='\n';}
-        else if(n.nodeName==='P'){
-          if(t&&!t.endsWith('\n'))t+='\n';
-          if(n.childNodes.length===1&&n.firstChild.nodeName==='BR'){t+='\n';}
-          else{n.childNodes.forEach(c=>{if(c.nodeType===Node.TEXT_NODE)t+=c.textContent;else if(c.nodeName==='BR')t+='\n';else t+=c.textContent;});}
-        }else{t+=n.textContent;}
-      });
-      return t;
-    }
     const subjectEl=document.getElementById('previewSubject');
     const bodyEl=document.getElementById('previewBody');
     const subjectWrap=document.getElementById('previewSubjectWrap');
     const subject=(subjectWrap&&subjectWrap.style.display!=='none'&&subjectEl)?subjectEl.innerText.trim():'';
-    const body=bodyEl?extractText(bodyEl):'';
+    const body=bodyEl?bodyEl.innerText:'';
     const toCopy=subject?subject+'\n'+body:body;
     const copied=await copyText(toCopy);showToast(copied?'Message copié ✓':"Impossible de copier.");if(copied)tutorialOnAction('copied');
   });
