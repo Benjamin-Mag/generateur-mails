@@ -334,7 +334,10 @@ html,body{height:100%;}
 .input-clear-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted-ink);font-size:1.05rem;line-height:1;width:26px;height:26px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .input-clear-btn:hover{color:var(--accent);background:var(--accent-soft);}
 .modal .hint{margin:8px 0 0;}
-.radio-row{display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;}
+.radio-row{display:flex;gap:6px 12px;margin-top:6px;flex-wrap:wrap;align-items:center;}
+.add-cat-btn{background:none;border:1.5px dashed var(--line);border-radius:50%;width:22px;height:22px;cursor:pointer;color:var(--muted-ink);font-size:16px;display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0;flex-shrink:0;transition:border-color .15s,color .15s;}
+.add-cat-btn:hover{border-color:var(--accent);color:var(--accent);}
+.new-cat-input{border:1px solid var(--line);background:var(--card-bg);border-radius:6px;padding:7px 10px;font-size:.88rem;color:var(--ink);flex:1;min-width:0;}
 .radio-row label{display:flex;align-items:center;gap:6px;font-size:.85rem;font-weight:500;text-transform:none;color:var(--ink);margin:0;}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
 .err-msg{color:var(--accent);font-size:.78rem;margin-top:4px;display:none;}
@@ -823,7 +826,7 @@ const OLD_FOOTERS = [
 const DEFAULT_EMAIL_FOOTER = "_________________________________________________\n\nAudibene - Pour bien entendre\nTour la Marseillaise\n2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille\n\nAudibene GmbH\n820 709 046 R.C.S. Marseille\nSiège de la société : Berlin\nGérants : Paul Crusius, Dr. Marco Vietor, Marco Wiesmann";
 
 /* ========== App state ========== */
-let appData = {templates:[],anamnese:{},customSituations:[],signatureName:'',phone:'',advisorGenre:'M',onboardingDone:false,tutorialDone:false,emailFooter:DEFAULT_EMAIL_FOOTER,sigPatientMail:'',sigPatientSMS:'',sigPartenaireMail:''};
+let appData = {templates:[],anamnese:{},customSituations:[],customCategories:{patient:[],partenaire:[]},signatureName:'',phone:'',advisorGenre:'M',onboardingDone:false,tutorialDone:false,emailFooter:DEFAULT_EMAIL_FOOTER,sigPatientMail:'',sigPatientSMS:'',sigPartenaireMail:''};
 let activeTab='anamnese';
 let manualValues={}, civilite=null, followType=null, selectedCategory=null, selectedTemplateId=null;
 let datePickerOpenVar=null, datePickerView={};
@@ -838,7 +841,7 @@ function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','
 function fieldLabel(v){if(FIELD_LABELS[v])return FIELD_LABELS[v];const c=v.replace(/_/g,' ');return c.charAt(0).toUpperCase()+c.slice(1);}
 function isDateVar(v){return /date/i.test(v);}
 function isHeureVar(v){return /heure/i.test(v);}
-function getCurrentCategoryList(){return followType==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES;}
+function getCurrentCategoryList(){const base=followType==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES;const custom=(appData.customCategories&&appData.customCategories[followType||'patient'])||[];return [...base,...custom];}
 function extractVars(text){const re=/\{\{\s*([^}]+?)\s*\}\}/g,seen=new Set(),vars=[];let m;while((m=re.exec(text))){const n=m[1].trim();if(n&&!seen.has(n)){seen.add(n);vars.push(n);}}return vars;}
 function buildFilledText(text,values){return text.replace(/\{\{\s*([^}]+?)\s*\}\}/g,(m,n)=>{const v=values[n.trim()];return(v&&String(v).trim().length)?v:m;});}
 function resolveGenre(text,genre){if(!genre)return text;text=text.replace(/(\S+?)er\(ère\)/g,(m,w)=>genre==='Madame'?w+'ère':w+'er');text=text.replace(/(\S+?)\(e\)/g,(m,w)=>genre==='Madame'?w+'e':w);return text;}
@@ -884,7 +887,10 @@ async function loadData(){
   let changed=false;
   OLD_FOOTERS.forEach(old=>{
     if(appData.emailFooter===old){
-      appData.templates.forEach(t=>{if(t.body)t.body=t.body.split(old).join(DEFAULT_EMAIL_FOOTER);});
+      if(!appData.customCategories)appData.customCategories={patient:[],partenaire:[]};
+  if(!appData.customCategories.patient)appData.customCategories.patient=[];
+  if(!appData.customCategories.partenaire)appData.customCategories.partenaire=[];
+  appData.templates.forEach(t=>{if(t.body)t.body=t.body.split(old).join(DEFAULT_EMAIL_FOOTER);});
       appData.emailFooter=DEFAULT_EMAIL_FOOTER;changed=true;
     }
   });
@@ -899,6 +905,9 @@ async function loadData(){
   appData.templates=appData.templates.filter(t=>!REMOVED_IDS.includes(t.id));
   if(appData.templates.length!==before)changed=true;
   const _sn=appData.signatureName;
+  if(!appData.customCategories)appData.customCategories={patient:[],partenaire:[]};
+  if(!appData.customCategories.patient)appData.customCategories.patient=[];
+  if(!appData.customCategories.partenaire)appData.customCategories.partenaire=[];
   appData.templates.forEach(t=>{
     ['body','smsCompanion','subject'].forEach(k=>{
       if(typeof t[k]==='string'){
@@ -917,6 +926,9 @@ async function loadData(){
   ['sigPatientMail','sigPatientSMS','sigPartenaireMail'].forEach(k=>{
     if(typeof appData[k]==='string'&&_sn&&appData[k].includes(_sn)){appData[k]=appData[k].split(_sn).join('{{nom_conseiller}}');changed=true;}
   });
+  if(!appData.customCategories)appData.customCategories={patient:[],partenaire:[]};
+  if(!appData.customCategories.patient)appData.customCategories.patient=[];
+  if(!appData.customCategories.partenaire)appData.customCategories.partenaire=[];
   appData.templates.forEach(t=>{
     if(!t.audience){t.audience=(t.id===NEW_TEMPLATE.id)?'patient':(SUIVI_TEMPLATES.some(s=>s.id===t.id)?'partenaire':'patient');changed=true;}
     if(t.audience==='partenaire'&&!t.partnerCategory){const s=SUIVI_TEMPLATES.find(s=>s.id===t.id);t.partnerCategory=s?s.partnerCategory:'CC1';changed=true;}
@@ -1985,13 +1997,31 @@ function wireAnamModal(root,idx,drafts){
 
 /* ========== Template modal ========== */
 function renderFormCategoryField(av,cc){
-  const l=av==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES_FORM,w=document.getElementById('formCategoryField');
+  if(!appData.customCategories)appData.customCategories={patient:[],partenaire:[]};
+  if(!appData.customCategories[av])appData.customCategories[av]=[];
+  const base=av==='partenaire'?PARTNER_CATEGORIES:PATIENT_CATEGORIES_FORM;
+  const custom=appData.customCategories[av];
+  const l=[...base,...custom];
+  const w=document.getElementById('formCategoryField');
   if(!w)return;
-  w.innerHTML='<label>Catégorie</label><div class="radio-row">'+l.map(o=>'<label><input type="radio" name="f-category" value="'+o.id+'" '+(cc===o.id?'checked':'')+'>  '+o.label+'</label>').join('')+'</div>';
-  w.querySelectorAll('input[name="f-category"]').forEach(r=>r.addEventListener('change',e=>{
-    const etiq=document.getElementById('f-category');
-    if(etiq)etiq.value=e.target.value;
-  }));
+  w.innerHTML='<label>Catégorie</label><div class="radio-row" id="catRadioRow">'+l.map(o=>'<label class="cat-radio-label"><input type="radio" name="f-category" value="'+escapeHtml(o.id)+'" '+(cc===o.id?'checked':'')+'>'+escapeHtml(o.label)+'</label>').join('')+'<button type="button" class="add-cat-btn" id="addCatBtn" title="Nouvelle catégorie">+</button></div><div id="newCatRow" style="display:none;margin-top:8px;gap:6px;align-items:center;"><input id="newCatInput" class="new-cat-input" placeholder="Nom de la catégorie" maxlength="30"><button type="button" class="btn-primary small" id="newCatConfirm">Créer</button><button type="button" class="btn-outline small" id="newCatCancel">✕</button></div>';
+  w.querySelectorAll('input[name="f-category"]').forEach(r=>r.addEventListener('change',e=>{const etiq=document.getElementById('f-category');if(etiq)etiq.value=e.target.value;}));
+  const addBtn=document.getElementById('addCatBtn');
+  const newRow=document.getElementById('newCatRow');
+  const newInput=document.getElementById('newCatInput');
+  addBtn.addEventListener('click',()=>{newRow.style.display='flex';newInput.focus();});
+  document.getElementById('newCatCancel').addEventListener('click',()=>{newRow.style.display='none';newInput.value='';});
+  async function createCat(){
+    const name=newInput.value.trim();
+    if(!name)return;
+    if(l.some(o=>o.id.toLowerCase()===name.toLowerCase())){newInput.classList.add('genre-alert');setTimeout(()=>newInput.classList.remove('genre-alert'),600);return;}
+    const cat={id:name,label:name};
+    appData.customCategories[av].push(cat);
+    await persist();
+    renderFormCategoryField(av,name);
+  }
+  document.getElementById('newCatConfirm').addEventListener('click',createCat);
+  newInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();createCat();}});
 }
 function buildModalHTML(aud,editing,nl,ni){
   const ic=editing?(aud==='partenaire'?(editing.partnerCategory||'CC1'):(editing.patientCategory||'Reconfirmation')):'Reconfirmation';
