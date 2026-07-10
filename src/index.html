@@ -2094,10 +2094,10 @@ function confirmDeleteAnam(id){
   document.getElementById('copyBodyBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t)return;
     if(needsGenreChoice()&&!civilite){showCenterAlert('Sélectionne le genre du patient avant de copier.');return;}
-    const se=document.getElementById('previewSubject');
-    const be=document.getElementById('previewBody');
-    const subject=(se&&se.offsetParent!==null?se.innerText:'').trim();
-    const body=(be?be.innerText:'').trim();
+    const vals=Object.assign({},getSystemValues(),manualValues,{nom:getRecipientNomValue(),'nom partenaire':manualValues['nom partenaire']||'',adresse:manualValues['adresse']?'\n'+manualValues['adresse']+'\n':''});
+    const genre=getEffectiveGenre();
+    const subject=t.subject?resolveGenre(buildFilledText(t.subject,vals),genre):'';
+    const body=resolveGenre(buildFilledText(t.body,vals),genre);
     const toCopy=subject?subject+'\n'+body:body;
     const copied=await copyText(toCopy);showToast(copied?'Message copié ✓':"Impossible de copier.");if(copied)tutorialOnAction('copied');
   });
