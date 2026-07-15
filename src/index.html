@@ -886,6 +886,7 @@ async function loadData(){
   appData.sigPatientMail=(typeof parsed.sigPatientMail==='string')?parsed.sigPatientMail:'';
   appData.sigPatientSMS=(typeof parsed.sigPatientSMS==='string')?parsed.sigPatientSMS:'';
   appData.sigPartenaireMail=(typeof parsed.sigPartenaireMail==='string')?parsed.sigPartenaireMail:'';
+  appData.customCategories=parsed.customCategories&&typeof parsed.customCategories==='object'?parsed.customCategories:{patient:[],partenaire:[]};
 
   let changed=false;
   OLD_FOOTERS.forEach(old=>{
