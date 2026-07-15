@@ -1081,8 +1081,14 @@ function renderTimePopover(v,anchorEl){
   });
 }
 
-async function copyText(text){
-  try{await navigator.clipboard.writeText(text);return true;}
+async function copyText(text,html){
+  try{
+    if(html&&window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([text],{type:'text/plain'}),'text/html':new Blob([html],{type:'text/html'})})]);
+      return true;
+    }
+    await navigator.clipboard.writeText(text);return true;
+  }
   catch(e){try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);return true;}catch(e2){return false;}}
 }
 
@@ -2203,10 +2209,27 @@ function confirmDeleteAnam(id){
     const subjectEl=document.getElementById('previewSubject');
     const bodyEl=document.getElementById('previewBody');
     const subjectWrap=document.getElementById('previewSubjectWrap');
-    const subject=(subjectWrap&&subjectWrap.style.display!=='none'&&subjectEl)?subjectEl.innerText.trim():'';
-    const body=bodyEl?bodyEl.innerText:'';
-    const toCopy=subject?subject+'\n'+body:body;
-    const copied=await copyText(toCopy);showToast(copied?'Message copié ✓':"Impossible de copier.");if(copied)tutorialOnAction('copied');
+    const showSubject=subjectWrap&&subjectWrap.style.display!=='none'&&subjectEl;
+    function cleanHtml(el){return el.innerHTML.replace(/<mark[^>]*>(.*?)<\/mark>/gi,'$1');}
+    function elToText(el){
+      let t='';
+      el.childNodes.forEach(n=>{
+        if(n.nodeType===Node.TEXT_NODE){t+=n.textContent;}
+        else if(n.nodeName==='BR'){t+='\n';}
+        else if(n.nodeName==='P'){
+          if(t&&!t.endsWith('\n'))t+='\n';
+          if(n.childNodes.length===1&&n.firstChild.nodeName==='BR'){t+='\n';}
+          else{n.childNodes.forEach(c=>{if(c.nodeType===Node.TEXT_NODE)t+=c.textContent;else if(c.nodeName==='BR')t+='\n';else t+=c.textContent;});}
+        }else{t+=n.textContent;}
+      });
+      return t;
+    }
+    const subject=showSubject?subjectEl.innerText.trim():'';
+    const bodyText=bodyEl?elToText(bodyEl):'';
+    const bodyHtml=bodyEl?cleanHtml(bodyEl):'';
+    const toCopyText=subject?subject+'\n'+bodyText:bodyText;
+    const toCopyHtml=subject?'<p>'+escapeHtml(subject)+'</p>'+bodyHtml:bodyHtml;
+    const copied=await copyText(toCopyText,toCopyHtml);showToast(copied?'Message copié ✓':"Impossible de copier.");if(copied)tutorialOnAction('copied');
   });
   document.getElementById('copySmsBtn').addEventListener('click',async()=>{
     const t=appData.templates.find(t=>t.id===selectedTemplateId);if(!t||!t.smsCompanion)return;
