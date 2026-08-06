@@ -1,0 +1,174 @@
+<title>Politique de confidentialité — Coller Mail Salesforce</title>
+<style>
+  :root {
+    --bg: #f8f8f6;
+    --surface: #ffffff;
+    --ink: #1a1f2e;
+    --muted: #5a6075;
+    --accent: #1B4F9B;
+    --accent-light: #e8eef7;
+    --border: #e0e3ec;
+    --radius: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #13161f;
+      --surface: #1c2030;
+      --ink: #e8eaf0;
+      --muted: #8a90a8;
+      --accent: #5b8de0;
+      --accent-light: #1e2a42;
+      --border: #2a2f42;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f8f8f6; --surface: #ffffff; --ink: #1a1f2e; --muted: #5a6075;
+    --accent: #1B4F9B; --accent-light: #e8eef7; --border: #e0e3ec;
+  }
+  :root[data-theme="dark"] {
+    --bg: #13161f; --surface: #1c2030; --ink: #e8eaf0; --muted: #8a90a8;
+    --accent: #5b8de0; --accent-light: #1e2a42; --border: #2a2f42;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 48px 20px 80px;
+  }
+
+  .doc {
+    max-width: 680px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 48px 56px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    text-wrap: balance;
+    margin-bottom: 8px;
+  }
+
+  .meta {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 32px 0 10px;
+  }
+
+  p { margin-bottom: 12px; color: var(--ink); }
+  p:last-child { margin-bottom: 0; }
+
+  ul {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+  li { margin-bottom: 5px; }
+
+  .highlight {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+
+  .contact-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .doc { padding: 28px 24px; }
+  }
+</style>
+
+<div class="doc">
+  <div class="badge">Extension Microsoft Edge</div>
+  <h1>Politique de confidentialité<br>Coller Mail Salesforce</h1>
+  <p class="meta">Dernière mise à jour : juillet 2026</p>
+
+  <div class="highlight">
+    Cette extension ne collecte, ne stocke et ne transmet aucune donnée personnelle à des serveurs externes.
+  </div>
+
+  <h2>Fonctionnement de l'extension</h2>
+  <p>L'extension <strong>Coller Mail Salesforce</strong> est un outil interne destiné aux conseillers audibene. Elle s'exécute exclusivement dans le navigateur de l'utilisateur et interagit uniquement avec les pages Salesforce Lightning.</p>
+
+  <h2>Données accédées</h2>
+  <p>L'extension accède temporairement aux informations suivantes, uniquement dans le navigateur et le temps d'une action :</p>
+  <ul>
+    <li><strong>Contenu du presse-papier</strong> : pour lire le mail généré et le coller dans l'éditeur Salesforce.</li>
+    <li><strong>Contenu de la page Salesforce active</strong> : pour lire le nom du patient et du partenaire affiché à l'écran.</li>
+  </ul>
+  <p>Ces données ne sont jamais enregistrées, ni transmises à un tiers.</p>
+
+  <h2>Données non collectées</h2>
+  <p>L'extension ne collecte pas :</p>
+  <ul>
+    <li>D'historique de navigation</li>
+    <li>D'identifiants ou mots de passe</li>
+    <li>De données de santé ou données patients</li>
+    <li>De statistiques d'utilisation</li>
+  </ul>
+
+  <h2>Ressources externes</h2>
+  <p>L'extension charge un logo hébergé sur les serveurs Salesforce d'audibene (<em>betterhearing.file.force.com</em>) pour l'insérer dans les mails. Aucune autre requête externe n'est effectuée.</p>
+
+  <h2>Stockage local</h2>
+  <p>L'extension n'utilise pas de stockage persistant (cookies, localStorage, IndexedDB). Aucune donnée n'est conservée entre deux sessions.</p>
+
+  <h2>Partage des données</h2>
+  <p>Aucune donnée n'est partagée avec des tiers, revendue ou utilisée à des fins publicitaires.</p>
+
+  <h2>Contact</h2>
+  <div class="contact-block">
+    Pour toute question concernant cette politique de confidentialité, contactez :<br><br>
+    <strong>audibene</strong><br>
+    Tour la Marseillaise — 2bis Bd Euromediterranée Quai d'Arenc, 13002 Marseille<br>
+    <a href="mailto:benjamin.mag.p@gmail.com">benjamin.mag.p@gmail.com</a>
+  </div>
+</div>
