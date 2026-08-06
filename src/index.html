@@ -994,6 +994,7 @@ async function initStorageAndLoad(){
     };
     // App still loads, but without file persistence until authorized
     await loadData();
+    renderAll();
     return;
   }
 
