@@ -972,8 +972,8 @@ async function initStorageAndLoad(){
         dirHandle=handle;
         await loadData();
         renderAll();
-        if(!appData.onboardingDone){showOnboardingModal();}
-        else if(!appData.tutorialDone){startMainTutorial();}
+        if(!appData.onboardingDone&&!localStorage.getItem('gm_onboardingDone')){showOnboardingModal();}
+        else if(!appData.tutorialDone&&!localStorage.getItem('gm_tutorialDone')){startMainTutorial();}
         return;
       }
     } catch(e){}
@@ -1708,6 +1708,7 @@ function _renderChecklistUI(items){
 async function finishTutorial(){
   closeTutorial();
   appData.tutorialDone=true;
+  localStorage.setItem('gm_tutorialDone','1');
   await persist();
   showToast('Tutoriel terminé 🎉');
 }
@@ -1857,6 +1858,7 @@ function showOnboardingModal(){
     appData.phone=phone;
     appData.advisorGenre=genre;
     appData.onboardingDone=true;
+    localStorage.setItem('gm_onboardingDone','1');
     await persist();
     closeModal();renderTemplatesGrid();renderTemplateSelect();
     showToast('Bienvenue '+name+' !');
