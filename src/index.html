@@ -2247,7 +2247,7 @@ function confirmDeleteAnam(id){
     if(da)confirmDeleteAnam(da.dataset.delAnam);
   });
   document.getElementById('addTemplateBtn').addEventListener('click',()=>{tutorialOnAction('addTemplateClicked');openTemplateForm(null);});
-  document.getElementById('nouveauTemplateBtn').addEventListener('click',()=>openGenDrawer(false));
+  document.getElementById('nouveauTemplateBtn').addEventListener('click',()=>{manualValues={};civilite=null;followType=null;selectedCategory=null;selectedTemplateId=null;datePickerView={};renderFollowTypeRow();renderGenreRow();renderCategoryRow();updateCategoryBlockVisibility();renderTemplateSelect();updateExtraFieldsAndPreview();updateModifierBtn();openGenDrawer(false);});
   document.getElementById('modifierTemplateBtn').addEventListener('click',()=>openGenDrawer(true));
   document.getElementById('genDrawerClose').addEventListener('click',closeGenDrawer);
   document.getElementById('genDrawerOverlay').addEventListener('click',closeGenDrawer);
