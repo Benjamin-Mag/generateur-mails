@@ -2007,10 +2007,16 @@ function renderFormCategoryField(av,cc,deleteMode){
   const l=[...base,...custom];
   const w=document.getElementById('formCategoryField');
   if(!w)return;
-  const radioLabels=l.map(o=>{
+  const radioLabels=l.map((o,idx)=>{
     const isCustom=custom.some(c=>c.id===o.id);
-    const del=deleteMode&&isCustom?'<button type="button" class="del-cat-btn" data-cat-id="'+escapeHtml(o.id)+'" title="Supprimer">×</button>':'';
-    return '<label class="cat-radio-label"><input type="radio" name="f-category" value="'+escapeHtml(o.id)+'" '+(cc===o.id?'checked':'')+'>'+escapeHtml(o.label)+del+'</label>';
+    const customIdx=custom.findIndex(c=>c.id===o.id);
+    const editBtns=deleteMode&&isCustom
+      ?'<button type="button" class="del-cat-btn rename-cat-btn" data-cat-id="'+escapeHtml(o.id)+'" data-cat-label="'+escapeHtml(o.label)+'" title="Renommer">✎</button>'
+       +(customIdx>0?'<button type="button" class="del-cat-btn move-cat-btn" data-cat-id="'+escapeHtml(o.id)+'" data-direction="-1" title="Monter">↑</button>':'')
+       +(customIdx<custom.length-1?'<button type="button" class="del-cat-btn move-cat-btn" data-cat-id="'+escapeHtml(o.id)+'" data-direction="1" title="Descendre">↓</button>':'')
+       +'<button type="button" class="del-cat-btn" data-cat-id="'+escapeHtml(o.id)+'" title="Supprimer">×</button>'
+      :'';
+    return '<label class="cat-radio-label"><input type="radio" name="f-category" value="'+escapeHtml(o.id)+'" '+(cc===o.id?'checked':'')+'>'+escapeHtml(o.label)+editBtns+'</label>';
   }).join('');
   const minusActive=deleteMode?' active':'';
   w.innerHTML='<label>Catégorie</label><div class="radio-row" id="catRadioRow">'+radioLabels+'<button type="button" class="add-cat-btn" id="addCatBtn" title="Nouvelle catégorie">+</button><button type="button" class="add-cat-btn minus-cat-btn'+minusActive+'" id="delCatModeBtn" title="Supprimer une catégorie">−</button></div><div id="newCatRow" style="display:none;margin-top:8px;gap:6px;align-items:center;"><input id="newCatInput" class="new-cat-input" placeholder="Nom de la catégorie" maxlength="30"><button type="button" class="btn-primary small" id="newCatConfirm">Créer</button><button type="button" class="btn-outline small" id="newCatCancel">✕</button></div>';
@@ -2036,8 +2042,8 @@ function renderFormCategoryField(av,cc,deleteMode){
     const curCat=w.querySelector('input[name="f-category"]:checked');
     renderFormCategoryField(av,curCat?curCat.value:cc,!deleteMode);
   });
-  // Boutons × sur catégories custom
-  w.querySelectorAll('.del-cat-btn').forEach(btn=>btn.addEventListener('click',async e=>{
+  // Boutons × supprimer
+  w.querySelectorAll('.del-cat-btn:not(.rename-cat-btn):not(.move-cat-btn)').forEach(btn=>btn.addEventListener('click',async e=>{
     e.preventDefault();
     const id=btn.dataset.catId;
     appData.customCategories[av]=appData.customCategories[av].filter(c=>c.id!==id);
@@ -2045,6 +2051,42 @@ function renderFormCategoryField(av,cc,deleteMode){
     const curCat=w.querySelector('input[name="f-category"]:checked');
     const nextCat=(curCat&&curCat.value!==id)?curCat.value:(base[0]?base[0].id:null);
     renderFormCategoryField(av,nextCat,true);
+  }));
+  // Boutons ↑↓ déplacer
+  w.querySelectorAll('.move-cat-btn').forEach(btn=>btn.addEventListener('click',async e=>{
+    e.preventDefault();
+    const id=btn.dataset.catId;
+    const dir=parseInt(btn.dataset.direction);
+    const cats=appData.customCategories[av];
+    const i=cats.findIndex(c=>c.id===id);
+    if(i+dir<0||i+dir>=cats.length)return;
+    [cats[i],cats[i+dir]]=[cats[i+dir],cats[i]];
+    await persist();
+    const curCat=w.querySelector('input[name="f-category"]:checked');
+    renderFormCategoryField(av,curCat?curCat.value:cc,true);
+  }));
+  // Boutons ✎ renommer
+  w.querySelectorAll('.rename-cat-btn').forEach(btn=>btn.addEventListener('click',e=>{
+    e.preventDefault();
+    const id=btn.dataset.catId;
+    const oldLabel=btn.dataset.catLabel;
+    const label=btn.closest('label');
+    if(!label)return;
+    const inp=document.createElement('input');
+    inp.value=oldLabel;inp.className='new-cat-input';inp.style.marginLeft='6px';inp.maxLength=30;
+    label.appendChild(inp);inp.focus();inp.select();
+    async function doRename(){
+      const name=inp.value.trim();
+      if(!name||name===oldLabel){renderFormCategoryField(av,cc,true);return;}
+      if(l.some(o=>o.id!==id&&o.id.toLowerCase()===name.toLowerCase())){inp.classList.add('genre-alert');setTimeout(()=>inp.classList.remove('genre-alert'),600);return;}
+      const cat=appData.customCategories[av].find(c=>c.id===id);
+      if(cat){cat.label=name;cat.id=name;}
+      appData.templates.forEach(t=>{if(t.audience===av&&(t.partnerCategory===id||t.patientCategory===id)){if(t.audience==='partenaire')t.partnerCategory=name;else t.patientCategory=name;}});
+      await persist();
+      renderFormCategoryField(av,name,true);
+    }
+    inp.addEventListener('blur',doRename);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doRename();}if(e.key==='Escape'){renderFormCategoryField(av,cc,true);}});
   }));
 }
 function buildModalHTML(aud,editing,nl,ni){
