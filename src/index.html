@@ -1263,6 +1263,7 @@ function openGenDrawer(isModifier){
   document.getElementById('genDrawer').classList.add('open');
   document.getElementById('genDrawerOverlay').classList.add('open');
   _genFloating=true;
+  updateExtraFieldsAndPreview();
 }
 function closeGenDrawer(){
   document.getElementById('genDrawer').classList.remove('open');
