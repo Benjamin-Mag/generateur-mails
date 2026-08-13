@@ -1147,10 +1147,14 @@ function renderTemplatesGrid(){
       +'</div>';
   }
   const pl=list.filter(t=>t.audience!=='partenaire'),pal=list.filter(t=>t.audience==='partenaire');
-  const palCards=pal.map(rc);
   let html=makePatientGroup(pl,false);
   {
-    html+=makeGroup('partenaire','Mails partenaires',palCards,'Aucun modèle partenaire.');
+    // Groupe partenaire avec sections par catégorie
+    const chevron='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+    let palHtml;
+    if(!pal.length){palHtml='<div class="group-body"><div class="empty-state">Aucun modèle partenaire.</div></div>';}
+    else{const cats=[],bycat={};pal.forEach(t=>{const c=t.partnerCategory||'Autre';if(!bycat[c]){bycat[c]=[];cats.push(c);}bycat[c].push(t);});let body='',gi=0;cats.forEach((cat,ci)=>{const sep=ci>0?'<div class="cat-divider"></div>':'';const catCards=bycat[cat].map(t=>rc(t).replace('<div class="card"','<div class="card" style="--i:'+gi++ +'"'));body+=sep+'<div class="cat-section"><span class="cat-section-label">'+escapeHtml(cat)+'</span><div class="grid">'+catCards.join('')+'</div></div>';});palHtml='<div class="group-body">'+body+'</div>';}
+    html+='<div class="template-group partenaire"><div class="group-header" data-toggle-group><span class="group-count">'+pal.length+'</span><span class="model-group-title">Mails partenaires</span><span class="group-chevron">'+chevron+'</span></div>'+palHtml+'</div>';
     const situations=appData.customSituations||[];
     const anamCards=situations.map(s=>{
       const text=(appData.anamnese[s.id]||{text:''}).text||'';
